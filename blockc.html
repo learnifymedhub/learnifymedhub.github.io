@@ -1,0 +1,1874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block C</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    
+        .container {
+            text-align: center;
+            max-width: 80%;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 58%;
+        }
+    
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+    
+        button:hover {
+            background: #2575fc;
+        }
+    
+        .question-container, .result-container, .login-container {
+            display: none;
+        }
+    
+        .question-container {
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            min-height: 300px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .options label {
+            display: block;
+            margin: -10px 0;
+        }
+    
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+    
+        .result-container ul {
+            text-align: left;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-container ul li {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .result-container ul li .question {
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-container ul li .options {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+    
+        .result-container ul li .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Enhanced Timer Styles */
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6a00, #ee0979); /* Gradient background */
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    
+        #timer:hover {
+            transform: scale(1.1); /* Slight scaling effect on hover */
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Change gradient on hover */
+        }
+    
+        #timer span {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Timer animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        #timer {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+    
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin: 20px auto;
+        }
+    
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    
+        .form-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    
+        .form-container input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .form-container button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 37%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .form-container button:hover {
+            background: #2575fc;
+        }
+    
+        .login-container input {
+            width: 51%;
+            padding: 13px;
+            margin: 16px;
+        }
+    
+        .login-container button {
+            width: 16%;
+            margin-top: 10px;
+        }
+    
+        p {
+            float: left;
+            padding: 2px 100px;
+            text-align: left;
+            line-height: 20px;
+        }
+    
+        #question {
+            font-size: 20px;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #timer {
+                font-size: 18px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+            .form-container {
+                width: 90%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            #timer {
+                font-size: 16px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .para1{
+                padding: 0px 20px;
+            }
+            .login-credentials{
+                font-size: 1.5em ;
+                line-height: 33px;
+            }
+            .login-container button {
+                width: 25%;
+                padding: 10px 25px;
+                margin-top: 10px;
+                text-align: center;
+            }
+    
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .login-container input {
+                width: 71%;
+                padding: 13px;
+                margin: 16px;
+            }
+    
+            .form-container {
+                width: 73%;
+            }
+            button {
+                font-size: 12px;
+                padding: 10px 25px;
+            }
+            #timer {
+                font-size: 9px;
+            }
+            .form-container h2 {
+                font-size: 18px;
+            }
+            .form-container input {
+                width: 84%;
+            }
+            #question {
+                font-size: 16px;
+            }
+            .options label {
+                font-size: 14px;
+            }
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-container">
+            <h1 class=" login-credentials">Enter Your Login Credentials </h1>
+            <input type="text" id="user-name" placeholder="Enter your Name" class="login-input"> <br>
+            <input type="email" id="user-gmail" placeholder="Enter your Gmail" class="login-input"> <br>
+            <input type="text" id="user-id" placeholder="Enter your ID" class="login-input"> <br>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input"> <br>
+            <button onclick="validateLogin()">Start Quiz</button>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation-buttons">
+                <button id="previous-button" onclick="previousQuestion()" style="display:none;">Previous</button>
+                <button id="next-button" onclick="nextQuestion()">Next</button>
+                <button id="skip-button" onclick="skipQuestion()">Skip</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+            <h1>Quiz Result</h1>
+            <h2>Your Score: <span id="score"></span></h2>
+            <ul id="answer-key"></ul>
+            
+
+            <div class="form-container">
+                <h2>Submit Your Details</h2>
+                <form onsubmit="sendmail(event)">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Start Container -->
+        <div class="start-container">
+            <h1>Welcome to the Block C Quiz</h1>
+            <h3>Important Instructions for Online Quiz</h3>
+            <p class="para1">
+
+                Please note that this online quiz is time-restricted and consists of 120 multiple-choice questions. It is essential to attempt the quiz within the allotted time frame. <br>  <br>
+                
+                <strong>Security Notice:</strong> This quiz contains high security layers, and any attempts to capture screenshots or screen recordings will result in immediate blocking of access. <br> <br>
+                
+               <strong> Availability:</strong> This quiz will be available to you until your final exam. <br> <br>
+                
+                To access the quiz, please provide the following information: <br> <br>
+                <strong>
+                - Username<br>
+                - Gmail address<br>
+                - User ID<br>
+                - password</strong> <br>  <br>
+                Please note that selected MCQ options cannot be changed, so choose carefully. After attempting all main questions, click 'Finish' to review skipped questions. Skipped MCQs will appear immediately, and clicking 'Next' after the last skipped question will display your results. Review each question thoughtfully, as submissions are final. <br>  <br> <strong> <em>Please enter your username in the designated input area at the bottom of the results section to confirm your submission.</em> </strong> <br> <br>
+                
+               We appreciate your cooperation and adherence to theseguidelines. <br>  <br> </p>
+            <button onclick="showLogin()">Start</button>
+        </div>
+
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdP3lE-1OjWkzp7za");
+        })();
+
+        function sendmail(event) {
+            event.preventDefault();
+
+            const params = {
+                username: document.getElementById("username").value,
+                score: document.getElementById("score").textContent,
+            };
+
+            emailjs.send("lmhservice3541", "lmhtemplate3541", params)
+                .then(
+                    (res) => {
+                        alert("Email sent successfully! Status: " + res.status);
+                    },
+                    (err) => {
+                        console.error("Failed to send email:", err);
+                        alert("Failed to send email. Please try again.");
+                    }
+                );
+        }
+
+        const allowedUsers = [
+        { name: "Admin Arsalan", gmail: "word3541@gmail.com", username: "Admin123" , password: "Admin123"},
+        { name: "Arif Khan", gmail: "akbeliever1@gmail.com", username: "Arif3275669640",password: "arif3541" },
+        { name: "Waleed Iqbal", gmail: "waleediqbal8584931@gmail.com", username: "Waleed3139429903",password: "waleed3541" },
+           
+        ];
+        const questions = [
+        {
+        "text": "Expiratory muscles contract at the time of:",
+        "options": ["Deep inspiration", "Normal inspiration and expiration", "Forceful expiration", "Normal expiration", "Slow expiration"],
+        "answer": "Forceful expiration",
+        "description": "Expiratory muscles such as the internal intercostals and abdominal muscles contract during forceful expiration to actively push air out."
+    },
+    {
+        "text": "Inflammation of the lung covering causing severe chest pain is:",
+        "options": ["Emphysema", "Pleurisy", "Asphyxia", "Hypoxia", "Pneumonia"],
+        "answer": "Pleurisy",
+        "description": "Pleurisy refers to inflammation of the pleura, causing sharp chest pain during respiration."
+    },
+    {
+        "text": "The impulse for voluntary muscles for forceful breathing starts in:",
+        "options": ["Medulla (Pons)", "Vagus nerve", "Cerebral hemispheres", "Spinal cord", "Cerebrospinal fluids"],
+        "answer": "Cerebral hemispheres",
+        "description": "Voluntary control of respiration, especially during forceful breathing, is regulated by the motor cortex in the cerebral hemispheres."
+    },
+    {
+        "text": "Fick's law of diffusion is related to:",
+        "options": ["Diffusion and surface area", "Diffusion and membrane potential", "Diffusion and water content", "Diffusion and pore diameter", "Surface area and membrane potential"],
+        "answer": "Diffusion and surface area",
+        "description": "Fick's law describes the rate of gas transfer across a membrane as proportional to the surface area and concentration gradient."
+    },
+    {
+        "text": "The main respiratory control neurons:",
+        "options": ["Send out regular bursts of impulses to expiratory muscles during quiet respiration", "Are unaffected by stimulation of pain receptors", "Are located in the pons", "Send out regular bursts of impulses to inspiratory muscles during quiet respiration", "Are unaffected by impulses from the cerebral cortex"],
+        "answer": "Send out regular bursts of impulses to inspiratory muscles during quiet respiration",
+        "description": "During quiet breathing, respiratory control neurons in the medulla send rhythmic impulses to inspiratory muscles."
+    },
+    {
+        "text": "With respect to dead space:",
+        "options": [
+            "Dead space volume is equal to the person's weight in kg",
+            "For a constant minute ventilation, alveolar ventilation is decreased as respiratory rate increases",
+            "Anatomic dead space is less than physiological dead space in healthy persons",
+            "Physiological dead space is measured by analysis of single breath nitrogen curves",
+            "Total dead space equals physiological space + anatomic dead space"
+        ],
+        "answer": "For a constant minute ventilation, alveolar ventilation is decreased as respiratory rate increases",
+        "description": "Higher respiratory rates reduce alveolar ventilation due to increased proportion of dead space ventilation."
+    },
+
+  {
+        "text": "Which of the following is a primary function of alveoli?",
+        "options": ["Oxygen storage", "Gas exchange", "Secretion of surfactant", "Regulating blood pressure", "Filtration of air particles"],
+        "answer": "Gas exchange",
+        "description": "Alveoli facilitate the exchange of oxygen and carbon dioxide between the air and blood."
+    },
+    {
+        "text": "The condition in which air accumulates in the pleural cavity is called:",
+        "options": ["Pleurisy", "Pneumothorax", "Bronchitis", "Pneumonia", "Hemothorax"],
+        "answer": "Pneumothorax",
+        "description": "Pneumothorax occurs when air enters the pleural space, leading to lung collapse."
+    },
+    {
+        "text": "The respiratory center in the brainstem primarily responds to changes in:",
+        "options": ["Blood pressure", "Oxygen levels", "Carbon dioxide levels", "Body temperature", "Respiratory rate"],
+        "answer": "Carbon dioxide levels",
+        "description": "The medullary respiratory center is sensitive to increased CO2, which acts as a primary stimulus for breathing."
+    },
+    {
+        "text": "Which law explains the relationship between gas volume and pressure in the lungs?",
+        "options": ["Fick's law", "Henry's law", "Boyle's law", "Dalton's law", "Charles's law"],
+        "answer": "Boyle's law",
+        "description": "Boyle's law states that gas volume is inversely proportional to pressure, crucial during lung expansion and contraction."
+    },
+    {
+        "text": "In a healthy individual, the majority of oxygen transport in the blood is:",
+        "options": ["Bound to hemoglobin", "Dissolved in plasma", "Bound to carbon dioxide", "Stored in tissues", "Attached to platelets"],
+        "answer": "Bound to hemoglobin",
+        "description": "Hemoglobin in red blood cells carries approximately 98% of oxygen in the blood."
+    },
+    {
+        "text": "Minute ventilation is the product of:",
+        "options": [
+            "Alveolar ventilation and tidal volume",
+            "Respiratory rate and dead space volume",
+            "Respiratory rate and tidal volume",
+            "Tidal volume and lung compliance",
+            "Respiratory rate and inspiratory reserve volume"
+        ],
+        "answer": "Respiratory rate and tidal volume",
+        "description": "Minute ventilation is calculated as the respiratory rate multiplied by tidal volume."
+    },
+        
+    {
+        "text": "With regards to pulmonary gas exchange:",
+        "options": ["Transfer of nitrous oxide is perfusion limited", "Transfer of oxygen is typically diffusion limited", "At altitude the profound systemic hypoxaemia favours oxygen diffusion", "The diffusion rate for CO2 is double that of oxygen", "Diffusion is inversely proportional to the partial pressure gradient"],
+        "answer": "Transfer of nitrous oxide is perfusion limited",
+        "description": "Nitrous oxide equilibrates rapidly, so its transfer is limited by the rate of blood perfusion rather than by diffusion."
+    },
+    {
+        "text": "With regard to the distribution of pulmonary blood flow:",
+        "options": ["Typically there is a zone at the apex that is not perfused", "The mean pulmonary arterial pressure is 8 mmHg", "In some areas flow is determined by the arterial/alveolar pressure difference", "Hypoxia leads to pulmonary vasodilation", "The net balance of Starling forces act to keep the alveoli dry"],
+        "answer": "In some areas flow is determined by the arterial/alveolar pressure difference",
+        "description": "Pulmonary blood flow distribution varies across the lung and can be influenced by the arterial-alveolar pressure difference in certain zones."
+    },
+    {
+        "text": "Lung compliance:",
+        "options": ["Is normally 100mL/cm water", "Falls if the lung remains unventilated for long periods", "Rises if the pulmonary venous pressure is increased", "Falls as the lung ages", "Is the area under the pressure-volume curve"],
+        "answer": "Falls if the lung remains unventilated for long periods",
+        "description": "Lung compliance decreases when the lungs are unventilated, due to reduced surfactant production and tissue elasticity."
+    },
+    {
+        "text": "The most important short-term response to high altitude is:",
+        "options": ["Hyperventilation", "Polycythaemia", "Chronic mountain sickness", "Acidosis", "Decreased EPO release"],
+        "answer": "Hyperventilation",
+        "description": "Hyperventilation is the initial compensatory mechanism to counteract hypoxia at high altitude by increasing oxygen uptake."
+    },
+    {
+        "text": "In CO2 transport:",
+        "options": ["The HCO3 content of venous blood is reduced compared to arterial blood", "The osmolarity of RBCs in venous blood is increased compared to arterial blood", "The haematocrit of venous blood is 3% less than arterial blood", "The solubility of CO2 in blood is less than O2", "CO2 does not react with plasma proteins"],
+        "answer": "The osmolarity of RBCs in venous blood is increased compared to arterial blood",
+        "description": "Venous blood has higher osmolarity due to the influx of bicarbonate and associated ions during CO2 transport."
+    },
+    {
+        "text": "Which factor significantly increases the rate of oxygen diffusion across the alveolar membrane?",
+        "options": ["Increased membrane thickness", "Increased surface area", "Decreased oxygen partial pressure gradient", "Reduced hemoglobin concentration", "High CO2 levels in alveoli"],
+        "answer": "Increased surface area",
+        "description": "According to Fick's law, diffusion is directly proportional to the surface area of the membrane, enhancing oxygen transfer."
+    },
+    {
+        "text": "What happens to pulmonary vascular resistance at low lung volumes?",
+        "options": ["It increases", "It decreases", "It remains constant", "It is unaffected by lung volumes", "It becomes zero"],
+        "answer": "It increases",
+        "description": "Pulmonary vascular resistance rises at low lung volumes due to compression of alveolar capillaries and reduced pulmonary artery caliber."
+    },
+    {
+        "text": "Which of the following is an immediate physiological adaptation to hypoxia?",
+        "options": ["Decreased tidal volume", "Hyperventilation", "Increased hemoglobin production", "Metabolic alkalosis", "Tissue acidosis"],
+        "answer": "Hyperventilation",
+        "description": "In response to hypoxia, the respiratory center triggers hyperventilation to enhance oxygen delivery."
+    },
+    {
+        "text": "What percentage of CO2 is transported in the blood as bicarbonate?",
+        "options": ["10%", "20%", "50%", "70%", "90%"],
+        "answer": "70%",
+        "description": "Approximately 70% of CO2 in the blood is transported as bicarbonate ions, formed through the reaction of CO2 with water catalyzed by carbonic anhydrase."
+    },
+    {
+        "text": "During deep inspiration, lung compliance is limited by which factor?",
+        "options": ["Elasticity of the alveoli", "Pulmonary surfactant deficiency", "Intercostal muscle fatigue", "Increased alveolar thickness", "Rib cage rigidity"],
+        "answer": "Elasticity of the alveoli",
+        "description": "Alveolar elasticity resists excessive expansion, limiting lung compliance during deep inspiration."
+    },
+
+    {
+        "text": "Which of the following statements is true about involuntary breathing?",
+        "options": ["It is controlled by the bronchioles", "It is controlled by the pulmonary arterioles", "It is controlled by the alveolar-capillary network", "It is controlled by the neurons, located in the medulla and pons", "It is controlled by the lungs parenchyma"],
+        "answer": "It is controlled by the neurons, located in the medulla and pons",
+        "description": "Involuntary breathing is regulated by the respiratory centers in the medulla and pons, which respond to changes in CO2 and O2 levels in the blood."
+    },
+    {
+        "text": "Which one of the following statements is false about the trachea?",
+        "options": ["Has C-shaped rings", "It is covered by epiglottis", "It splits into the right and left lungs", "It has hyaline cartilage", "None of the above"],
+        "answer": "It is covered by epiglottis",
+        "description": "The trachea is not covered by the epiglottis; the epiglottis covers the larynx during swallowing to prevent food from entering the airway."
+    },
+    {
+        "text": "___ is located between two pleural sacs and is the central compartment of the thoracic cavity.",
+        "options": ["Hilum", "Pleura", "Mediastinum", "Thoracic cage", "Lung"],
+        "answer": "Mediastinum",
+        "description": "The mediastinum is the central compartment of the thoracic cavity, situated between the two pleural sacs."
+    },
+    {
+        "text": "Which of the following functions by filtering and keeping the mucus and dirt away from our lungs?",
+        "options": ["Cilia", "Bronchioles", "Hair in the lungs", "Air in the lungs", "All of the above"],
+        "answer": "Cilia",
+        "description": "Cilia line the respiratory tract and function to move mucus and trapped particles out of the lungs."
+    },
+    {
+        "text": "The following structure in the posterior mediastinum is found immediately posterior to the left atrium:",
+        "options": ["Azygous vein", "Thoracic duct", "Esophagus", "Bifurcation of aorta", "Great Cardiac vein"],
+        "answer": "Esophagus",
+        "description": "The esophagus lies immediately posterior to the left atrium in the posterior mediastinum."
+    },
+    {
+        "text": "The most characteristic feature of thoracic vertebra is:",
+        "options": ["The body is heart-shaped", "Spine is oblique", "Body has costal facets", "Vertebral foramen is smaller & circular", "Not arranged in a straight line"],
+        "answer": "Body has costal facets",
+        "description": "Thoracic vertebrae are distinguished by the presence of costal facets for rib articulation."
+    },
+    {
+        "text": "Visceral pleura:",
+        "options": ["Is insensitive to pain", "Develops from splanchnopleura", "Covers all the surfaces of lung except hilum", "Innervated by autonomic nerves", "Adherent to the heart and blood vessels"],
+        "answer": "Develops from splanchnopleura",
+        "description": "The visceral pleura is derived from splanchnopleura, the mesodermal layer that gives rise to visceral organs."
+    },
+    {
+        "text": "The apex of the heart is:",
+        "options": ["Situated in the 5th intercostal space", "Just medial to the mid-clavicular line", "Directed downwards, backwards & to the right", "Cannot be heard by a stethoscope", "Formed by the right ventricle"],
+        "answer": "Situated in the 5th intercostal space",
+        "description": "The apex of the heart is located at the level of the 5th intercostal space, typically near the mid-clavicular line."
+    },
+    {
+        "text": "One of the following is the function of the diaphragm in expiration:",
+        "options": ["Production of energy", "Relaxation", "Contraction", "Gaseous exchange", "Helping the lungs to stay inflated"],
+        "answer": "Relaxation",
+        "description": "During expiration, the diaphragm relaxes, reducing thoracic volume and aiding in expelling air from the lungs."
+    },
+    {
+        "text": "The lungs are attached to the walls of the thorax by means of the:",
+        "options": ["Pericardial membrane", "Parietal pleural membrane", "Visceral pleural membrane", "Mesentery", "Diaphragm"],
+        "answer": "Parietal pleural membrane",
+        "description": "The lungs are attached to the thoracic cavity via the parietal pleura, which is continuous with the visceral pleura."
+    },
+    {
+        "text": "The cells that make and secrete mucus, which protects the lining of the respiratory tract, are called:",
+        "options": ["Squamous epithelium", "Pneumothorax", "Terminal bronchioles", "Alveolar cells", "Goblet cells"],
+        "answer": "Goblet cells",
+        "description": "Goblet cells are specialized epithelial cells that produce mucus to trap particles and protect the respiratory lining."
+    },
+    {
+        "text": "Which of the following does not belong to the conducting portion of the respiratory system?",
+        "options": ["Nose", "Pharynx", "Alveoli", "Bronchioles", "None"],
+        "answer": "Alveoli",
+        "description": "Alveoli are part of the respiratory zone, where gas exchange occurs, and not part of the conducting zone."
+    },
+    {
+        "text": "The structure which closes off the larynx during swallowing is:",
+        "options": ["Epiglottis", "Vocal cords", "Adam's apple", "Glottis", "Laryngopharynx"],
+        "answer": "Epiglottis",
+        "description": "The epiglottis closes the larynx during swallowing to prevent food and liquid from entering the respiratory tract."
+    },
+    {
+        "text": "When further increase in substrate concentration does not further increase Vi, the enzyme is:",
+        "options": ["Exhausted", "Saturated", "Available", "Inactive", "Active"],
+        "answer": "Saturated",
+        "description": "When an enzyme is saturated, all active sites are occupied by substrate, and the reaction rate reaches its maximum velocity (Vmax)."
+    },
+    {
+        "text": "A holoenzyme is:",
+        "options": ["Coenzyme + cofactor", "Coenzyme + prosthetic group", "Apoenzyme + active site", "Apoenzyme + cofactor", "Incomplete"],
+        "answer": "Apoenzyme + cofactor",
+        "description": "A holoenzyme is the complete, active form of an enzyme consisting of an apoenzyme (protein portion) and its cofactor (non-protein portion)."
+    },
+    {
+        "text": "In most enzymes, the active site on the enzyme's surface takes the form of:",
+        "options": ["Substrate", "Coenzyme", "Cleft", "Acetyl residues", "Acyl residues"],
+        "answer": "Cleft",
+        "description": "The active site of an enzyme typically forms a cleft or groove where substrate binding occurs, facilitating catalysis."
+    },
+    {
+        "text": "The term apoenzyme is applicable to:",
+        "options": ["Simple enzyme", "Protein part of conjugate enzyme", "Organic cofactor of a conjugate enzyme", "Inorganic cofactor of a conjugate enzyme", "Complete enzyme"],
+        "answer": "Protein part of conjugate enzyme",
+        "description": "An apoenzyme is the protein portion of a conjugated enzyme, which requires a cofactor to become active."
+    },
+    {
+        "text": "Lock and Key theory of enzyme action was proposed by:",
+        "options": ["Fischer", "Koshland", "Kuhne", "Arrhenius", "Nicholas"],
+        "answer": "Fischer",
+        "description": "The Lock and Key model of enzyme action was proposed by Emil Fischer, suggesting that the enzyme's active site is complementary to the substrate."
+    },
+    {
+        "text": "According to Bohr's effect, the oxygen-dissociation curve will be shifted to the right when:",
+        "options": [
+            "Increase oxyhemoglobin release, decrease pH, increase PCO2",
+            "Decrease oxyhemoglobin release, increase pH, decrease PCO2",
+            "Increase oxyhemoglobin release, increase pH, decrease PCO2",
+            "Increase oxyhemoglobin release, decrease pH, decrease PCO2",
+            "Increase oxyhemoglobin release, increase pH, increase PCO2"
+        ],
+        "answer": "Increase oxyhemoglobin release, decrease pH, increase PCO2",
+        "description": "Bohr's effect describes how low pH and high PCO2 decrease hemoglobin's affinity for oxygen, facilitating oxygen release to tissues."
+    },
+    {
+        "text": "In addition to transporting O2 from the lungs to the tissues, hemoglobin also transports:",
+        "options": ["CO2 & H2O", "CO2 & protons", "NH3 & CO2", "NH3 & H2O", "H2CO3"],
+        "answer": "CO2 & protons",
+        "description": "Hemoglobin plays a role in transporting CO2 and buffering protons, assisting in maintaining acid-base balance in the blood."
+    },
+    {
+        "text": "The left ventricle has a thicker wall than the right ventricle because:",
+        "options": [
+            "It is richer in blood supply",
+            "It ejects blood through a narrower orifice",
+            "It ejects a greater cardiac output",
+            "It ejects blood against a higher pressure",
+            "It contracts at a higher rate"
+        ],
+        "answer": "It ejects blood against a higher pressure",
+        "description": "The left ventricle pumps blood into the systemic circulation, requiring a thicker wall to generate higher pressure."
+    },
+    {
+        "text": "The atrioventricular valves:",
+        "options": [
+            "Have three cusps for each valve",
+            "Their closure is initiated when the ventricular pressure exceeds atrial pressure",
+            "Open by contraction of papillary muscles",
+            "Are not closing simultaneously",
+            "All of the above"
+        ],
+        "answer": "Their closure is initiated when the ventricular pressure exceeds atrial pressure",
+        "description": "The atrioventricular valves close when ventricular pressure surpasses atrial pressure, preventing backflow into the atria."
+    },
+    {
+        "text": "The action potential of cardiac muscle is characterized by the presence of a plateau which:",
+        "options": [
+            "In the ventricular muscle, it reaches 100 msec",
+            "In the atrial muscle, it is reached at 300 msec",
+            "It results from a balance between Ca++ influx",
+            "It is shorter than the ARP of skeletal muscle",
+            "It occurs before each repolarization"
+        ],
+        "answer": "It results from a balance between Ca++ influx",
+        "description": "The plateau phase in cardiac muscle action potentials is due to prolonged Ca++ influx, balancing K+ efflux."
+    },
+    {
+        "text": "It is impossible to tetanize (stiffen) a heart because:",
+        "options": [
+            "There is a long mechanical refractory period",
+            "The refractory period is very short",
+            "The heart muscles do not contain Ca++",
+            "Depolarization is shorter",
+            "Repolarization is longer"
+        ],
+        "answer": "There is a long mechanical refractory period",
+        "description": "The long refractory period in cardiac muscle prevents tetany, allowing proper filling and contraction cycles."
+    },
+    {
+        "text": "The absolute refractory period in the ventricle:",
+        "options": [
+            "Increases during sympathetic stimulation",
+            "Coincides with the phase of rapid depolarization and the plateau",
+            "Corresponds with the whole duration of action potential and K+ efflux",
+            "It results from an inflow of K+ and Na+",
+            "It is the same as in SA node"
+        ],
+        "answer": "Coincides with the phase of rapid depolarization and the plateau",
+        "description": "The absolute refractory period in ventricular muscle coincides with depolarization and the plateau phase, preventing new action potentials."
+    },
+    {
+        "text": "In the cardiac cycle, the ventricular pressure increases above atrial pressure during:",
+        "options": [
+            "Isometric contraction phase",
+            "Atrial systole phase",
+            "Maximum ejection phase",
+            "Reduced ejection phase",
+            "Just after the QRS complex formation"
+        ],
+        "answer": "Isometric contraction phase",
+        "description": "During the isometric contraction phase, ventricular pressure rises above atrial pressure, but the valves remain closed until pressure opens the semilunar valves."
+    },
+    {
+        "text": "In the cardiac cycle, the dicrotic notch in aortic pressure is due to:",
+        "options": [
+            "Sudden closure of AV valves",
+            "Sudden closure of aortic valve",
+            "Sudden decrease in aortic pressure",
+            "Marked decrease in ventricular pressure",
+            "High pressure of the left ventricle"
+        ],
+        "answer": "Sudden closure of aortic valve",
+        "description": "The dicrotic notch in aortic pressure represents a brief increase in pressure caused by the elastic recoil of the aorta after the sudden closure of the aortic valve."
+    },
+    {
+        "text": "C wave in atrial pressure occurs in:",
+        "options": [
+            "Isometric contraction phase",
+            "Isometric relaxation phase",
+            "Maximum ejection phase",
+            "Atrial systole phase",
+            "None"
+        ],
+        "answer": "Isometric contraction phase",
+        "description": "The C wave in atrial pressure occurs during the isometric contraction phase due to the bulging of the tricuspid valve into the atrium."
+    },
+    {
+        "text": "In ECG, the P wave is formed due to:",
+        "options": [
+            "Atrial depolarization",
+            "Atrial repolarization",
+            "Atrial systole",
+            "Atrial diastole",
+            "Right atrial stimulation"
+        ],
+        "answer": "Atrial depolarization",
+        "description": "The P wave on an ECG represents atrial depolarization, which leads to atrial contraction."
+    },
+    {
+        "text": "After a mild hemorrhage, compensatory responses initiated by the baroreceptor reflex keep blood pressure at or close to its normal value. Which one of the following values is less after compensation for the hemorrhage than it was before the hemorrhage?",
+        "options": [
+            "Venous reservoir",
+            "Heart rate",
+            "Ventricular contractility",
+            "Total peripheral resistance",
+            "Coronary blood flow"
+        ],
+        "answer": "Venous reservoir",
+        "description": "During hemorrhage, the baroreceptor reflex reduces venous reservoir by constricting veins to maintain blood pressure and ensure blood flow to vital organs."
+    },
+    {
+        "text": "Which of the following conditions causes tachycardia?",
+        "options": [
+            "1st degree heart block",
+            "2nd degree heart block",
+            "3rd degree heart block",
+            "Hypertension",
+            "Hypotension"
+        ],
+        "answer": "Hypotension",
+        "description": "Tachycardia is often a compensatory response to hypotension, as the body increases heart rate to maintain cardiac output and perfusion."
+    },
+    {
+        "text": "Sudden standing evokes the baroreceptor reflex. Which one of the following will be greater after a person suddenly stands up than it was before the person stood?",
+        "options": [
+            "The end-diastolic volume",
+            "The renal blood flow",
+            "The venous return",
+            "The pulse pressure",
+            "The ejection fraction"
+        ],
+        "answer": "The ejection fraction",
+        "description": "When a person suddenly stands up, baroreceptor reflex increases sympathetic activity, which boosts heart contractility and raises ejection fraction."
+    },
+    {
+        "text": "In the post-mortem report, the medico-legal officer mentions the development of post-mortem lividity, which is:",
+        "options": [
+            "A change in the eye after death",
+            "Early sign after death",
+            "Immediate sign of death",
+            "Late change after death",
+            "Sign of somatic death"
+        ],
+        "answer": "Late change after death",
+        "description": "Post-mortem lividity, or livor mortis, is a late post-mortem change where blood settles in dependent body parts, causing discoloration."
+    },
+    {
+        "text": "Increasing vagal stimulation of the heart will cause an increase in:",
+        "options": [
+            "Heart rate",
+            "PR interval",
+            "Ventricular contractility",
+            "Ejection fraction",
+            "Cardiac output"
+        ],
+        "answer": "PR interval",
+        "description": "Vagal stimulation slows conduction through the AV node, increasing the PR interval on an ECG."
+    },
+    {
+        "text": "During exercise, there is an increase in a person's:",
+        "options": [
+            "Stroke volume",
+            "Diastolic pressure",
+            "Venous compliance",
+            "Pulmonary arterial resistance",
+            "Total peripheral resistance"
+        ],
+        "answer": "Stroke volume",
+        "description": "During exercise, stroke volume increases as the heart pumps more blood to meet the oxygen demands of the body."
+    },
+    {
+        "text": "Lymph capillaries differ from systemic blood capillaries in that they:",
+        "options": [
+            "Are less permeable",
+            "Are not lined by endothelium",
+            "Lack valves",
+            "Are absent in the central nervous system",
+            "Collapse when interstitial pressure increases"
+        ],
+        "answer": "Are absent in the central nervous system",
+        "description": "Lymph capillaries are not present in the central nervous system, where cerebrospinal fluid performs drainage functions."
+    },
+    {
+        "text": "At birth, changes that occur in the fetal circulation include:",
+        "options": [
+            "Increased systemic arterial pressure",
+            "Increased pulmonary vascular resistance",
+            "Increased pulmonary arterial pressure",
+            "Decreased left atrial pressure",
+            "Decreased pulmonary blood flow"
+        ],
+        "answer": "Increased systemic arterial pressure",
+        "description": "After birth, systemic arterial pressure increases as blood flow through the systemic circulation rises and the placenta is removed from circulation."
+    },
+    {
+        "text": "Turbulence is more likely to occur in a blood vessel if:",
+        "options": [
+            "The velocity of blood within the vessel increases",
+            "The viscosity of blood within the vessel increases",
+            "The diameter of the vessel decreases",
+            "The density of the blood decreases",
+            "The length of the vessel increases"
+        ],
+        "answer": "The velocity of blood within the vessel increases",
+        "description": "High blood velocity increases Reynolds number, leading to turbulence in the vessel."
+    },
+    {
+        "text": "Systemic arteriolar constriction may result from an increase in the concentration of:",
+        "options": [
+            "Nitric oxide",
+            "Angiotensin II",
+            "Atrial natriuretic peptide",
+            "Beta receptor agonists",
+            "Hydrogen ion"
+        ],
+        "answer": "Angiotensin II",
+        "description": "Angiotensin II is a potent vasoconstrictor that increases systemic arteriolar constriction, raising blood pressure."
+    },
+    {
+        "text": "In complete heart block, there is usually:",
+        "options": [
+            "Increased ventricular contractility",
+            "Increased heart rate",
+            "Increased mean blood pressure",
+            "Slow P waves",
+            "No relation of P waves with QRS complex"
+        ],
+        "answer": "No relation of P waves with QRS complex",
+        "description": "In complete heart block, the atrial and ventricular rhythms are dissociated, and P waves do not correlate with QRS complexes."
+    },
+    {
+        "text": "After an episode of exercise training, the trained individual will have a:",
+        "options": [
+            "Decreased density of mitochondria in the trained muscles",
+            "Increased resting heart rate",
+            "Decreased maximum oxygen consumption",
+            "Increased stroke volume with decreased heart rate",
+            "Decreased extraction of oxygen by exercising muscles"
+        ],
+        "answer": "Increased stroke volume with decreased heart rate",
+        "description": "Exercise training improves heart efficiency, resulting in an increased stroke volume and decreased resting heart rate."
+    },
+    {
+        "text": "When the blood pressure in the body increases, baroreceptors are activated causing:",
+        "options": [
+            "Decreasing heart rate and myocardial contractility",
+            "Excitation of vasoconstrictor area",
+            "Increased heart rate and myocardial contractility",
+            "Inhibition of vagal center",
+            "Vasoconstriction of veins and arterioles"
+        ],
+        "answer": "Decreasing heart rate and myocardial contractility",
+        "description": "Baroreceptor activation in response to high blood pressure leads to a decrease in heart rate and contractility to lower the blood pressure."
+    },
+    {
+        "text": "CNS ischemic response is a direct respiratory response of vasomotor center to:",
+        "options": [
+            "Arterial pressure above 60 to 70 mmHg",
+            "Decreased blood flow and carbon dioxide concentration",
+            "Excessive urinary output by kidneys",
+            "Powerful activation of sympathetic vasoconstriction",
+            "Rapid rise in arterial pressure"
+        ],
+        "answer": "Powerful activation of sympathetic vasoconstriction",
+        "description": "CNS ischemic response is triggered by low blood flow and oxygen, resulting in sympathetic vasoconstriction to restore blood pressure."
+    },
+    {
+        "text": "A 55-year-old man presented in the outpatient department with headaches. His blood pressure was 180/100 mmHg. Further investigations show that he had renovascular hypertension as a result of stenosis in the left kidney. The following changes will be seen in his total peripheral resistance, plasma renin, and plasma aldosterone concentrations respectively:",
+        "options": [
+            "Decrease, decrease, increase",
+            "Decrease, increase, increase",
+            "Increase, increase, increase",
+            "Increase, decrease, increase",
+            "Increase, increase, decrease"
+        ],
+        "answer": "Increase, increase, increase",
+        "description": "Renovascular hypertension due to kidney stenosis causes increased renin and aldosterone levels, raising total peripheral resistance."
+    },
+    {
+        "text": "In patients with Beriberi, pulmonary disease, hyperthyroidism, hypothyroidism, the total peripheral resistance and cardiac output varied, but arterial pressure was maintained within a normal range because of normal:",
+        "options": [
+            "Brain",
+            "Circulation",
+            "Heart",
+            "Lungs",
+            "Kidneys"
+        ],
+        "answer": "Kidneys",
+        "description": "The kidneys help regulate blood pressure by adjusting blood volume and the balance of electrolytes, maintaining normal arterial pressure."
+    },
+    {
+        "text": "Right axis deviation in an electrocardiogram is usually caused by:",
+        "options": [
+            "Aortic valve regurgitation",
+            "Aortic valve stenosis",
+            "Excess abdominal fat",
+            "Pulmonary hypertension",
+            "Systemic hypertension"
+        ],
+        "answer": "Pulmonary hypertension",
+        "description": "Right axis deviation on an ECG is commonly seen in pulmonary hypertension, which increases right ventricular load."
+    },
+    {
+        "text": "A 35-year-old man has dyspnea. His electrocardiogram shows no P waves, and he has a heart rate of 42 beats/min. Most likely diagnosis?",
+        "options": [
+            "First degree heart block",
+            "Second degree heart block",
+            "Sinoatrial heart block",
+            "Sinus bradycardia",
+            "Third degree heart block"
+        ],
+        "answer": "Sinoatrial heart block",
+        "description": "Sinoatrial block can cause a lack of P waves and a low heart rate due to impaired signal conduction from the sinoatrial node."
+    },
+    {
+        "text": "A 55-year-old man reports to his physician that he becomes easily fatigued while doing routine work around the house. The electrocardiogram was recorded at his physician's office, which shows small R waves and deep S waves in leads I and II and R waves in lead III. Most likely diagnosis:",
+        "options": [
+            "Complete left bundle branch block",
+            "Left ventricular hypertrophy",
+            "Pulmonary valve stenosis",
+            "Right bundle branch block",
+            "Right ventricular hypertrophy"
+        ],
+        "answer": "Right bundle branch block",
+        "description": "Right bundle branch block typically shows characteristic small R waves and deep S waves in the leads mentioned."
+    },
+    {
+        "text": "A 65-year-old man had the electrocardiogram recorded during his annual physical examination. Which show missing QRS complexes after some P waves? What is the most likely diagnosis?",
+        "options": [
+            "Atrial flutter",
+            "Atrial paroxysmal tachycardia",
+            "First degree A-V block",
+            "Second degree A-V block",
+            "Third degree A-V block"
+        ],
+        "answer": "Second degree A-V block",
+        "description": "Second degree A-V block is characterized by the absence of QRS complexes following some P waves due to failure of atrial signals to reach the ventricles."
+    },
+
+    {
+        "text": "In compensated hemorrhagic shock, which of the physiological mechanism is involved?",
+        "options": [
+            "Central nervous system ischemic response",
+            "Decreased absorption of interstitial fluid through the capillaries",
+            "Decreased Antidiuretic hormone release",
+            "Decreased heart rate",
+            "Stress relaxation"
+        ],
+        "answer": "Central nervous system ischemic response",
+        "description": "The CNS ischemic response is activated in hemorrhagic shock to increase sympathetic tone, causing vasoconstriction to help preserve blood pressure."
+    },
+    {
+        "text": "An increase in shear stress in a blood vessel results in:",
+        "options": [
+            "Decreased cyclic guanosine monophosphate production",
+            "Decreased endothelin production",
+            "Decreased prostacyclin production",
+            "Increased nitric oxide release",
+            "Increased renin production"
+        ],
+        "answer": "Increased nitric oxide release",
+        "description": "Increased shear stress on blood vessels stimulates the release of nitric oxide, leading to vasodilation and improved blood flow."
+    },
+    {
+        "text": "An increased venous return of blood to the heart is normally associated with:",
+        "options": [
+            "Acute large vein dilation",
+            "Decreased mean systemic filling pressure",
+            "Decreased sympathetic tone",
+            "Increased blood volume",
+            "Increased venous compliance"
+        ],
+        "answer": "Increased blood volume",
+        "description": "Increased venous return is often due to higher blood volume, which increases the preload to the heart."
+    },
+    {
+        "text": "Cardiac output is often increased in:",
+        "options": [
+            "Anaphylactic shock",
+            "Hemorrhagic shock",
+            "Hypovolemic shock",
+            "Neurogenic shock",
+            "Septic shock"
+        ],
+        "answer": "Septic shock",
+        "description": "In septic shock, the body responds with a compensatory increase in cardiac output as part of a systemic inflammatory response."
+    },
+    {
+        "text": "A healthy, 25-year-old male participates in a 100 meter run. Following muscles are used during expiration:",
+        "options": [
+            "Diaphragm and external intercostals",
+            "Diaphragm and internal intercostals",
+            "Diaphragm only",
+            "Internal intercostals and rectus abdominis",
+            "Sternocleidomastoid"
+        ],
+        "answer": "Internal intercostals and rectus abdominis",
+        "description": "During forced expiration, the internal intercostals and rectus abdominis muscles are activated to help expel air from the lungs."
+    },
+    {
+        "text": "A preterm infant has a surfactant deficiency. Without surfactant, many of the alveoli collapse at the end of each expiration, which leads to pulmonary failure. Following sets of changes is present in a preterm infant compared with a normal infant.",
+        "options": [
+            "Alveolar surface tension: decreased, Pulmonary compliance: decreased",
+            "Alveolar surface tension: decreased, Pulmonary compliance: increased",
+            "Alveolar surface tension: increased, Pulmonary compliance: decreased",
+            "Alveolar surface tension: increased, Pulmonary compliance: increased",
+            "Alveolar surface tension: no change, Pulmonary compliance: decreased"
+        ],
+        "answer": "Alveolar surface tension: increased, Pulmonary compliance: decreased",
+        "description": "Surfactant deficiency leads to increased surface tension in the alveoli, decreasing pulmonary compliance and making breathing more difficult."
+    },
+    {
+        "text": "A change in which ion movement gives rise to the pacemaker potential in sinoatrial node?",
+        "options": [
+            "Sodium",
+            "Potassium",
+            "Chloride",
+            "Calcium",
+            "Bicarbonate"
+        ],
+        "answer": "Sodium",
+        "description": "The pacemaker potential in the sinoatrial node is primarily due to the influx of sodium ions during diastole, leading to gradual depolarization."
+    },
+    {
+        "text": "In which structure is propagation of the action potential the fastest in the heart?",
+        "options": [
+            "The sinus node",
+            "The AV-node",
+            "The bundle of His",
+            "The atrial myocardium",
+            "The ventricular myocardium"
+        ],
+        "answer": "The bundle of His",
+        "description": "The bundle of His conducts the action potential the fastest to ensure synchronized contraction of the ventricles."
+    },
+    {
+        "text": "A 50-year-old man comes to cardiac OPD with a history of hypertension for the last 5 years and wants guidance from the doctor about the diet. Which of the options mentioned below is not included in the dietary changes advocated by WHO for prevention of heart diseases?",
+        "options": [
+            "Reduction of fat intake to 20-30% of caloric intake.",
+            "A decrease in complex carbohydrate consumption.",
+            "Consumption of saturated fats must be limited to less than 10% of total energy intake.",
+            "Reduction of salt intake to 5 g/day or less.",
+            "Reduction of cholesterol to below 100mg per 1000Kcal per day."
+        ],
+        "answer": "A decrease in complex carbohydrate consumption.",
+        "description": "The WHO advocates a balanced intake of carbohydrates, including complex carbohydrates, for heart disease prevention."
+    },
+    {
+        "text": "If the circumflex artery gives the posterior interventricular branch, this circulation is described as:",
+        "options": [
+            "Right Dominance",
+            "Left dominance",
+            "Codominance",
+            "Undetermined",
+            "Equal dominance"
+        ],
+        "answer": "Left dominance",
+        "description": "In left dominance, the circumflex artery provides the posterior interventricular branch, supplying the posterior part of the heart."
+    },
+    {
+        "text": "Aortic opening transmits all except:",
+        "options": [
+            "Aorta",
+            "Thoracic duct",
+            "Vagus nerves",
+            "Azygos vein",
+            "Lymphatics"
+        ],
+        "answer": "Azygos vein",
+        "description": "The azygos vein does not pass through the aortic opening; it drains into the superior vena cava instead."
+    },
+
+    {
+        "text": "In standing position, venous return to heart from the lower limbs is affected by all of the following except",
+        "options": [
+            "Competent valves",
+            "Deep fascia",
+            "Arterial pressure",
+            "Contraction of the calf muscles",
+            "Force of contraction"
+        ],
+        "answer": "Arterial pressure",
+        "description": "Venous return from the lower limbs is influenced by factors like calf muscle contraction, competent valves, and deep fascia. Arterial pressure has less direct influence on venous return in this case."
+    },
+    {
+        "text": "The pericardium is the double sac membrane that:",
+        "options": [
+            "Encloses the heart",
+            "Lines the aorta",
+            "Makes up the heart valves",
+            "Is found only in the capillaries",
+            "Surrounds the major blood vessels"
+        ],
+        "answer": "Encloses the heart",
+        "description": "The pericardium is a double-layered sac that encloses and protects the heart."
+    },
+    {
+        "text": "Blood returning to the heart from the body organs enters the:",
+        "options": [
+            "Left atrium through the aorta",
+            "Right atrium through the vena cava",
+            "Left ventricle by the pulmonary artery",
+            "Right ventricle by the pulmonary vein",
+            "Directly into lungs"
+        ],
+        "answer": "Right atrium through the vena cava",
+        "description": "Deoxygenated blood from the body returns to the right atrium via the superior and inferior vena cava."
+    },
+    {
+        "text": "The only vein in the body that transports oxygen-rich blood is the:",
+        "options": [
+            "Coronary vein",
+            "Hepatic portal vein",
+            "Pulmonary vein",
+            "Aortic vein",
+            "Coronary veins"
+        ],
+        "answer": "Pulmonary vein",
+        "description": "The pulmonary vein carries oxygenated blood from the lungs back to the heart."
+    },
+    {
+        "text": "A blockage within the heart arteries caused by the death of heart muscle cells is known as:",
+        "options": [
+            "An embolism",
+            "An infarct",
+            "An abscess",
+            "A mass",
+            "Blood"
+        ],
+        "answer": "An infarct",
+        "description": "An infarct refers to tissue death due to the obstruction of blood flow, often occurring in the heart muscle (myocardial infarction)."
+    },
+    {
+        "text": "The branches into Circumflex artery and left anterior descending artery",
+        "options": [
+            "Left main coronary artery",
+            "Right marginal artery",
+            "Posterior descending artery",
+            "Anterior descending artery",
+            "None of these"
+        ],
+        "answer": "Left main coronary artery",
+        "description": "The left main coronary artery divides into the circumflex artery and left anterior descending artery."
+    },
+    {
+        "text": "A 52-year-old woman was admitted to the hospital with a diagnosis of right-sided pleurisy with pneumonia. It was decided to remove a sample of pleural fluid from her pleural cavity. The resident inserted the needle close to the lower border of the eighth rib in the anterior axillary line. The next morning she complained of altered skin sensation extending from the point where the needle was inserted downward and forward to the midline of the abdominal wall above the umbilicus. What was the most likely cause?",
+        "options": [
+            "The needle was inserted too low down in the intercostal space",
+            "The needle was inserted too close to the lower border of the eighth rib and damaged the eighth intercostal nerve",
+            "The needle had impaled the eighth rib",
+            "The needle had penetrated too deeply and pierced the lung",
+            "The needle has injured the major blood vessels"
+        ],
+        "answer": "The needle was inserted too close to the lower border of the eighth rib and damaged the eighth intercostal nerve",
+        "description": "The altered sensation suggests that the eighth intercostal nerve was injured during the procedure."
+    },
+    {
+        "text": "A 43-year-old man was involved in a violent quarrel with his wife. In a fit of rage, the wife picked up a carving knife and lunged forward, striking his anterior neck over the left clavicle. The husband collapsed on the kitchen floor, bleeding profusely from the wound. The distraught wife called an ambulance. On examination in the emergency department of the hospital, the following conditions were found except which?",
+        "options": [
+            "Auscultation revealed diminished breath sounds over the left hemithorax",
+            "The trachea was deflected to the left",
+            "The left upper limb was lying stationary on the table, and active movement of the small muscles of the left hand was absent",
+            "The patient was insensitive to pin prick along the lateral side of the left arm, forearm, and hand",
+            "The patient was in hypovolemic shock"
+        ],
+        "answer": "The patient was in hypovolemic shock",
+        "description": "The hypovolemic shock is unlikely given the primary issue is trauma to the neck, suggesting the patient may be experiencing vascular or neurological damage."
+    },
+    {
+        "text": "All the structures are seen in transverse section of T4 vertebral level except:",
+        "options": [
+            "Arch of aorta",
+            "Thymus",
+            "Azygous vein",
+            "Thoracic duct",
+            "Lymphatics"
+        ],
+        "answer": "Lymphatics",
+        "description": "At the T4 vertebral level, the lymphatic structures are not typically visible in a transverse section."
+    },
+    {
+        "text": "A 59-year-old man complains of recurrent attacks of pain in the region of the left shoulder radiating to the sternum and pit of stomach. The attacks of pain came at lengthy intervals until the last 2 days when it became continuous. The physician diagnosed it as angina pectoris. In this case, the pain pathway from the heart is carried by:",
+        "options": [
+            "Superior cervical cardiac nerve",
+            "Middle & inferior cervical cardiac nerves",
+            "Inferior cervical cardiac nerve",
+            "Thoracic splanchnic nerve",
+            "Vagus nerve"
+        ],
+        "answer": "Thoracic splanchnic nerve",
+        "description": "Angina pectoris pain is often carried by the thoracic splanchnic nerves, which transmit visceral pain from the heart to the brain."
+    },
+    {
+        "text": "The angiogenesis is development of vessel from:",
+        "options": [
+            "Existing vessels",
+            "Neural crest",
+            "Ectoderm",
+            "Endoderm",
+            "Blood island"
+        ],
+        "answer": "Existing vessels",
+        "description": "Angiogenesis refers to the formation of new blood vessels from pre-existing ones, often in response to growth factors or tissue demand."
+    },
+    {
+        "text": "Foramen ovale closes after birth because of increased pressure in",
+        "options": [
+            "Lungs",
+            "Right atrium",
+            "Right ventricle",
+            "Left atrium",
+            "Left ventricle"
+        ],
+        "answer": "Left atrium",
+        "description": "The increased pressure in the left atrium after birth causes the foramen ovale to close, separating the two atria."
+    },
+    {
+        "text": "The heart tube continues to elongate and bend on day:",
+        "options": [
+            "Twenty three of development",
+            "Thirty three of development",
+            "Forty three of development",
+            "Fifty three of development",
+            "Sixty three of development"
+        ],
+        "answer": "Twenty three of development",
+        "description": "By day 23 of development, the heart tube continues to elongate and bend as part of the process of heart formation."
+    },
+    {
+        "text": "In dextrocardia, the heart loops to the:",
+        "options": [
+            "Right side instead of the left",
+            "Left side instead of the right",
+            "Upwards",
+            "Downwards",
+            "Midline"
+        ],
+        "answer": "Right side instead of the left",
+        "description": "In dextrocardia, the heart undergoes abnormal looping and ends up on the right side of the chest instead of the left."
+    },
+    {
+        "text": "Induction of heart development is related to endoderm of which of the following organs?",
+        "options": [
+            "Trachea",
+            "Bronchi",
+            "Esophagus",
+            "Duodenum",
+            "Left lung"
+        ],
+        "answer": "Duodenum",
+        "description": "The endoderm of the duodenum plays a key role in inducing heart development."
+    },
+    {
+        "text": "Cardiac muscle fibers electrically connect to neighboring fibers by",
+        "options": [
+            "Desmosomes",
+            "Intermediate discs",
+            "Gap junctions",
+            "Contractile fibers",
+            "Chordae tendinae"
+        ],
+        "answer": "Gap junctions",
+        "description": "Gap junctions are specialized structures that electrically connect cardiac muscle fibers, allowing coordinated contraction."
+    },
+    {
+        "text": "The requirements of which vitamin increase when the intake of carbohydrates increases in the diet?",
+        "options": [
+            "Ascorbic acid",
+            "Cholecalciferol",
+            "Retinoic acid",
+            "Tocopherol",
+            "Thiamine"
+        ],
+        "answer": "Thiamine",
+        "description": "Increased carbohydrate intake increases the body's need for thiamine, which is essential for carbohydrate metabolism."
+    },
+    {
+        "text": "Pinky, a 6-year-old girl, is brought by her parents with complaints of pain in her lower limbs and arms. She is lagging behind in growth and exhibits muscle wasting and formation of pits on shins. Blood tests show mild elevation of lactate and pyruvate. The most probable diagnosis is:",
+        "options": [
+            "Beri-beri",
+            "Pellagra",
+            "Pernicious anemia",
+            "Rickets",
+            "Scurvy"
+        ],
+        "answer": "Beri-beri",
+        "description": "Beri-beri, caused by thiamine deficiency, can result in muscle weakness, pain, and growth issues, along with elevated lactate and pyruvate."
+    },
+    {
+        "text": "Leukotrienes are synthesized by the addition of hydroperoxy groups to which unsaturated fatty acid?",
+        "options": [
+            "Arachidonic acid",
+            "Linolenic acid",
+            "Linoleic acid",
+            "Oleic acid",
+            "Palmitic acid"
+        ],
+        "answer": "Arachidonic acid",
+        "description": "Leukotrienes are derived from arachidonic acid through the addition of hydroperoxy groups."
+    },
+    {
+        "text": "Autosomal Tay-Sach's disease is caused by",
+        "options": [
+            "Gangliosidosis",
+            "Cerebrosides deficiency",
+            "Lipidosis",
+            "Glycogen storage",
+            "Mucopolysaccharidosis"
+        ],
+        "answer": "Gangliosidosis",
+        "description": "Tay-Sach's disease is caused by the accumulation of gangliosides, which are a type of lipid in the nervous system."
+    },
+    {
+        "text": "A 40-year-old male with normal weight, leading a healthy lifestyle, is diagnosed with coronary heart disease. His lipid profile shows elevated LDL levels and hypercholesterolemia. Further investigations reveal defective LDL receptors and a mutation in the ligand region of apo B-100. What is your diagnosis?",
+        "options": [
+            "Tangier disease",
+            "Fish-eye disease",
+            "Familial alpha lipoproteinemia",
+            "Familial lipoprotein lipase deficiency",
+            "Familial hypercholesterolemia (type 2a)"
+        ],
+        "answer": "Familial hypercholesterolemia (type 2a)",
+        "description": "Familial hypercholesterolemia type 2a is characterized by defective LDL receptors, leading to high LDL levels and hypercholesterolemia."
+    },
+    {
+        "text": "The lipoprotein that absorbs cholesterol from the peripheral tissues and transports it to the liver is:",
+        "options": [
+            "VLDL",
+            "IDL",
+            "LDL",
+            "HDL",
+            "Chylomicrons"
+        ],
+        "answer": "HDL",
+        "description": "HDL (high-density lipoprotein) is responsible for reverse cholesterol transport, moving cholesterol from peripheral tissues to the liver."
+    },
+    {
+        "text": "The lipoprotein that transports triglycerides from the liver to adipose tissues and muscles is:",
+        "options": [
+            "VLDL",
+            "HDL",
+            "IDL",
+            "LDL",
+            "Chylomicron"
+        ],
+        "answer": "VLDL",
+        "description": "VLDL (very-low-density lipoprotein) is responsible for transporting triglycerides from the liver to adipose tissues and muscles."
+    },
+    {
+        "text": "In humans, a dietary essential fatty acid is",
+        "options": [
+            "Palmitic acid",
+            "Stearic acid",
+            "Oleic acid",
+            "Linoleic acid",
+            "Butyric acid"
+        ],
+        "answer": "Linoleic acid",
+        "description": "Linoleic acid is an essential fatty acid that the human body cannot synthesize and must be obtained through the diet."
+    },
+    {
+        "text": "The process of eicosanoids synthesis from twenty-carbon essential fatty acids is",
+        "options": [
+            "Reduction",
+            "Oxidation",
+            "Cyclization",
+            "Oxidoreduction",
+            "Acylation"
+        ],
+        "answer": "Oxidation",
+        "description": "Eicosanoids are synthesized by the oxidation of essential fatty acids, particularly arachidonic acid."
+    },
+    {
+        "text": "Cephalin consists of",
+        "options": [
+            "Glycerol, fatty acid, phosphoric acid and choline",
+            "Glycerol, fatty acid, phosphoric acid and ethanolamine",
+            "Glycerol, fatty acid, phosphoric acid and inositol",
+            "Glycerol, fatty acid, phosphoric acid and serine",
+            "Glycerol, fatty acid, phosphoric acid and sugar"
+        ],
+        "answer": "Glycerol, fatty acid, phosphoric acid and ethanolamine",
+        "description": "Cephalin, a type of phospholipid, is composed of glycerol, fatty acids, phosphoric acid, and ethanolamine."
+    },
+    {
+        "text": "Phospholipid acting as a surfactant is",
+        "options": [
+            "Cephalin",
+            "Phosphatidyl inositol",
+            "Lecithin",
+            "Phosphatidyl serine",
+            "Ganglioside"
+        ],
+        "answer": "Lecithin",
+        "description": "Lecithin, a phospholipid, acts as a surfactant and is crucial in the lung alveolar membrane to reduce surface tension."
+    },
+    {
+        "text": "A 60-year-old man is brought to the emergency room with 6 hours history of severe chest pain radiating towards jaw and back along with vomiting and shortness of breath. What specific test is indicated?",
+        "options": [
+            "Serum urea",
+            "Trop T",
+            "SGPT",
+            "ALT",
+            "Myoglobin"
+        ],
+        "answer": "Trop T",
+        "description": "Troponin T is a specific biomarker for myocardial injury and is the most useful test in diagnosing a myocardial infarction."
+    },
+    {
+        "text": "Troponin is not normally found in the blood. It is released into the blood when heart muscles become damaged. It reaches its peak level in",
+        "options": [
+            "12-18 hrs",
+            "72 hrs",
+            "8-24 hrs",
+            "10 days",
+            "4-6 hrs"
+        ],
+        "answer": "12-18 hrs",
+        "description": "Troponin levels typically peak 12 to 18 hours after myocardial injury and can remain elevated for up to a week."
+    },
+    {
+        "text": "Which of the following is a characteristic of high-density lipoproteins (HDL)?",
+        "options": [
+            "Transports cholesterol from the liver to peripheral tissues",
+            "Has a high content of triglycerides",
+            "Helps remove cholesterol from the peripheral tissues",
+            "Increases the risk of cardiovascular diseases",
+            "Is produced in the intestines"
+        ],
+        "answer": "Helps remove cholesterol from the peripheral tissues",
+        "description": "HDL is known as 'good cholesterol' because it helps transport cholesterol from peripheral tissues to the liver for excretion."
+    },
+    {
+        "text": "Which of the following enzymes plays a key role in the conversion of glucose to glucose-6-phosphate in the liver?",
+        "options": [
+            "Hexokinase",
+            "Glucokinase",
+            "Phosphofructokinase",
+            "Pyruvate kinase",
+            "Aldolase"
+        ],
+        "answer": "Glucokinase",
+        "description": "Glucokinase is an enzyme that catalyzes the phosphorylation of glucose to glucose-6-phosphate, primarily in the liver."
+    },
+    {
+        "text": "What is the role of acetyl-CoA in the citric acid cycle?",
+        "options": [
+            "It provides energy for the synthesis of glucose",
+            "It acts as an electron donor in oxidative phosphorylation",
+            "It enters the cycle to form citric acid",
+            "It is used to synthesize amino acids",
+            "It directly produces ATP"
+        ],
+        "answer": "It enters the cycle to form citric acid",
+        "description": "Acetyl-CoA enters the citric acid cycle, where it combines with oxaloacetate to form citric acid, initiating a series of reactions to produce energy."
+    },
+    {
+        "text": "Which vitamin is necessary for the carboxylation of glutamate residues in proteins involved in blood clotting?",
+        "options": [
+            "Vitamin A",
+            "Vitamin C",
+            "Vitamin D",
+            "Vitamin E",
+            "Vitamin K"
+        ],
+        "answer": "Vitamin K",
+        "description": "Vitamin K is essential for the carboxylation of glutamate residues in clotting factors, which is necessary for blood coagulation."
+    },
+    {
+        "text": "What is the main function of the mitochondria?",
+        "options": [
+            "Synthesize proteins",
+            "Produce ribosomes",
+            "Generate ATP",
+            "Transport nutrients",
+            "Regulate cell division"
+        ],
+        "answer": "Generate ATP",
+        "description": "Mitochondria are the powerhouses of the cell, generating ATP through oxidative phosphorylation to provide energy for cellular processes."
+    },
+    {
+        "text": "Which of the following hormones is primarily responsible for the regulation of blood glucose levels?",
+        "options": [
+            "Insulin",
+            "Adrenaline",
+            "Cortisol",
+            "Thyroxine",
+            "Prolactin"
+        ],
+        "answer": "Insulin",
+        "description": "Insulin is the primary hormone that helps regulate blood glucose levels by promoting the uptake of glucose into cells for energy production or storage."
+    },
+    {
+        "text": "Which of the following amino acids is essential for protein synthesis but cannot be synthesized by the human body?",
+        "options": [
+            "Glutamine",
+            "Serine",
+            "Leucine",
+            "Tyrosine",
+            "Asparagine"
+        ],
+        "answer": "Leucine",
+        "description": "Leucine is an essential amino acid, meaning the body cannot produce it and must obtain it from food sources."
+    },
+    {
+        "text": "Which condition is characterized by the buildup of lactic acid in the body?",
+        "options": [
+            "Hypoglycemia",
+            "Lactic acidosis",
+            "Metabolic alkalosis",
+            "Respiratory acidosis",
+            "Hyperkalemia"
+        ],
+        "answer": "Lactic acidosis",
+        "description": "Lactic acidosis occurs when there is an accumulation of lactic acid in the body, often due to anaerobic metabolism or impaired oxygen delivery."
+    },
+    {
+        "text": "In which part of the cell does glycolysis occur?",
+        "options": [
+            "Mitochondria",
+            "Nucleus",
+            "Cytoplasm",
+            "Endoplasmic reticulum",
+            "Golgi apparatus"
+        ],
+        "answer": "Cytoplasm",
+        "description": "Glycolysis takes place in the cytoplasm, where glucose is broken down into pyruvate, producing ATP and NADH."
+    }
+
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+const userAnswers = [];
+const skippedQuestions = [];
+let timerInterval;
+const timePerQuestion = 66; // 1.1 minutes in seconds
+let totalQuizTime; // Total time for the quiz
+let timeRemaining; // Time left in the quiz
+
+// Progress Bar Functions
+let progressBarContainer;
+
+function createProgressBar(numQuestions) {
+    // Create a rectangular container with fixed height and scroll functionality
+    progressBarContainer = document.createElement("div");
+    progressBarContainer.id = "progress-bar-container";
+    progressBarContainer.style.textAlign = "center";
+    progressBarContainer.style.marginBottom = "20px";
+    progressBarContainer.style.height = "60px";  // Fixed height for the container
+    progressBarContainer.style.overflowX = "auto";  // Enable horizontal scrolling
+    progressBarContainer.style.whiteSpace = "nowrap";  // Ensure the boxes stay on the same line
+    progressBarContainer.style.border = "1px solid #e0e0e0";  // Rectangular border
+    progressBarContainer.style.borderRadius = "5px";  // Optional rounded corners
+    document.querySelector('.question-container').prepend(progressBarContainer);
+
+    for (let i = 0; i < numQuestions; i++) {
+        const square = document.createElement("div");
+        square.textContent = i + 1;
+        square.style.display = "inline-block";
+        square.style.width = "30px";
+        square.style.height = "30px";
+        square.style.lineHeight = "30px";
+        square.style.textAlign = "center";
+        square.style.margin = "5px";
+        square.style.border = "1px solid black";
+        square.style.borderRadius = "5px";
+        square.style.backgroundColor = "white";
+        square.dataset.index = i;
+        progressBarContainer.appendChild(square);
+    }
+}
+
+function updateProgressBar(index, status) {
+    const square = progressBarContainer.children[index];
+    if (status === "answered") {
+        square.style.backgroundColor = "green";
+        square.style.color = "white";
+    } else if (status === "skipped") {
+        square.style.backgroundColor = "yellow";
+        square.style.color = "black";
+    }
+}
+
+function removeProgressBar() {
+    if (progressBarContainer) {
+        progressBarContainer.remove();
+    }
+}
+
+// Quiz Logic
+function validateLogin() {
+    const name = document.getElementById("user-name").value;
+    const gmail = document.getElementById("user-gmail").value;
+    const userId = document.getElementById("user-id").value;
+
+    const user = allowedUsers.find(user => user.name === name && user.gmail === gmail && user.username === userId);
+    if (user) {
+        document.querySelector('.login-container').style.display = "none";
+        document.querySelector('.question-container').style.display = "block";
+        startQuiz();
+    } else {
+        alert("Invalid login credentials. Please try again.");
+    }
+}
+
+function startQuiz() {
+    createProgressBar(questions.length);
+    totalQuizTime = timePerQuestion * questions.length;
+    timeRemaining = totalQuizTime;
+
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.question-container').style.display = "block";
+    startTimer();
+    showQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const timerElement = document.getElementById("timer");
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `Time Left: ${minutes}m ${seconds}s`;
+}
+// This function hides the timer when the last question is reached
+function handleTimerVisibility() {
+    if (currentQuestion === questions.length - 1) {
+        clearInterval(timerInterval); // Stop the timer on the last question
+        document.getElementById("timer").style.display = "none";  // Hide the timer after the last question
+    }
+}
+// Call this function when moving to the next question
+function nextQuestion() {
+    // Your existing logic for the next question
+
+    // Check timer visibility when changing questions
+    handleTimerVisibility();
+}
+
+// End quiz and hide timer
+function endQuiz() {
+    // Your existing endQuiz logic goes here
+    clearInterval(timerInterval); // Ensure timer is stopped when quiz ends
+    document.getElementById("timer").style.display = "none";  // Hide timer after quiz ends
+}
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        const userAnswer = selectedOption.value;
+        userAnswers[currentQuestion] = userAnswer;
+        if (userAnswer === questions[currentQuestion].answer) {
+            score++;
+        }
+        updateProgressBar(currentQuestion, "answered");
+        questions[currentQuestion].answered = true;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            handleSkippedQuestions();
+        }
+    } else {
+        alert("Please select an answer or skip the question.");
+    }
+}
+
+function skipQuestion() {
+    if (!skippedQuestions.includes(currentQuestion)) {
+        skippedQuestions.push(currentQuestion);
+    }
+    updateProgressBar(currentQuestion, "skipped");
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        handleSkippedQuestions();
+    }
+}
+
+function showQuestion() {
+    if (currentQuestion >= questions.length) {
+        removeProgressBar();
+        endQuiz();
+        return;
+    }
+
+    const question = questions[currentQuestion];
+    if (question.answered) {
+        handleSkippedQuestions();
+        return;
+    }
+
+    document.querySelector('.question-container').style.display = "block";
+    document.getElementById("question").textContent = question.text;
+
+    let optionsHTML = '';
+    question.options.forEach(option => {
+        optionsHTML += `<label><input type="radio" name="answer" value="${option}"> ${option}</label><br>`;
+    });
+
+    document.getElementById("options").innerHTML = optionsHTML;
+    updateButtons();
+}
+
+function handleSkippedQuestions() {
+    if (skippedQuestions.length > 0) {
+        currentQuestion = skippedQuestions.shift();
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function updateButtons() {
+    const nextButton = document.getElementById("next-button");
+    if (skippedQuestions.length > 0) {
+        nextButton.textContent = currentQuestion === questions.length - 1 && skippedQuestions.length === 1 ? "Finish" : "Next";
+    } else {
+        nextButton.textContent = currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    }
+}
+function endQuiz() {
+    document.querySelector('.question-container').style.display = "none";
+    document.querySelector('.result-container').style.display = "block";
+    document.getElementById("score").textContent = score;
+
+    const answerKey = document.getElementById("answer-key");
+    answerKey.innerHTML = '';
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const resultItem = document.createElement("li");
+        resultItem.innerHTML = `
+            <div class="question">${question.text}</div>
+            <div class="options">
+                ${question.options.map(option => {
+                    let optionText = option;
+                    if (userAnswer === option) {
+                        // If the answer is incorrect, color "Your answer" red
+                        if (userAnswer !== question.answer) {
+                            optionText += " <span style='color: red;'>(Your answer)</span>";
+                        } else {
+                            optionText += " <span style='color: green;'>(Correct)</span>";
+                        }
+                    }
+                    if (option === question.answer && userAnswer !== option) {
+                        // For correct option (when the user didn't choose it), mark it as green
+                        optionText += " <span style='color: green;'>(Correct)</span>";
+                    }
+                    return `<div>${optionText}</div>`;
+                }).join('')}
+            </div>
+            <hr style="border: 1px solid #ccc; margin: 10px 0;">  <!-- Horizontal Line -->
+            <div class="description"><strong>Explanation:</strong> ${question.description}</div>
+        `;
+        answerKey.appendChild(resultItem);
+    });
+}
+
+function showLogin() {
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.login-container').style.display = "block";
+}
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block B</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    
+        .container {
+            text-align: center;
+            max-width: 80%;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 58%;
+        }
+    
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+    
+        button:hover {
+            background: #2575fc;
+        }
+    
+        .question-container, .result-container, .login-container {
+            display: none;
+        }
+    
+        .question-container {
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            min-height: 300px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .options label {
+            display: block;
+            margin: -10px 0;
+        }
+    
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+    
+        .result-container ul {
+            text-align: left;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-container ul li {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .result-container ul li .question {
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-container ul li .options {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+    
+        .result-container ul li .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Enhanced Timer Styles */
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6a00, #ee0979); /* Gradient background */
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    
+        #timer:hover {
+            transform: scale(1.1); /* Slight scaling effect on hover */
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Change gradient on hover */
+        }
+    
+        #timer span {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Timer animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        #timer {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+    
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin: 20px auto;
+        }
+    
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    
+        .form-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    
+        .form-container input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .form-container button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 37%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .form-container button:hover {
+            background: #2575fc;
+        }
+    
+        .login-container input {
+            width: 51%;
+            padding: 13px;
+            margin: 16px;
+        }
+    
+        .login-container button {
+            width: 16%;
+            margin-top: 10px;
+        }
+    
+        p {
+            float: left;
+            padding: 2px 100px;
+            text-align: left;
+            line-height: 20px;
+        }
+    
+        #question {
+            font-size: 20px;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #timer {
+                font-size: 18px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+            .form-container {
+                width: 90%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            #timer {
+                font-size: 16px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .para1{
+                padding: 0px 20px;
+            }
+            .login-credentials{
+                font-size: 1.5em ;
+                line-height: 33px;
+            }
+            .login-container button {
+                width: 25%;
+                padding: 10px 25px;
+                margin-top: 10px;
+                text-align: center;
+            }
+    
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .login-container input {
+                width: 71%;
+                padding: 13px;
+                margin: 16px;
+            }
+    
+            .form-container {
+                width: 73%;
+            }
+            button {
+                font-size: 12px;
+                padding: 10px 25px;
+            }
+            #timer {
+                font-size: 9px;
+            }
+            .form-container h2 {
+                font-size: 18px;
+            }
+            .form-container input {
+                width: 84%;
+            }
+            #question {
+                font-size: 16px;
+            }
+            .options label {
+                font-size: 14px;
+            }
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-container">
+            <h1 class=" login-credentials">Enter Your Login Credentials </h1>
+            <input type="text" id="user-name" placeholder="Enter your Name" class="login-input"> <br>
+            <input type="email" id="user-gmail" placeholder="Enter your Gmail" class="login-input"> <br>
+            <input type="text" id="user-id" placeholder="Enter your ID" class="login-input"> <br>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input"> <br>
+            <button onclick="validateLogin()">Start Quiz</button>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation-buttons">
+                <button id="previous-button" onclick="previousQuestion()" style="display:none;">Previous</button>
+                <button id="next-button" onclick="nextQuestion()">Next</button>
+                <button id="skip-button" onclick="skipQuestion()">Skip</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+            <h1>Quiz Result</h1>
+            <h2>Your Score: <span id="score"></span></h2>
+            <ul id="answer-key"></ul>
+            
+
+            <div class="form-container">
+                <h2>Submit Your Details</h2>
+                <form onsubmit="sendmail(event)">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Start Container -->
+        <div class="start-container">
+            <h1>Welcome to the Block B Quiz</h1>
+            <h3>Important Instructions for Online Quiz</h3>
+            <p class="para1">
+
+                Please note that this online quiz is time-restricted and consists of 120 multiple-choice questions. It is essential to attempt the quiz within the allotted time frame. <br>  <br>
+                
+                <strong>Security Notice:</strong> This quiz contains high security layers, and any attempts to capture screenshots or screen recordings will result in immediate blocking of access. <br> <br>
+                
+               <strong> Availability:</strong> This quiz will be available to you until your final exam. <br> <br>
+                
+                To access the quiz, please provide the following information: <br> <br>
+                <strong>
+                - Username<br>
+                - Gmail address<br>
+                - User ID<br>
+                - password</strong> <br>  <br>
+                Please note that selected MCQ options cannot be changed, so choose carefully. After attempting all main questions, click 'Finish' to review skipped questions. Skipped MCQs will appear immediately, and clicking 'Next' after the last skipped question will display your results. Review each question thoughtfully, as submissions are final. <br>  <br> <strong> <em>Please enter your username in the designated input area at the bottom of the results section to confirm your submission.</em> </strong> <br> <br>
+                
+               We appreciate your cooperation and adherence to theseguidelines. <br>  <br> </p>
+            <button onclick="showLogin()">Start</button>
+        </div>
+
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdP3lE-1OjWkzp7za");
+        })();
+
+        function sendmail(event) {
+            event.preventDefault();
+
+            const params = {
+                username: document.getElementById("username").value,
+                score: document.getElementById("score").textContent,
+            };
+
+            emailjs.send("lmhservice3541", "lmhtemplate3541", params)
+                .then(
+                    (res) => {
+                        alert("Email sent successfully! Status: " + res.status);
+                    },
+                    (err) => {
+                        console.error("Failed to send email:", err);
+                        alert("Failed to send email. Please try again.");
+                    }
+                );
+        }
+
+        const allowedUsers = [
+            { name: "Admin Arsalan", gmail: "word3541@gmail.com", username: "Admin123" , password: "Admin123"},
+            { name: "Arif Khan", gmail: "akbeliever1@gmail.com", username: "Arif3275669640",password: "arif3541" },
+            { name: "Waleed Iqbal", gmail: "waleediqbal8584931@gmail.com", username: "Waleed3139429903",password: "waleed3541" },
+            
+
+        ];
+        const questions = [
+        {
+        "text": "A 40-year-old woman presents with a blood clot in her popliteal vein. This is most likely to affect blood flow in which of the following veins?",
+        "options": ["Greater saphenous vein", "Small saphenous vein", "Femoral vein", "Posterior tibial vein", "Anterior tibial vein"],
+        "answer": "Femoral vein",
+        "description": "A clot in the popliteal vein can block or reduce blood flow in the femoral vein, which receives blood from the popliteal vein."
+    },
+    {
+        "text": "Which muscle is the strongest extensor of the hip joint?",
+        "options": ["Gluteus maximus", "Iliacus", "Adductor magnus", "Obturator externus", "Pectineus"],
+        "answer": "Gluteus maximus",
+        "description": "The gluteus maximus is the most powerful extensor of the hip, responsible for movement like standing and climbing."
+    },
+    {
+        "text": "In osteomyelitis, the infection of bone, which area of a growing long bone is most often involved?",
+        "options": ["Diaphysis", "Metaphysis", "Bone marrow", "Epiphyseal plate", "Epiphysis"],
+        "answer": "Metaphysis",
+        "description": "Osteomyelitis most commonly affects the metaphysis of growing bones due to the rich vascularization and slower blood flow in this region."
+    },
+    {
+        "text": "In adult bones, the epiphyseal line marks the cessation of which process?",
+        "options": ["Epiphyseal plate growth", "Primary ossification", "Secondary ossification", "Bone remodeling", "Bone resorption"],
+        "answer": "Epiphyseal plate growth",
+        "description": "The epiphyseal line indicates the end of growth in the long bones, marking the point where the epiphyseal plate has closed."
+    },
+    {
+        "text": "Bone formation from a cartilage model is known as which type of ossification?",
+        "options": ["En bloc", "Endochondral", "Intramembranous", "Perichondral", "Endosteal"],
+        "answer": "Endochondral",
+        "description": "Endochondral ossification is the process in which bone forms from a cartilage template, commonly seen in long bone development."
+    },
+    {
+        "text": "At the final stages of upper limb development, the upper limbs rotate in which direction?",
+        "options": ["Medially through 90 degrees", "Laterally through 90 degrees", "Medially through 180 degrees", "Laterally through 180 degrees", "Medially through 45 degrees"],
+        "answer": "Laterally through 90 degrees",
+        "description": "During limb development, the upper limbs undergo a 90-degree lateral rotation, aligning the palms anteriorly."
+    },
+    {
+        "text": "From which embryological structure do the bones of the upper limb develop?",
+        "options": ["Myotome", "Dermatome", "Somatic lateral plate mesoderm", "Splanchnic mesoderm", "Intermediate mesoderm"],
+        "answer": "Somatic lateral plate mesoderm",
+        "description": "The bones of the upper limb are derived from the somatic lateral plate mesoderm, which also contributes to other skeletal structures."
+    },
+    {
+        "text": "What is the basic structural unit of compact bone known as?",
+        "options": ["Cement line", "Osteons", "Interstitial lamella", "Marrow spaces", "Canaliculi"],
+        "answer": "Osteons",
+        "description": "Osteons (Haversian systems) are the fundamental structural units of compact bone, consisting of concentric lamellae surrounding a central canal."
+    },
+    {
+        "text": "The yellow elastic bands that connect adjacent vertebral arches are called what?",
+        "options": ["Interspinous ligament", "Intertransverse ligament", "Ligamentum flavum", "Ligamentum nuchae", "Supraspinous ligament"],
+        "answer": "Ligamentum flavum",
+        "description": "The ligamentum flavum is a yellow, elastic ligament that connects the laminae of adjacent vertebrae, contributing to spinal stability."
+    },
+    {
+        "text": "Which of the following bones contributes most significantly to the medial longitudinal arch of the foot?",
+        "options": ["Calcaneus", "Navicular bone", "Talus bone", "Medial cuneiform bone", "Bases of the medial three metatarsal bones"],
+        "answer": "Navicular bone",
+        "description": "The navicular bone is crucial for maintaining the medial longitudinal arch, playing a key role in weight-bearing and foot movement."
+    },
+    {
+        "text": "Which muscle in the foot inserts into the tendon of the flexor digitorum longus?",
+        "options": ["Quadratus plantae", "Abductor hallucis", "Flexor digitorum brevis", "Abductor digiti minimi", "Flexor hallucis longus"],
+        "answer": "Quadratus plantae",
+        "description": "The quadratus plantae muscle inserts into the tendon of the flexor digitorum longus, aiding in flexing the toes."
+    },
+    {
+        "text": "Which of the following proteins is absent in smooth muscle compared to skeletal muscle?",
+        "options": ["Actin", "Myosin", "Calmodulin", "Troponin & Tropomyosin", "Titin"],
+        "answer": "Troponin & Tropomyosin",
+        "description": "Smooth muscle lacks troponin and tropomyosin, using calmodulin instead to regulate contraction."
+    },
+    {
+        "text": "A cyclist sustains an injury in her axilla during a fall. She experiences weakness in movements like adduction and extension of her arm. Which nerve is most likely injured?",
+        "options": ["Accessory nerve", "Dorsal scapular nerve", "Medial pectoral nerve", "Thoracodorsal nerve", "Lateral pectoral nerve"],
+        "answer": "Thoracodorsal nerve",
+        "description": "Injury to the thoracodorsal nerve, which innervates the latissimus dorsi, results in weakness in arm adduction and extension."
+    },
+    {
+        "text": "During SGD session, the facilitator asked about the action of Dorsal Interossei, the correct answer was:",
+        "options": ["Flexion of toes", "Extension of toes", "Abduction of toes at M.T.P joint", "Adduction of toes at M.T.P joint", "Abduction and extension of toes"],
+        "answer": "Abduction of toes at M.T.P joint",
+        "description": "The dorsal interossei muscles are responsible for the abduction of toes at the metatarsophalangeal joint."
+    },
+    {
+        "text": "The joint between the atlas and axis is?",
+        "options": ["Angular joint", "Ball and socket joint", "Gliding joint", "Pivot joint", "Saddle joint"],
+        "answer": "Pivot joint",
+        "description": "The atlantoaxial joint is a pivot joint, allowing rotation of the head."
+    },
+    {
+        "text": "Which of the following is the largest segment of the movable part of the vertebral column?",
+        "options": ["Cervical", "Coccygeal", "Lumbar", "Sacrum", "Thorax"],
+        "answer": "Lumbar",
+        "description": "The lumbar spine is the largest segment of the movable vertebral column and supports much of the body's weight."
+    },
+    {
+        "text": "Erector spinae muscle is innervated by the:",
+        "options": ["Axillary nerve", "Accessory nerve", "Branches from the posterior cord of brachial plexus", "Dorsal rami of spinal nerves", "Dorsal scapular nerve"],
+        "answer": "Dorsal rami of spinal nerves",
+        "description": "The erector spinae group is innervated by the dorsal rami of the spinal nerves."
+    },
+    {
+        "text": "The wrist joint is an articulation between the radius and proximal carpal bones. What type of synovial joint is it?",
+        "options": ["Pivot joint", "Saddle joint", "Hinge joint", "Ellipsoid joint", "Plane joint"],
+        "answer": "Ellipsoid joint",
+        "description": "The wrist joint is an ellipsoid joint, allowing flexion, extension, and limited rotation."
+    },
+    {
+        "text": "The superomedial boundary of the popliteal fossa is formed by which of the following structures?",
+        "options": ["Biceps femoris", "Medial head of gastrocnemius", "Semimembranosus", "Lateral head of gastrocnemius", "Sartorius"],
+        "answer": "Semimembranosus",
+        "description": "The semimembranosus forms the superomedial boundary of the popliteal fossa."
+    },
+    {
+        "text": "Which one of the following is the deepest structure in the popliteal fossa?",
+        "options": ["Popliteal vein", "Tibial nerve", "Common peroneal nerve", "Popliteal artery", "Small saphenous vein"],
+        "answer": "Popliteal artery",
+        "description": "The popliteal artery is the deepest structure in the popliteal fossa, running in close proximity to the tibial nerve."
+    },
+    {
+        "text": "The movement that is possible on the radioulnar joints is:",
+        "options": ["Extension", "Flexion", "Pronation and supination", "Abduction", "Adduction"],
+        "answer": "Pronation and supination",
+        "description": "The radioulnar joints allow pronation and supination of the forearm."
+    },
+    {
+        "text": "The major number of superficial lymphatic vessels in the arm that follow the cephalic vein drain into which of the following group of lymph nodes?",
+        "options": ["Anterior axillary lymph nodes", "Apical axillary lymph nodes", "Cubital nodes", "Deltopectoral lymph nodes", "Supraclavicular lymph nodes"],
+        "answer": "Apical axillary lymph nodes",
+        "description": "Lymphatic vessels following the cephalic vein drain into the apical axillary lymph nodes, located at the top of the axilla."
+    },
+    {
+        "text": "Which of the following nerves innervates the muscles directly responsible for dorsiflexion and eversion of the foot?",
+        "options": ["Tibial nerve", "Deep peroneal nerve", "Sciatic nerve", "Common peroneal nerve", "Femoral nerve"],
+        "answer": "Deep peroneal nerve",
+        "description": "The deep peroneal nerve innervates muscles like tibialis anterior, which are responsible for dorsiflexion and eversion of the foot."
+    },
+    {
+        "text": "The proximal radioulnar joint is an articulation between the head of the radius and the radial notch of the ulna. What type of joint is it?",
+        "options": ["Pivot joint", "Saddle joint", "Hinge joint", "Ellipsoid joint", "Plane joint"],
+        "answer": "Pivot joint",
+        "description": "The proximal radioulnar joint is a pivot joint, allowing the radius to rotate around the ulna."
+    },
+    {
+        "text": "Which of the following carpal bones takes part in forming the articulating surfaces of the wrist joint?",
+        "options": ["Lunate", "Pisiform", "Trapezoid", "Capitate", "Hamate"],
+        "answer": "Lunate",
+        "description": "The lunate is one of the carpal bones that forms part of the articulating surface of the wrist joint."
+    },
+    {
+        "text": "Which of the following is most likely the first symptom of Myasthenia Gravis?",
+        "options": ["Choking", "Dysphonia", "Muscle weakness", "Ptosis", "Speech problem"],
+        "answer": "Ptosis",
+        "description": "Ptosis, or drooping eyelids, is often the first clinical symptom of Myasthenia Gravis."
+    },
+    {
+        "text": "When a muscle is stimulated after a period of rest, initial contractions are weak and subsequently the strength of contraction increases reaching a plateau, this phenomenon is called Treppe or staircase effect. The most likely cause of this is an increase in?",
+        "options": ["Duration of cross-bridge cycle", "The concentration of calcium ions in the cytosol", "The magnitude of end-plate potential", "The number of contracting muscle fibers", "The velocity of muscle contraction"],
+        "answer": "The concentration of calcium ions in the cytosol",
+        "description": "Treppe effect is due to an increase in calcium ion concentration in the cytosol, improving the efficiency of cross-bridge formation."
+    },
+    {
+        "text": "Which one is the most likely site for the presence of multi-unit smooth muscle?",
+        "options": ["Muscle of blood vessel", "Muscles of gut", "Muscle of heart", "Muscle of iris of eye", "Muscle of ureter"],
+        "answer": "Muscle of iris of eye",
+        "description": "The multi-unit smooth muscle is found in structures like the iris of the eye, where each muscle cell functions independently."
+    },
+    {
+        "text": "Which one of the muscle proteins is absent in smooth muscle?",
+        "options": ["Actin", "Myosin", "Calmodulin", "Troponin", "Tropomyosin"],
+        "answer": "Troponin",
+        "description": "Smooth muscle lacks troponin, relying on calmodulin for regulation of contraction instead."
+    },
+    {
+        "text": "There are multiple terminal branches arising from the brachial plexus. Which one of the following nerves is related to the surgical neck of the humerus?",
+        "options": ["Radial nerve", "Axillary nerve", "Ulnar nerve", "Musculo-cutaneous nerve", "Median nerve"],
+        "answer": "Axillary nerve",
+        "description": "The axillary nerve runs close to the surgical neck of the humerus and can be injured there."
+    },
+    {
+        "text": "Which one of the following structures is related to the surgical neck of the humerus?",
+        "options": ["Anterior interosseous Nerve", "Axillary Nerve", "Brachial artery", "Median Nerve", "Musculocutaneous nerve"],
+        "answer": "Axillary Nerve",
+        "description": "The axillary nerve is closely associated with the surgical neck of the humerus and is at risk of injury in fractures."
+    },
+    {
+        "text": "A 30-year-old pregnant lady presents with spasms of the hands and feet, leg cramps, and overactive neurological reflexes. She is diagnosed with tetany due to deficiency of which of the following forms of calcium?",
+        "options": ["Serum Total calcium", "Serum Complexed calcium", "Serum Ionized calcium", "Serum Protein bound calcium", "Total intra mitochondrial calcium"],
+        "answer": "Serum Ionized calcium",
+        "description": "Tetany due to calcium deficiency typically results from low ionized calcium levels in the blood."
+    },
+    {
+        "text": "A 50-year-old had a small bowel resection secondary to mesenteric ischemia 2 months ago. He is now dependent on total parenteral nutrition. The patient develops gradual onset of shortness of breath, orthopnea, and paroxysmal nocturnal dyspnea with mild ankle edema over a period of eight months. These symptoms are due to which of the following?",
+        "options": ["Zinc deficiency", "Chromium deficiency", "Selenium deficiency", "Manganese deficiency", "Vitamin E deficiency"],
+        "answer": "Selenium deficiency",
+        "description": "Selenium deficiency can cause cardiomyopathy, leading to symptoms such as shortness of breath and edema."
+    },
+    {
+        "text": "A 4-year-old boy was presented with gingival bleeding. He was diagnosed with a severe form of scurvy. Which of the following metabolic defects had resulted in this condition?",
+        "options": ["Failure to form Acetyle CoA from pyruvate", "Failure to form succinyle CoA from propionyl CoA", "Failure to form methionine from homocysteine", "Failure to form fumarate from succinate", "Failure to form hydroxyproline from proline"],
+        "answer": "Failure to form hydroxyproline from proline",
+        "description": "Scurvy is caused by a deficiency in vitamin C, which is necessary for the synthesis of hydroxyproline, an important component of collagen."
+    },
+    {
+        "text": "Which of the following muscles in the thigh has a double motor nerve supply?",
+        "options": ["Quadriceps femoris", "Adductor magnus", "Adductor longus", "Iliacus", "Obturator internus"],
+        "answer": "Adductor magnus",
+        "description": "The adductor magnus receives innervation from both the obturator nerve and the tibial part of the sciatic nerve."
+    },
+    {
+        "text": "Spiral groove is an important anatomical landmark on the posterior surface of the humerus. Which one of the following nerves is lodged in this groove?",
+        "options": ["Musculo-cutaneous nerve", "Median nerve", "Radial nerve", "Axillary nerve", "Ulnar nerve"],
+        "answer": "Radial nerve",
+        "description": "The radial nerve passes through the spiral groove on the posterior aspect of the humerus."
+    },
+    {
+        "text": "A medical student is unable to supinate his pronated forearm. Damage to which of the following nerves results in this type of injury?",
+        "options": ["Anterior interosseous nerve", "Axillary nerve", "Median nerve", "Musculocutaneous nerve", "Ulnar nerve"],
+        "answer": "Musculocutaneous nerve",
+        "description": "The musculocutaneous nerve innervates the biceps brachii, the primary muscle responsible for supination of the forearm."
+    },
+    {
+        "text": "Wasting of Thenar muscles is due to injury to which of the following nerves?",
+        "options": ["Axillary nerve", "Median nerve", "Musculo-cutaneous nerve", "Radial nerve", "Ulnar nerve"],
+        "answer": "Median nerve",
+        "description": "The median nerve innervates the thenar muscles, and damage can lead to atrophy in this region, often seen in conditions like carpal tunnel syndrome."
+    },
+    {
+        "text": "A young man was given an intramuscular injection in the arm region by a quack in his village. He developed 'Wrist drop' after a few hours. This paralysis is due to damage to which of the following nerves?",
+        "options": ["Axillary nerve", "Musculocutaneous nerve", "Median nerve", "Radial nerve", "Ulnar nerve"],
+        "answer": "Radial nerve",
+        "description": "Wrist drop is a classic symptom of radial nerve damage, as it affects wrist extension."
+    },
+    {
+        "text": "Which one of the following is a branch of the lateral cord of the brachial plexus?",
+        "options": ["Medial pectoral nerve", "Medial root of median nerve", "Median nerve", "Medial cutaneous nerve of arm", "Musculocutaneous nerve"],
+        "answer": "Musculocutaneous nerve",
+        "description": "The musculocutaneous nerve arises from the lateral cord of the brachial plexus and supplies muscles of the anterior arm."
+    },
+    {
+        "text": "Which one of the following nerves originates from the trunk of the brachial plexus?",
+        "options": ["Dorsal scapular nerve", "Nerve to subclavius", "Suprascapular nerve", "Long thoracic nerve", "Lateral pectoral nerve"],
+        "answer": "Suprascapular nerve",
+        "description": "The suprascapular nerve originates from the superior trunk of the brachial plexus and innervates the supraspinatus and infraspinatus muscles."
+    },
+    {
+        "text": "Ability of skeletal muscle fibers to regenerate following injury is best described as:",
+        "options": ["Comparable to that of most epithelia", "Extensive", "Moderately well developed", "Nonexistent", "Quite limited"],
+        "answer": "Quite limited",
+        "description": "Skeletal muscle fibers have a limited ability to regenerate after injury, relying on satellite cells for repair."
+    },
+    {
+        "text": "Which of the following thigh muscles serves as both a hip and knee flexor?",
+        "options": ["Sartorius", "Iliopsoas", "Vastus lateralis", "Vastus intermedius", "Rectus femoris"],
+        "answer": "Sartorius",
+        "description": "The sartorius muscle flexes both the hip and the knee joint."
+    },
+    {
+        "text": "There are several intermuscular spaces in the scapular region which act as passageways for neurovascular structures to traverse the upper limb. The quadrangular intermuscular space transmits which of the following arteries?",
+        "options": ["Anterior circumflex humeral artery", "Circumflex scapular artery", "Posterior circumflex humeral artery", "Subscapular artery", "Profunda brachii artery"],
+        "answer": "Posterior circumflex humeral artery",
+        "description": "The posterior circumflex humeral artery passes through the quadrangular space alongside the axillary nerve."
+    },
+    {
+        "text": "A motorcyclist had an RTA in which his head was violently separated from his neck. His C5-C6 roots of the brachial plexus were seriously injured. The next day he developed 'Porter's tip hand deformity'. Which one of the following nerves is responsible for the loss of flexion at the elbow joint?",
+        "options": ["Axillary nerve", "Ulnar nerve", "Musculocutaneous nerve", "Suprascapular nerve", "Median nerve"],
+        "answer": "Musculocutaneous nerve",
+        "description": "Injury to the musculocutaneous nerve results in loss of flexion at the elbow joint, characteristic of 'Porter's tip' deformity."
+    },
+    {
+        "text": "A 50-year-old patient had a small bowel resection secondary to mesenteric ischemia 2 months ago. He is now dependent on total parenteral nutrition. He developed shortness of breath with mild ankle edema. It may be due to a deficiency of which of the following?",
+        "options": ["Chromium", "Manganese", "Selenium", "Vitamin A", "Vitamin E"],
+        "answer": "Selenium",
+        "description": "Selenium deficiency is associated with cardiomyopathy and can lead to respiratory symptoms such as shortness of breath."
+    },
+    {
+        "text": "A 40-year-old lady had a surgery for removal of carcinoma from the right breast. After a day, it was observed that her right scapula is winged and protruding out of the back region. Using your knowledge of anatomy, identify the nerve causing this condition?",
+        "options": ["Axillary nerve", "Dorsal scapular nerve", "Long thoracic nerve", "Suprascapular nerve", "Thoracodorsal nerve"],
+        "answer": "Long thoracic nerve",
+        "description": "Injury to the long thoracic nerve causes winging of the scapula, as it innervates the serratus anterior muscle."
+    },
+    {
+        "text": "Regarding the types of synovial joints, the shoulder joint is a synovial joint of which of the following varieties?",
+        "options": ["Biaxial", "Condyloid", "Multiaxial", "Plane type", "Hinge joint"],
+        "answer": "Multiaxial",
+        "description": "The shoulder joint is a ball-and-socket joint, allowing movement along three axes, thus classified as multiaxial."
+    },
+    {
+        "text": "Which of the following thigh muscles has a dual nerve supply?",
+        "options": ["Rectus femoris", "Pectineus", "Sartorius", "Adductor Longus", "Vastus lateralis"],
+        "answer": "Pectineus",
+        "description": "The pectineus muscle receives innervation from both the femoral nerve and the obturator nerve."
+    },
+    {
+        "text": "Following a subcapital fracture of the neck of the femur, an 80-year-old man sustains avascular necrosis of the femoral head. This is most likely to be the consequence of interruption to the blood supply to the head from which of the following sources?",
+        "options": ["Arteries from trochanteric anastomosis in the retinacula", "Artery of the ligament of the head from the obturator artery", "Branches from the profunda femoris artery", "Branches from the pudendal artery", "Branches from the inferior gluteal artery"],
+        "answer": "Branches from the profunda femoris artery",
+        "description": "Avascular necrosis of the femoral head often results from damage to the blood supply provided by the profunda femoris artery."
+    },
+    {
+        "text": "The inferior end of the tibia is expanded and offers a bearing surface for the?",
+        "options": ["Calcaneus", "Femur", "Pisiform", "Fibula", "Talus"],
+        "answer": "Talus",
+        "description": "The inferior end of the tibia forms part of the ankle joint and articulates with the talus."
+    },
+    {
+        "text": "Which of the following mineral deficiencies may result in hypothyroidism?",
+        "options": ["Chromium", "Magnesium", "Fluoride", "Selenium", "Zinc"],
+        "answer": "Selenium",
+        "description": "Selenium is essential for thyroid function, and its deficiency can lead to hypothyroidism."
+    },
+    {
+        "text": "The study of designing equipment & devices that fit the human body, its movements & cognitive abilities pertains to which one of the following choices?",
+        "options": ["Anthropology", "Archeology", "Ergogenic aids", "Ergonomics", "Gerontology"],
+        "answer": "Ergonomics",
+        "description": "Ergonomics is the science of designing equipment and devices to fit human anatomy and cognitive abilities."
+    },
+    {
+        "text": "Which one of the following muscles is enclosed by clavipectoral fascia?",
+        "options": ["Pectoralis major", "Pectoralis minor", "Latissimus dorsi", "Teres major", "Teres minor"],
+        "answer": "Pectoralis minor",
+        "description": "The pectoralis minor muscle is located under the clavipectoral fascia in the upper chest."
+    },
+    {
+        "text": "Posterior Tibial Artery is the main artery of the posterior aspect of the leg. Which one of the following is correct about it?",
+        "options": ["It begins at the upper border of Popliteus muscle.", "It lies deep to Popliteal muscle.", "It is palpable posterior to medial malleolus.", "It is palpable anterior to medial malleolus.", "It lies between Tibialis posterior and flexor digitorum muscle."],
+        "answer": "It is palpable posterior to medial malleolus.",
+        "description": "The posterior tibial artery can be palpated just behind the medial malleolus."
+    },
+    {
+        "text": "Sural nerve is a cutaneous nerve that supplies the lower half of the posterior aspect of the leg. It is a branch of:",
+        "options": ["Anterior division of femoral nerve", "Posterior division of femoral nerve", "Obturator nerve", "Tibial nerve", "Common peroneal/fibular nerve"],
+        "answer": "Tibial nerve",
+        "description": "The sural nerve is a cutaneous branch of the tibial nerve, providing sensory innervation to the lower leg."
+    },
+    {
+        "text": "Which one of the following is the action of Palmar interossei?",
+        "options": ["Adduction of toes at M.T.P. Joint", "Abduction of toes at M.T.P joint", "Extension of toes at I.P. Joint", "Flexion of toes at I.P. joint", "Flexion at M.T.P joint and extension at I.P. joint"],
+        "answer": "Adduction of toes at M.T.P. Joint",
+        "description": "The palmar interossei muscles are responsible for adducting the toes at the metatarsophalangeal joints."
+    },
+    {
+        "text": "Which one of the following is the action of Lumbrical in the foot?",
+        "options": ["Adduction of toes at M.T.P joint", "Abduction of toes at M.T.P. joint", "Flexion at M.T.P joint and extension at Interphalangeal (I.P) joint", "Extension at M.T.P joint and flexion at I.P joint", "Extension at M.T.P joint"],
+        "answer": "Flexion at M.T.P joint and extension at Interphalangeal (I.P) joint",
+        "description": "The lumbrical muscles in the foot flex the toes at the metatarsophalangeal joints and extend at the interphalangeal joints."
+    },
+    {
+        "text": "Which one of the following is the correct option about the extent of the axillary artery?",
+        "options": ["From the inner border of the 1st rib to the lower border of the pectoralis minor muscle", "From the inner border of the 1st rib to the upper border of teres major muscle", "From the outer border of the 1st rib to the lower border of teres major muscle", "From the inner border of the 1st rib to the lower border of teres major muscle", "From the inner border of the 1st rib to the outer border of teres major"],
+        "answer": "From the outer border of the 1st rib to the lower border of teres major muscle",
+        "description": "The axillary artery extends from the outer border of the first rib to the lower border of the teres major muscle."
+    },
+    {
+        "text": "Which one of the following muscles is a part of the anterior axillary fold?",
+        "options": ["Teres major", "Teres minor", "Latissimus dorsi", "Pectoralis major", "Serratus anterior"],
+        "answer": "Pectoralis major",
+        "description": "The pectoralis major muscle forms part of the anterior axillary fold."
+    },
+    {
+        "text": "Which one of the following muscles connects the upper limb to the thoracic wall?",
+        "options": ["Trapezius", "Pectoralis major", "Latissimus dorsi", "Deltoid", "Supraspinatus"],
+        "answer": "Pectoralis major",
+        "description": "The pectoralis major muscle connects the upper limb to the thoracic wall."
+    },
+    {
+        "text": "Cubital fossa is a triangular depression located on the anterior surface of the elbow joint. Which of the following muscles forms the lateral border of this fossa?",
+        "options": ["Lateral border of pronator teres", "Brachioradialis", "Brachialis", "Supinator muscle", "Biceps brachii"],
+        "answer": "Brachioradialis",
+        "description": "The brachioradialis forms the lateral boundary of the cubital fossa."
+    },
+    {
+        "text": "Which of the following thigh muscles flexes the thigh at the hip joint and extends the knee?",
+        "options": ["Rectus femoris", "Vastus lateralis", "Biceps femoris", "Semimembranosus", "Sartorius"],
+        "answer": "Rectus femoris",
+        "description": "The rectus femoris is the only quadriceps muscle that flexes the thigh at the hip and extends the knee."
+    },
+    {
+        "text": "Which one of the following options is correct regarding the gross features of the posterior compartment of the leg?",
+        "options": [
+            "Elephantiasis is a disease caused by varicose veins.",
+            "Gastrocnemius muscle also takes origin from posterior surface of Tibia.",
+            "Plantaris muscle takes origin from the medial condyle of femur.",
+            "Posterior Tibial artery is not accompanied by two venae comitantes along its course.",
+            "Small Saphenous vein is drained into popliteal vein."
+        ],
+        "answer": "Small Saphenous vein is drained into popliteal vein.",
+        "description": "The small saphenous vein drains into the popliteal vein, located in the popliteal fossa, which is part of the venous drainage of the posterior leg."
+    },
+    {
+        "text": "Smooth muscle is similar to skeletal muscle in which of the following aspects?",
+        "options": [
+            "Acetylcholine can initiate action potential in muscle.",
+            "Both have Latch phenomenon.",
+            "Both require Calcium ions for Action potential.",
+            "Cross-bridges of myosin attach with actin filaments.",
+            "Resting Membrane Potential is -90 millivolt."
+        ],
+        "answer": "Cross-bridges of myosin attach with actin filaments.",
+        "description": "Both smooth and skeletal muscle utilize actin and myosin filaments to generate force through cross-bridge formation during contraction."
+    },
+    {
+        "text": "When comparing the contractile response in smooth and skeletal muscle, which of the following is the most different?",
+        "options": [
+            "The mechanism of force generation",
+            "The nature of the contractile proteins",
+            "The role of calcium in initiation of contraction",
+            "The source of activator calcium.",
+            "The source of energy used during contraction"
+        ],
+        "answer": "The source of activator calcium.",
+        "description": "In skeletal muscle, calcium comes primarily from the sarcoplasmic reticulum, while in smooth muscle, it comes from both the extracellular space and the sarcoplasmic reticulum."
+    },
+    {
+        "text": "Which of the following arteries forms the chief blood supply of the posterior muscles of the thigh?",
+        "options": [
+            "Inferior gluteal artery",
+            "Transverse branch of medial femoral circumflex artery",
+            "Perforating branches of the profunda femoris artery",
+            "Genicular arteries",
+            "nil"
+        ],
+        "answer": "Perforating branches of the profunda femoris artery",
+        "description": "The perforating branches of the profunda femoris artery provide the primary blood supply to the posterior muscles of the thigh."
+    },
+    {
+        "text": "Contraction of the myofibril in skeletal muscle takes place at the:",
+        "options": [
+            "I band",
+            "M band",
+            "H band",
+            "Between two I bands",
+            "Between two Z bands"
+        ],
+        "answer": "Between two Z bands",
+        "description": "Contraction in skeletal muscle involves the sliding of actin and myosin filaments between Z discs (bands), shortening the sarcomere."
+    },
+    {
+        "text": "Cardiac and skeletal muscles are different in that:",
+        "options": [
+            "Only cardiac muscle has inherent rhythmicity.",
+            "Only skeletal muscle has central nuclei.",
+            "Only cardiac muscle has transverse striations.",
+            "Only skeletal muscle is influenced by nerves.",
+            "Only skeletal muscle has intercalated discs."
+        ],
+        "answer": "Only cardiac muscle has inherent rhythmicity.",
+        "description": "Cardiac muscle has intrinsic rhythmicity, allowing it to contract without external stimulation, unlike skeletal muscle which requires neural input."
+    },
+    {
+        "text": "Which one of the following structures passes through clavipectoral fascia?",
+        "options": [
+            "Superior thoracic A",
+            "Lateral thoracic A",
+            "Cephalic vein",
+            "Medial pectoral nerve",
+            "Long thoracic nerve"
+        ],
+        "answer": "Cephalic vein",
+        "description": "The cephalic vein passes through the clavipectoral fascia in the region of the axilla, draining blood from the upper limb."
+    },
+    {
+        "text": "The popliteal fossa is a shallow depression located at the back of the knee joint. Which of the following structures is located most superficially in this fossa?",
+        "options": [
+            "Popliteal artery",
+            "Popliteal vein",
+            "Knee joint capsule",
+            "Popliteus muscle",
+            "Tibial nerve"
+        ],
+        "answer": "Tibial nerve",
+        "description": "The tibial nerve is the most superficial structure in the popliteal fossa, lying just beneath the skin and fascia."
+    },
+    {
+        "text": "Foot drop is a clinical condition in which the foot appears permanently plantar flexed and the patient loses the ability to dorsiflex the foot at the ankle joint. Damage to which of the following nerves causes this condition?",
+        "options": [
+            "Tibial nerve",
+            "Common peroneal nerve",
+            "Obturator nerve",
+            "Medial plantar nerve",
+            "Lateral plantar nerve"
+        ],
+        "answer": "Common peroneal nerve",
+        "description": "Damage to the common peroneal nerve leads to foot drop due to the loss of function in the muscles that dorsiflex the foot."
+    },
+    {
+        "text": "Which of the following is the primary biochemical defect in Wilson's disease?",
+        "options": [
+            "Decreased excretion of copper from liver",
+            "Increased synthesis of ceruloplasmin by liver",
+            "Increased intestinal absorption of copper",
+            "Increased urinary absorption of copper",
+            "Reduced urinary excretion of copper"
+        ],
+        "answer": "Decreased excretion of copper from liver",
+        "description": "Wilson's disease is characterized by the accumulation of copper in the liver, due to defective excretion of copper into bile."
+    },
+
+    {
+        "text": "Which one of the following is correct regarding the action of Tibialis posterior muscle?",
+        "options": [
+            "Dorsi-flexor of foot",
+            "Planter-flexor of foot",
+            "Planter flexor and inverter of foot",
+            "Dorsi-flexor and inverter of foot",
+            "Everter of foot"
+        ],
+        "answer": "Planter flexor and inverter of foot",
+        "description": "The tibialis posterior muscle is responsible for both plantar flexion and inversion of the foot."
+    },
+    {
+        "text": "Which of the following muscles are supplied by the obturator nerve?",
+        "options": [
+            "Adductor longus",
+            "Obturator externus",
+            "Adductor brevis",
+            "Adductor part of adductor magnus",
+            "Hamstring part of the adductor magnus"
+        ],
+        "answer": "Hamstring part of the adductor magnus",
+        "description": "The hamstring part of the adductor magnus is supplied by the obturator nerve, unlike other parts of the adductor muscles."
+    },
+    {
+        "text": "The content of the adductor canal includes which of the following?",
+        "options": [
+            "Terminal part of femoral artery",
+            "Femoral vein",
+            "Saphenous nerve",
+            "Femoral nerve",
+            "Posterior division of obturator nerve"
+        ],
+        "answer": "Femoral nerve",
+        "description": "The femoral nerve is one of the contents of the adductor canal, along with other vessels and the saphenous nerve."
+    },
+    {
+        "text": "All of the following muscles are primary adductors of the hip joint, except:",
+        "options": [
+            "Adductor brevis",
+            "Adductor longus",
+            "Adductor part of adductor magnus",
+            "Hamstring part of the adductor magnus",
+            "Gracilis"
+        ],
+        "answer": "Gracilis",
+        "description": "The gracilis, though involved in hip adduction, is not a primary adductor of the hip joint, unlike the others listed."
+    },
+    {
+        "text": "Which one of the following is the 'root value' of the radial nerve?",
+        "options": [
+            "C5 – C6",
+            "C5-C6-C7",
+            "C5-C6-C7-C8",
+            "C5-C6-C7-C8-T1",
+            "C5-C6-C7-C8-T1-T2"
+        ],
+        "answer": "C5-C6-C7-C8-T1",
+        "description": "The radial nerve is formed by the union of fibers from C5 to T1 of the brachial plexus."
+    },
+    {
+        "text": "The axillary nerve arises from which segment of the brachial plexus?",
+        "options": [
+            "Roots",
+            "Trunks",
+            "Divisions",
+            "Medial cord",
+            "Posterior cord"
+        ],
+        "answer": "Posterior cord",
+        "description": "The axillary nerve arises from the posterior cord of the brachial plexus, which is formed by the union of C5 and C6 nerve roots."
+    },
+    {
+        "text": "Somites differentiate into which of the following?",
+        "options": [
+            "Bone",
+            "Cartilage",
+            "Dermis of the skin",
+            "Epidermis",
+            "Muscle"
+        ],
+        "answer": "Muscle",
+        "description": "Somites differentiate into muscle, skin, and bones, with the dermis and skeletal muscles being major derivatives."
+    },
+    {
+        "text": "Which one of the following arteries arises from the 1st part of the axillary artery?",
+        "options": [
+            "Superior thoracic artery",
+            "Lateral thoracic artery",
+            "Thoraco-acromial artery",
+            "Subscapular artery",
+            "Anterior circumflex humeral artery"
+        ],
+        "answer": "Superior thoracic artery",
+        "description": "The superior thoracic artery arises from the 1st part of the axillary artery and supplies the upper part of the thorax."
+    },
+    {
+        "text": "Which one of the following nerves originates from the trunk of the brachial plexus?",
+        "options": [
+            "Dorsal scapular nerve",
+            "Nerve to subclavius",
+            "Suprascapular nerve",
+            "Long thoracic nerve",
+            "Lateral pectoral nerve"
+        ],
+        "answer": "Suprascapular nerve",
+        "description": "The suprascapular nerve originates from the upper trunk of the brachial plexus and supplies the supraspinatus and infraspinatus muscles."
+    },
+    {
+        "text": "Deltoid muscle is assisted in its primary action of arm abduction by which of the following muscles?",
+        "options": [
+            "Latissimus dorsi",
+            "Levator scapulae",
+            "Serratus anterior",
+            "Subscapularis",
+            "Supraspinatus"
+        ],
+        "answer": "Supraspinatus",
+        "description": "The supraspinatus muscle assists the deltoid in the initial stages of arm abduction by stabilizing the shoulder joint."
+    },
+    {
+        "text": "Which of the following is a purely sensory nerve originating from the lumbar plexus?",
+        "options": [
+            "Ilioinguinal nerve",
+            "Iliohypogastric nerve",
+            "Genitofemoral nerve",
+            "Lateral cutaneous nerve of thigh",
+            "Obturator nerve"
+        ],
+        "answer": "Lateral cutaneous nerve of thigh",
+        "description": "The lateral cutaneous nerve of the thigh is a purely sensory nerve and supplies sensation to the skin of the lateral thigh."
+    },
+    {
+        "text": "The lumbar plexus is formed by ventral primary rami of which of the following spinal nerves?",
+        "options": [
+            "T12, L1, L2 and L3",
+            "L1, L2, L3 and L4",
+            "L2, L3, L4 and L5",
+            "L2, L4, L5 and S1",
+            "L4, L5, S1 and S2"
+        ],
+        "answer": "L1, L2, L3 and L4",
+        "description": "The lumbar plexus is formed from the ventral rami of L1 to L4 spinal nerves and supplies the lower abdomen and anterior thigh."
+    },
+    {
+        "text": "Cutaneous nerve supply of the lateral aspect of the thigh is derived from which of the following nerve roots?",
+        "options": [
+            "Anterior rami of L2-L3 spinal nerves",
+            "Anterior rami of L3-L4 spinal nerves",
+            "Anterior rami of L5, S1 and S2",
+            "Anterior rami of L4, L5 and S1",
+            "S1 and S2"
+        ],
+        "answer": "Anterior rami of L2-L3 spinal nerves",
+        "description": "The lateral cutaneous nerve of the thigh, which supplies the lateral thigh, originates from the anterior rami of L2 and L3 spinal nerves."
+    },
+    {
+        "text": "The skin over the femoral triangle is supplied by which of the following nerves?",
+        "options": [
+            "Ilioinguinal nerve",
+            "Obturator nerve",
+            "Lateral femoral cutaneous nerve of thigh",
+            "Genital branch of genitofemoral nerve",
+            "Femoral branch of genitofemoral nerve"
+        ],
+        "answer": "Femoral branch of genitofemoral nerve",
+        "description": "The femoral branch of the genitofemoral nerve supplies sensation to the skin over the femoral triangle."
+    },
+    {
+        "text": "Which of the following muscles is a primary extensor of the knee joint?",
+        "options": [
+            "Biceps femoris",
+            "Semitendinosus",
+            "Rectus femoris",
+            "Sartorius",
+            "Vastus medialis"
+        ],
+        "answer": "Rectus femoris",
+        "description": "The rectus femoris is one of the quadriceps muscles and is a primary extensor of the knee joint."
+    },
+    {
+        "text": "Which nerve supplies the muscles of the posterior compartment of the leg?",
+        "options": [
+            "Tibial nerve",
+            "Common fibular nerve",
+            "Sural nerve",
+            "Deep fibular nerve",
+            "Superficial fibular nerve"
+        ],
+        "answer": "Tibial nerve",
+        "description": "The tibial nerve innervates the muscles of the posterior compartment of the leg, including the gastrocnemius and soleus."
+    },
+    {
+        "text": "The long thoracic nerve supplies which of the following muscles?",
+        "options": [
+            "Serratus anterior",
+            "Pectoralis major",
+            "Latissimus dorsi",
+            "Subscapularis",
+            "Rhomboid major"
+        ],
+        "answer": "Serratus anterior",
+        "description": "The long thoracic nerve innervates the serratus anterior muscle, which is involved in scapular protraction."
+    },
+    {
+        "text": "Which of the following muscles is innervated by the femoral nerve?",
+        "options": [
+            "Iliopsoas",
+            "Biceps femoris",
+            "Adductor magnus",
+            "Gluteus maximus",
+            "Gracilis"
+        ],
+        "answer": "Iliopsoas",
+        "description": "The iliopsoas is innervated by the femoral nerve and is a primary flexor of the hip."
+    },
+    {
+        "text": "The brachial plexus arises from which of the following spinal nerve roots?",
+        "options": [
+            "C5, C6, C7",
+            "C5, C6, C7, C8, T1",
+            "C3, C4, C5",
+            "C1, C2, C3",
+            "T2, T3, T4"
+        ],
+        "answer": "C5, C6, C7, C8, T1",
+        "description": "The brachial plexus is formed by the ventral rami of C5 to T1 and supplies the upper limb."
+    },
+    {
+        "text": "Which of the following structures is found in the carpal tunnel?",
+        "options": [
+            "Ulnar nerve",
+            "Flexor digitorum superficialis tendon",
+            "Median nerve",
+            "Radial artery",
+            "Extensor tendons"
+        ],
+        "answer": "Median nerve",
+        "description": "The carpal tunnel contains the median nerve and several flexor tendons, including those of the flexor digitorum superficialis."
+    },
+    {
+        "text": "The ligamentum flavum connects which of the following structures?",
+        "options": [
+            "Spinous processes",
+            "Transverse processes",
+            "Vertebral bodies",
+            "Laminae of adjacent vertebrae",
+            "Intervertebral discs"
+        ],
+        "answer": "Laminae of adjacent vertebrae",
+        "description": "The ligamentum flavum connects the laminae of adjacent vertebrae and helps maintain spinal stability."
+    },
+    {
+        "text": "Which muscle is responsible for lateral rotation of the arm at the shoulder joint?",
+        "options": [
+            "Subscapularis",
+            "Supraspinatus",
+            "Infraspinatus",
+            "Pectoralis major",
+            "Latissimus dorsi"
+        ],
+        "answer": "Infraspinatus",
+        "description": "The infraspinatus muscle is primarily responsible for lateral rotation of the arm at the shoulder joint."
+    },
+    {
+        "text": "Which of the following nerves innervates the skin of the anterior and medial thigh?",
+        "options": [
+            "Obturator nerve",
+            "Femoral nerve",
+            "Sciatic nerve",
+            "Tibial nerve",
+            "Lateral femoral cutaneous nerve"
+        ],
+        "answer": "Femoral nerve",
+        "description": "The femoral nerve provides sensory innervation to the skin of the anterior and medial thigh."
+    },
+    {
+        "text": "Which of the following muscles is responsible for hip flexion?",
+        "options": [
+            "Gluteus maximus",
+            "Iliopsoas",
+            "Biceps femoris",
+            "Sartorius",
+            "Tensor fasciae latae"
+        ],
+        "answer": "Iliopsoas",
+        "description": "The iliopsoas muscle is the primary flexor of the hip joint."
+    },
+    {
+        "text": "The femoral artery is a continuation of which artery?",
+        "options": [
+            "External iliac artery",
+            "Internal iliac artery",
+            "Popliteal artery",
+            "Common iliac artery",
+            "Abdominal aorta"
+        ],
+        "answer": "External iliac artery",
+        "description": "The femoral artery is a continuation of the external iliac artery after it passes beneath the inguinal ligament."
+    },
+    {
+        "text": "Which of the following muscles is innervated by the deep fibular nerve?",
+        "options": [
+            "Tibialis anterior",
+            "Gastrocnemius",
+            "Soleus",
+            "Flexor digitorum longus",
+            "Peroneus longus"
+        ],
+        "answer": "Tibialis anterior",
+        "description": "The tibialis anterior is innervated by the deep fibular nerve and is responsible for dorsiflexion of the foot."
+    },
+    {
+        "text": "Which of the following nerves supplies the posterior compartment of the arm?",
+        "options": [
+            "Median nerve",
+            "Radial nerve",
+            "Ulnar nerve",
+            "Musculocutaneous nerve",
+            "Axillary nerve"
+        ],
+        "answer": "Radial nerve",
+        "description": "The radial nerve supplies the posterior compartment of the arm, including muscles like the triceps brachii."
+    },
+    {
+        "text": "Which of the following muscles assists in plantarflexion and inversion of the foot?",
+        "options": [
+            "Tibialis anterior",
+            "Tibialis posterior",
+            "Peroneus longus",
+            "Gastrocnemius",
+            "Flexor digitorum longus"
+        ],
+        "answer": "Tibialis posterior",
+        "description": "The tibialis posterior assists in both plantarflexion and inversion of the foot."
+    },
+    {
+        "text": "Which structure passes through the inguinal canal in males?",
+        "options": [
+            "Ureter",
+            "Femoral artery",
+            "Spermatic cord",
+            "Round ligament",
+            "Obturator nerve"
+        ],
+        "answer": "Spermatic cord",
+        "description": "In males, the spermatic cord passes through the inguinal canal, containing the vas deferens, arteries, veins, and nerves."
+    },
+    {
+        "text": "Which of the following muscles is responsible for flexion of the elbow joint?",
+        "options": [
+            "Brachialis",
+            "Triceps brachii",
+            "Biceps brachii",
+            "Pronator teres",
+            "Anconeus"
+        ],
+        "answer": "Brachialis",
+        "description": "The brachialis muscle is a primary flexor of the elbow joint."
+    },
+    {
+        "text": "Which of the following arteries supplies the muscles of the anterior compartment of the leg?",
+        "options": [
+            "Anterior tibial artery",
+            "Posterior tibial artery",
+            "Femoral artery",
+            "Popliteal artery",
+            "Fibular artery"
+        ],
+        "answer": "Anterior tibial artery",
+        "description": "The anterior tibial artery supplies the muscles of the anterior compartment of the leg, including the tibialis anterior."
+    },
+    {
+        "text": "The thoracic duct drains lymph into which of the following veins?",
+        "options": [
+            "Left subclavian vein",
+            "Right subclavian vein",
+            "Jugular vein",
+            "Internal jugular vein",
+            "Femoral vein"
+        ],
+        "answer": "Left subclavian vein",
+        "description": "The thoracic duct drains lymph into the left subclavian vein at the junction with the internal jugular vein."
+    },
+    {
+        "text": "Which nerve innervates the diaphragm?",
+        "options": [
+            "Vagus nerve",
+            "Phrenic nerve",
+            "Intercostal nerves",
+            "Brachial plexus",
+            "Cervical nerves"
+        ],
+        "answer": "Phrenic nerve",
+        "description": "The phrenic nerve innervates the diaphragm and is responsible for its contraction during respiration."
+    },
+    {
+        "text": "Which of the following structures is located in the posterior triangle of the neck?",
+        "options": [
+            "Subclavian artery",
+            "Carotid artery",
+            "Jugular vein",
+            "Brachial plexus",
+            "Vertebral artery"
+        ],
+        "answer": "Brachial plexus",
+        "description": "The brachial plexus lies within the posterior triangle of the neck, alongside other important structures."
+    },
+    {
+        "text": "The obturator nerve passes through which of the following structures?",
+        "options": [
+            "Obturator foramen",
+            "Greater sciatic foramen",
+            "Lesser sciatic foramen",
+            "Inguinal canal",
+            "Femoral canal"
+        ],
+        "answer": "Obturator foramen",
+        "description": "The obturator nerve passes through the obturator foramen to innervate the medial thigh muscles."
+    },
+    {
+        "text": "Which of the following muscles is responsible for hip abduction?",
+        "options": [
+            "Gluteus maximus",
+            "Sartorius",
+            "Gluteus medius",
+            "Adductor magnus",
+            "Rectus femoris"
+        ],
+        "answer": "Gluteus medius",
+        "description": "The gluteus medius is the primary muscle responsible for abduction of the hip."
+    },
+    {
+        "text": "Which nerve is responsible for sensation in the lateral aspect of the forearm?",
+        "options": [
+            "Musculocutaneous nerve",
+            "Ulnar nerve",
+            "Radial nerve",
+            "Median nerve",
+            "Axillary nerve"
+        ],
+        "answer": "Musculocutaneous nerve",
+        "description": "The musculocutaneous nerve provides sensation to the lateral aspect of the forearm."
+    },
+    {
+        "text": "Which of the following nerves innervates the muscles of the anterior compartment of the thigh?",
+        "options": [
+            "Obturator nerve",
+            "Femoral nerve",
+            "Sciatic nerve",
+            "Gluteal nerve",
+            "Peroneal nerve"
+        ],
+        "answer": "Femoral nerve",
+        "description": "The femoral nerve innervates the muscles of the anterior compartment of the thigh, including the quadriceps femoris."
+    },
+    {
+        "text": "Which artery is the first branch of the subclavian artery?",
+        "options": [
+            "Vertebral artery",
+            "Internal thoracic artery",
+            "Thyrocervical trunk",
+            "Costocervical trunk",
+            "Dorsal scapular artery"
+        ],
+        "answer": "Vertebral artery",
+        "description": "The vertebral artery is the first major branch of the subclavian artery and supplies the brain and spinal cord."
+    },
+    {
+        "text": "Which of the following muscles is responsible for medial rotation of the hip joint?",
+        "options": [
+            "Gluteus maximus",
+            "Iliopsoas",
+            "Gluteus medius",
+            "Tensor fasciae latae",
+            "Adductor longus"
+        ],
+        "answer": "Tensor fasciae latae",
+        "description": "The tensor fasciae latae muscle is responsible for medial rotation of the hip joint."
+    },
+    {
+        "text": "Which of the following veins drains the upper limb into the subclavian vein?",
+        "options": [
+            "Cephalic vein",
+            "Basilic vein",
+            "Median cubital vein",
+            "Axillary vein",
+            "Radial vein"
+        ],
+        "answer": "Axillary vein",
+        "description": "The axillary vein receives blood from the upper limb and drains into the subclavian vein."
+    },
+    {
+        "text": "Which of the following muscles is responsible for extending the knee joint?",
+        "options": [
+            "Biceps femoris",
+            "Semitendinosus",
+            "Vastus medialis",
+            "Sartorius",
+            "Rectus femoris"
+        ],
+        "answer": "Vastus medialis",
+        "description": "The vastus medialis is one of the quadriceps muscles and is responsible for extending the knee joint."
+    },
+    {
+        "text": "Which of the following arteries supplies the medial compartment of the thigh?",
+        "options": [
+            "Femoral artery",
+            "Obturator artery",
+            "Popliteal artery",
+            "External iliac artery",
+            "Internal iliac artery"
+        ],
+        "answer": "Obturator artery",
+        "description": "The obturator artery supplies the muscles and tissues of the medial compartment of the thigh."
+    },
+    {
+        "text": "Which nerve innervates the muscles of the posterior compartment of the forearm?",
+        "options": [
+            "Radial nerve",
+            "Ulnar nerve",
+            "Median nerve",
+            "Axillary nerve",
+            "Musculocutaneous nerve"
+        ],
+        "answer": "Radial nerve",
+        "description": "The radial nerve innervates the muscles of the posterior compartment of the forearm, including the extensor muscles."
+    },
+    {
+        "text": "Which nerve innervates the muscles responsible for the plantar flexion of the foot?",
+        "options": [
+            "Tibial nerve",
+            "Femoral nerve",
+            "Peroneal nerve",
+            "Sural nerve",
+            "Obturator nerve"
+        ],
+        "answer": "Tibial nerve",
+        "description": "The tibial nerve innervates the muscles responsible for plantar flexion, such as the gastrocnemius and soleus."
+    },
+    {
+        "text": "The deep fibular nerve is a branch of which of the following?",
+        "options": [
+            "Femoral nerve",
+            "Sciatic nerve",
+            "Tibial nerve",
+            "Obturator nerve",
+            "Common fibular nerve"
+        ],
+        "answer": "Common fibular nerve",
+        "description": "The deep fibular nerve is a branch of the common fibular nerve and supplies the anterior compartment of the leg."
+    },
+    {
+        "text": "Which of the following nerves provides sensory innervation to the skin over the lateral aspect of the leg?",
+        "options": [
+            "Saphenous nerve",
+            "Superficial fibular nerve",
+            "Deep fibular nerve",
+            "Sural nerve",
+            "Femoral nerve"
+        ],
+        "answer": "Sural nerve",
+        "description": "The sural nerve provides sensory innervation to the skin over the lateral aspect of the leg and foot."
+    }
+        
+    
+
+
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+const userAnswers = [];
+const skippedQuestions = [];
+let timerInterval;
+const timePerQuestion = 66; // 1.1 minutes in seconds
+let totalQuizTime; // Total time for the quiz
+let timeRemaining; // Time left in the quiz
+
+// Progress Bar Functions
+let progressBarContainer;
+
+function createProgressBar(numQuestions) {
+    // Create a rectangular container with fixed height and scroll functionality
+    progressBarContainer = document.createElement("div");
+    progressBarContainer.id = "progress-bar-container";
+    progressBarContainer.style.textAlign = "center";
+    progressBarContainer.style.marginBottom = "20px";
+    progressBarContainer.style.height = "60px";  // Fixed height for the container
+    progressBarContainer.style.overflowX = "auto";  // Enable horizontal scrolling
+    progressBarContainer.style.whiteSpace = "nowrap";  // Ensure the boxes stay on the same line
+    progressBarContainer.style.border = "1px solid #e0e0e0";  // Rectangular border
+    progressBarContainer.style.borderRadius = "5px";  // Optional rounded corners
+    document.querySelector('.question-container').prepend(progressBarContainer);
+
+    for (let i = 0; i < numQuestions; i++) {
+        const square = document.createElement("div");
+        square.textContent = i + 1;
+        square.style.display = "inline-block";
+        square.style.width = "30px";
+        square.style.height = "30px";
+        square.style.lineHeight = "30px";
+        square.style.textAlign = "center";
+        square.style.margin = "5px";
+        square.style.border = "1px solid black";
+        square.style.borderRadius = "5px";
+        square.style.backgroundColor = "white";
+        square.dataset.index = i;
+        progressBarContainer.appendChild(square);
+    }
+}
+
+function updateProgressBar(index, status) {
+    const square = progressBarContainer.children[index];
+    if (status === "answered") {
+        square.style.backgroundColor = "green";
+        square.style.color = "white";
+    } else if (status === "skipped") {
+        square.style.backgroundColor = "yellow";
+        square.style.color = "black";
+    }
+}
+
+function removeProgressBar() {
+    if (progressBarContainer) {
+        progressBarContainer.remove();
+    }
+}
+
+// Quiz Logic
+function validateLogin() {
+    const name = document.getElementById("user-name").value;
+    const gmail = document.getElementById("user-gmail").value;
+    const userId = document.getElementById("user-id").value;
+
+    const user = allowedUsers.find(user => user.name === name && user.gmail === gmail && user.username === userId);
+    if (user) {
+        document.querySelector('.login-container').style.display = "none";
+        document.querySelector('.question-container').style.display = "block";
+        startQuiz();
+    } else {
+        alert("Invalid login credentials. Please try again.");
+    }
+}
+
+function startQuiz() {
+    createProgressBar(questions.length);
+    totalQuizTime = timePerQuestion * questions.length;
+    timeRemaining = totalQuizTime;
+
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.question-container').style.display = "block";
+    startTimer();
+    showQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const timerElement = document.getElementById("timer");
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `Time Left: ${minutes}m ${seconds}s`;
+}
+// This function hides the timer when the last question is reached
+function handleTimerVisibility() {
+    if (currentQuestion === questions.length - 1) {
+        clearInterval(timerInterval); // Stop the timer on the last question
+        document.getElementById("timer").style.display = "none";  // Hide the timer after the last question
+    }
+}
+// Call this function when moving to the next question
+function nextQuestion() {
+    // Your existing logic for the next question
+
+    // Check timer visibility when changing questions
+    handleTimerVisibility();
+}
+
+// End quiz and hide timer
+function endQuiz() {
+    // Your existing endQuiz logic goes here
+    clearInterval(timerInterval); // Ensure timer is stopped when quiz ends
+    document.getElementById("timer").style.display = "none";  // Hide timer after quiz ends
+}
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        const userAnswer = selectedOption.value;
+        userAnswers[currentQuestion] = userAnswer;
+        if (userAnswer === questions[currentQuestion].answer) {
+            score++;
+        }
+        updateProgressBar(currentQuestion, "answered");
+        questions[currentQuestion].answered = true;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            handleSkippedQuestions();
+        }
+    } else {
+        alert("Please select an answer or skip the question.");
+    }
+}
+
+function skipQuestion() {
+    if (!skippedQuestions.includes(currentQuestion)) {
+        skippedQuestions.push(currentQuestion);
+    }
+    updateProgressBar(currentQuestion, "skipped");
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        handleSkippedQuestions();
+    }
+}
+
+function showQuestion() {
+    if (currentQuestion >= questions.length) {
+        removeProgressBar();
+        endQuiz();
+        return;
+    }
+
+    const question = questions[currentQuestion];
+    if (question.answered) {
+        handleSkippedQuestions();
+        return;
+    }
+
+    document.querySelector('.question-container').style.display = "block";
+    document.getElementById("question").textContent = question.text;
+
+    let optionsHTML = '';
+    question.options.forEach(option => {
+        optionsHTML += `<label><input type="radio" name="answer" value="${option}"> ${option}</label><br>`;
+    });
+
+    document.getElementById("options").innerHTML = optionsHTML;
+    updateButtons();
+}
+
+function handleSkippedQuestions() {
+    if (skippedQuestions.length > 0) {
+        currentQuestion = skippedQuestions.shift();
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function updateButtons() {
+    const nextButton = document.getElementById("next-button");
+    if (skippedQuestions.length > 0) {
+        nextButton.textContent = currentQuestion === questions.length - 1 && skippedQuestions.length === 1 ? "Finish" : "Next";
+    } else {
+        nextButton.textContent = currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    }
+}
+function endQuiz() {
+    document.querySelector('.question-container').style.display = "none";
+    document.querySelector('.result-container').style.display = "block";
+    document.getElementById("score").textContent = score;
+
+    const answerKey = document.getElementById("answer-key");
+    answerKey.innerHTML = '';
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const resultItem = document.createElement("li");
+        resultItem.innerHTML = `
+            <div class="question">${question.text}</div>
+            <div class="options">
+                ${question.options.map(option => {
+                    let optionText = option;
+                    if (userAnswer === option) {
+                        // If the answer is incorrect, color "Your answer" red
+                        if (userAnswer !== question.answer) {
+                            optionText += " <span style='color: red;'>(Your answer)</span>";
+                        } else {
+                            optionText += " <span style='color: green;'>(Correct)</span>";
+                        }
+                    }
+                    if (option === question.answer && userAnswer !== option) {
+                        // For correct option (when the user didn't choose it), mark it as green
+                        optionText += " <span style='color: green;'>(Correct)</span>";
+                    }
+                    return `<div>${optionText}</div>`;
+                }).join('')}
+            </div>
+            <hr style="border: 1px solid #ccc; margin: 10px 0;">  <!-- Horizontal Line -->
+            <div class="description"><strong>Explanation:</strong> ${question.description}</div>
+        `;
+        answerKey.appendChild(resultItem);
+    });
+}
+
+function showLogin() {
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.login-container').style.display = "block";
+}
+
+
+</script>
+</body>
+</html>
