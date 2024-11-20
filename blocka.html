@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block A</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    
+        .container {
+            text-align: center;
+            max-width: 80%;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 58%;
+        }
+    
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+    
+        button:hover {
+            background: #2575fc;
+        }
+    
+        .question-container, .result-container, .login-container {
+            display: none;
+        }
+    
+        .question-container {
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            min-height: 300px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .options label {
+            display: block;
+            margin: -10px 0;
+        }
+    
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+    
+        .result-container ul {
+            text-align: left;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-container ul li {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .result-container ul li .question {
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-container ul li .options {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+    
+        .result-container ul li .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Enhanced Timer Styles */
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6a00, #ee0979); /* Gradient background */
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    
+        #timer:hover {
+            transform: scale(1.1); /* Slight scaling effect on hover */
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Change gradient on hover */
+        }
+    
+        #timer span {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Timer animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        #timer {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+    
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin: 20px auto;
+        }
+    
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    
+        .form-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    
+        .form-container input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .form-container button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 37%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .form-container button:hover {
+            background: #2575fc;
+        }
+    
+        .login-container input {
+            width: 51%;
+            padding: 13px;
+            margin: 16px;
+        }
+    
+        .login-container button {
+            width: 16%;
+            margin-top: 10px;
+        }
+    
+        p {
+            float: left;
+            padding: 2px 100px;
+            text-align: left;
+            line-height: 20px;
+        }
+    
+        #question {
+            font-size: 20px;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #timer {
+                font-size: 18px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+            .form-container {
+                width: 90%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            #timer {
+                font-size: 16px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .para1{
+                padding: 0px 20px;
+            }
+            .login-credentials{
+                font-size: 1.5em ;
+                line-height: 33px;
+            }
+            .login-container button {
+                width: 25%;
+                padding: 10px 25px;
+                margin-top: 10px;
+                text-align: center;
+            }
+    
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .login-container input {
+                width: 71%;
+                padding: 13px;
+                margin: 16px;
+            }
+    
+            .form-container {
+                width: 73%;
+            }
+            button {
+                font-size: 12px;
+                padding: 10px 25px;
+            }
+            #timer {
+                font-size: 9px;
+            }
+            .form-container h2 {
+                font-size: 18px;
+            }
+            .form-container input {
+                width: 84%;
+            }
+            #question {
+                font-size: 16px;
+            }
+            .options label {
+                font-size: 14px;
+            }
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-container">
+            <h1 class=" login-credentials">Enter Your Login Credentials </h1>
+            <input type="text" id="user-name" placeholder="Enter your Name" class="login-input"> <br>
+            <input type="email" id="user-gmail" placeholder="Enter your Gmail" class="login-input"> <br>
+            <input type="text" id="user-id" placeholder="Enter your ID" class="login-input"> <br>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input"> <br>
+            <button onclick="validateLogin()">Start Quiz</button>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation-buttons">
+                <button id="previous-button" onclick="previousQuestion()" style="display:none;">Previous</button>
+                <button id="next-button" onclick="nextQuestion()">Next</button>
+                <button id="skip-button" onclick="skipQuestion()">Skip</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+            <h1>Quiz Result</h1>
+            <h2>Your Score: <span id="score"></span></h2>
+            <ul id="answer-key"></ul>
+            
+
+            <div class="form-container">
+                <h2>Submit Your Details</h2>
+                <form onsubmit="sendmail(event)">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Start Container -->
+        <div class="start-container">
+            <h1>Welcome to the Block A Quiz</h1>
+            <h3>Important Instructions for Online Quiz</h3>
+            <p class="para1">
+
+                Please note that this online quiz is time-restricted and consists of 120 multiple-choice questions. It is essential to attempt the quiz within the allotted time frame. <br>  <br>
+                
+                <strong>Security Notice:</strong> This quiz contains high security layers, and any attempts to capture screenshots or screen recordings will result in immediate blocking of access. <br> <br>
+                
+               <strong> Availability:</strong> This quiz will be available to you until your final exam. <br> <br>
+                
+                To access the quiz, please provide the following information: <br> <br>
+                <strong>
+                - Username<br>
+                - Gmail address<br>
+                - User ID<br>
+                - password</strong> <br>  <br>
+                Please note that selected MCQ options cannot be changed, so choose carefully. After attempting all main questions, click 'Finish' to review skipped questions. Skipped MCQs will appear immediately, and clicking 'Next' after the last skipped question will display your results. Review each question thoughtfully, as submissions are final. <br>  <br> <strong> <em>Please enter your username in the designated input area at the bottom of the results section to confirm your submission.</em> </strong> <br> <br>
+                
+               We appreciate your cooperation and adherence to theseguidelines. <br>  <br> </p>
+            <button onclick="showLogin()">Start</button>
+        </div>
+
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdP3lE-1OjWkzp7za");
+        })();
+
+        function sendmail(event) {
+            event.preventDefault();
+
+            const params = {
+                username: document.getElementById("username").value,
+                score: document.getElementById("score").textContent,
+            };
+
+            emailjs.send("lmhservice3541", "lmhtemplate3541", params)
+                .then(
+                    (res) => {
+                        alert("Email sent successfully! Status: " + res.status);
+                    },
+                    (err) => {
+                        console.error("Failed to send email:", err);
+                        alert("Failed to send email. Please try again.");
+                    }
+                );
+        }
+
+        const allowedUsers = [
+        { name: "Admin Arsalan", gmail: "word3541@gmail.com", username: "Admin123" , password: "Admin123"},
+            { name: "Waleed Iqbal", gmail: "waleediqbal8584931@gmail.com", username: "Waleed3139429903",password: "waleed3541" },
+           
+        ];
+        const questions = [
+    
+        
+    {
+        "text": "Which of the following macromolecules are found in the plasma membrane?",
+        "options": ["Carbohydrates, Lipids & Proteins", "Lipids & Proteins only", "Lipids only", "Proteins & Carbohydrates only", "Proteins Only"],
+        "answer": "Carbohydrates, Lipids & Proteins",
+        "description": "The plasma membrane consists of a combination of carbohydrates, lipids, and proteins."
+    },
+    {
+        "text": "Concerning the histology of cells, which one of the following cells is a multinucleate cell?",
+        "options": ["Smooth muscle cell", "Cardiac muscle cell", "Skeletal muscle cell", "Epithelial cell in the skin", "Connective tissue cell"],
+        "answer": "Skeletal muscle cell",
+        "description": "Skeletal muscle cells are multinucleate due to the fusion of multiple precursor cells during development."
+    },
+    {
+        "text": "Which of the following organelles is most likely responsible for autolysis of damaged cells?",
+        "options": ["Endoplasmic reticulum", "Golgi Apparatus", "Lysosomes", "Mitochondria", "Peroxisomes"],
+        "answer": "Lysosomes",
+        "description": "Lysosomes contain hydrolytic enzymes that break down cellular debris and are responsible for autolysis."
+    },
+    {
+        "text": "Regarding the organelles and inclusion bodies of the cell, which one of the following structures is an inclusion body?",
+        "options": ["Mitochondria", "Rough endoplasmic reticulum", "Smooth endoplasmic reticulum", "Peroxisome", "Lipofuscin granules"],
+        "answer": "Lipofuscin granules",
+        "description": "Lipofuscin granules are inclusion bodies that accumulate as a result of aging or cell stress."
+    },
+    {
+        "text": "A young boy of 18 years from Gilgit Baltistan applied to join the Pakistan Army. In the medical test, his routine laboratory investigation showed an RBC count of 7 million per microliter of blood. What is the most likely cause for his more than normal RBC count?",
+        "options": ["Excess erythropoietin from a renal tumor", "Iodine deficiency", "Iron overload", "Physiological polycythemia", "Polycythemia Vera"],
+        "answer": "Physiological polycythemia",
+        "description": "Physiological polycythemia occurs as an adaptation to high-altitude environments where oxygen levels are low."
+    },
+    {
+        "text": "Transfusing a person with blood plasma proteins from a person or animal that has been actively immunized against a specific antigen most likely provides what type of immunity?",
+        "options": ["Active immunity", "Autoimmunity", "Anti immunity", "No resistance", "Passive immunity"],
+        "answer": "Passive immunity",
+        "description": "Passive immunity is the transfer of ready-made antibodies to provide immediate protection."
+    },
+    {
+        "text": "Which of the following is most likely the function of interleukin-1?",
+        "options": ["Activation of the complement system", "Activation of the macrophage system", "Chemotaxis of neutrophils", "Destruction of bacteria", "Growth and reproduction of lymphocytes"],
+        "answer": "Activation of the macrophage system",
+        "description": "Interleukin-1 plays a key role in activating macrophages and initiating the inflammatory response."
+    },
+    {
+        "text": "Consider the ABG report: Blood pH = 7.12, pCO2 = 80, plasma bicarbonate = 26 mEq/L, and H2CO3 = 20.7 mEq/L. Which one of the following is the acid-base disturbance according to this lab report?",
+        "options": ["Metabolic alkalosis", "Mixed acid-base disorder", "Metabolic acidosis compensated", "Respiratory acidosis", "Respiratory alkalosis"],
+        "answer": "Respiratory acidosis",
+        "description": "Respiratory acidosis occurs due to hypoventilation, leading to CO2 retention and a decrease in blood pH."
+    },
+    {
+        "text": "Wernicke-Korsakoff syndrome, a thiamin deficiency state, is caused by alcoholism, smoking, caffeine, anorexia, and pregnancy. It is characterized by confusion, ataxia, nystagmus, memory problems, and which of the following?",
+        "options": ["Confabulation", "Diabetes Insipidus", "Diarrhea", "Fever", "Hypertension"],
+        "answer": "Confabulation",
+        "description": "Confabulation is a symptom of Wernicke-Korsakoff syndrome, characterized by the fabrication of false memories."
+    },
+    {
+        "text": "A patient of chronic renal failure was brought to Northwest Teaching Hospital for dialysis. His lab reports revealed urea 300 mg/dL, creatinine 14 mg/dL, RBC count 3.8 million/microliter, and Hb of 9 mg/dL. What is the most likely cause of his anemia?",
+        "options": ["Deficiency of erythropoietin", "Deficiency of iron due to loss in urine", "Excess of creatinine causing hemolysis", "Hemolysis in the damaged kidney", "Suppression of the bone marrow by the high urea level"],
+        "answer": "Deficiency of erythropoietin",
+        "description": "Erythropoietin is essential for RBC production, and its deficiency is a common cause of anemia in chronic renal failure."
+    },
+    {
+        "text": "The internal elastic membrane (internal elastic lamina) is seen as a wavy line in a slide of cross-section of some blood vessels under the microscope. It is most conspicuous in which of the following blood vessels?",
+        "options": ["Aorta", "Capillaries", "Large veins", "Muscular arteries", "Small veins"],
+        "answer": "Muscular arteries",
+        "description": "The internal elastic lamina is a prominent feature of muscular arteries, aiding in their ability to contract and relax."
+    },
+    {
+        "text": "What is the major function of sudoriferous glands?",
+        "options": ["Gives skin texture", "Gives skin a healthy color", "Helps to regulate body temperature", "Lubricates the skin surface", "Protects the skin elasticity"],
+        "answer": "Helps to regulate body temperature",
+        "description": "Sudoriferous glands, or sweat glands, regulate body temperature through sweat production."
+    },
+    {
+        "text": "There are more than a dozen clotting factors. A few of them are vitamin K dependent. Which one of the following clotting factors is most likely vitamin K dependent?",
+        "options": ["Factor I", "Factor III", "Factor V", "Factor IX", "Factor XI"],
+        "answer": "Factor IX",
+        "description": "Vitamin K is essential for the synthesis of several clotting factors, including Factor IX, which is part of the coagulation cascade."
+    },
+    {
+        "text": "A 30-year-old man has been diagnosed with acute intermittent porphyria. Which of the following diet plans should he avoid in the future to prevent an acute attack?",
+        "options": ["Crash diets to lose weight", "High carbohydrate diet", "High protein diet", "Keto diet", "Low protein diet"],
+        "answer": "Crash diets to lose weight",
+        "description": "Crash diets can trigger an acute attack of porphyria by increasing the demand for heme synthesis, which is impaired in the condition."
+    },
+    {
+        "text": "In 2018, the tenth vaccine was added to the expanded program of immunization for children in Pakistan. This particular vaccine is:",
+        "options": ["Chickenpox vaccine", "Cholera vaccine", "Influenza vaccine", "Pneumococcal vaccine", "Rotavirus vaccine"],
+        "answer": "Pneumococcal vaccine",
+        "description": "The pneumococcal vaccine was added to Pakistan's immunization program to protect children against Streptococcus pneumoniae infections."
+    },
+    {
+        "text": "Regarding the event of fertilization in the female reproductive system, the normal site of fertilization is located in which of the following parts?",
+        "options": ["Uterine cavity", "Intramural part of the uterine tube", "Isthmus of the uterine tube", "Ampulla of the uterine tube", "Infundibulum of the uterine tube"],
+        "answer": "Ampulla of the uterine tube",
+        "description": "The ampulla of the uterine tube is the widest section and the usual site of fertilization in the female reproductive system."
+    },
+    {
+        "text": "A middle-aged obese cardiac patient arrived at ER with flushing of the face after taking Niacin Tablets. What should be given to relieve him of this episode?",
+        "options": ["Antacids", "Aspirin", "Corticosteroids", "Paracetamol", "PPI (Proton Pump Inhibitor)"],
+        "answer": "Aspirin",
+        "description": "Aspirin can relieve flushing caused by niacin by inhibiting prostaglandin synthesis."
+    },
+    {
+        "text": "A drug transported against its concentration gradient across the membrane follows which of the following transport mechanisms?",
+        "options": ["Active transport", "Simple diffusion", "Passive transport", "Facilitated diffusion", "Bulk flow"],
+        "answer": "Active transport",
+        "description": "Active transport requires energy (usually ATP) to move substances against their concentration gradient."
+    },
+    {
+        "text": "The most important characteristic of a water-insoluble substance governing its diffusivity across the cell membrane is its:",
+        "options": ["Electrical charge", "Hydrated diameter", "Lipid solubility", "Molecular weight", "Three-dimensional shape"],
+        "answer": "Lipid solubility",
+        "description": "Lipid solubility determines how easily a substance can diffuse through the lipid bilayer of the cell membrane."
+    },
+    {
+        "text": "The acrosome of the sperm contains hydrolytic enzymes that play a major role in fertilization. Which of the following structures gives rise to the acrosome of the sperm?",
+        "options": ["Mitochondria of spermatid", "Golgi complex of spermatid", "Nucleus of spermatid", "Centrosome of spermatid", "Cytoplasm of spermatid"],
+        "answer": "Golgi complex of spermatid",
+        "description": "The Golgi complex of the spermatid forms the acrosome, which contains enzymes crucial for penetrating the egg during fertilization."
+    },
+    {
+        "text": "A woman visited a dermatologist. The skin of her hands was sodden. She used to wash her hands repeatedly because she felt that her hands were dirty. What should the doctor do in this situation?",
+        "options": ["Prescribe her derma medicines only", "Refer her to a psychologist", "Ignore this patient", "Refer her to a physician", "Advise for investigations"],
+        "answer": "Refer her to a psychologist",
+        "description": "The symptoms suggest obsessive-compulsive disorder (OCD), which requires psychological assessment and treatment."
+    },
+    {
+        "text": "In which of the following muscles of the body are the myofilaments arranged in sarcomeres?",
+        "options": ["Visceral muscle", "Ciliary muscle of the eye", "Cardiac muscle", "Smooth muscle in blood vessel walls", "Erector pili muscle of skin"],
+        "answer": "Cardiac muscle",
+        "description": "Cardiac muscle has myofilaments organized into sarcomeres, giving it a striated appearance."
+    },
+    {
+        "text": "A doctor advised a 40-year-old woman to have mammography each year. This advice refers to:",
+        "options": ["Primordial prevention", "Primary prevention", "Secondary prevention", "Tertiary prevention", "Health protection"],
+        "answer": "Secondary prevention",
+        "description": "Secondary prevention involves screening and early detection of diseases to improve outcomes."
+    },
+    {
+        "text": "Which one is the most likely function of cytotoxic T-cells?",
+        "options": [
+            "They are activated by the presentation of antigen by an infected cell",
+            "They destroy bacteria by initiating macrophage phagocytosis",
+            "It causes shrinkage of the attacked cell",
+            "They require the presence of a competent suppressor T lymphocyte system",
+            "They require the presence of competent B lymphocytes"
+        ],
+        "answer": "They are activated by the presentation of antigen by an infected cell",
+        "description": "Cytotoxic T-cells recognize infected cells presenting antigens on MHC class I molecules and induce their apoptosis."
+    },
+    {
+        "text": "The sectional plane that divides the body into anterior and posterior portions is:",
+        "options": ["Coronal", "Cardinal plane", "Cross-sectional", "Sagittal plane", "Transverse plane"],
+        "answer": "Coronal",
+        "description": "The coronal plane divides the body into front (anterior) and back (posterior) portions."
+    },
+    {
+        "text": "A patient, who is a known case of diabetes mellitus, was admitted to the ER with a history of severe vomiting. The doctor found him in a ketotic state. Which one of the following acid-base disturbances would have resulted in this situation?",
+        "options": [
+            "High anion gap metabolic acidosis",
+            "Low anion gap metabolic acidosis",
+            "Normal anion gap metabolic acidosis",
+            "Low anion gap metabolic alkalosis",
+            "High anion gap metabolic alkalosis"
+        ],
+        "answer": "High anion gap metabolic acidosis",
+        "description": "Diabetic ketoacidosis leads to the accumulation of ketone bodies, resulting in a high anion gap metabolic acidosis."
+    },
+    {
+        "text": "Dextran is a polymer of glucose units. What type of linkages are predominant in its structure?",
+        "options": [
+            "Alpha-1-1 Glycosidic linkage",
+            "Alpha-1-4 Glycosidic linkage",
+            "Alpha-1-6 Glycosidic linkage",
+            "Beta-1-4 Glycosidic linkage",
+            "Beta-1-2 Glycosidic linkage"
+        ],
+        "answer": "Alpha-1-6 Glycosidic linkage",
+        "description": "Dextran predominantly contains alpha-1-6 glycosidic linkages, which form its branched structure."
+    },
+    {
+        "text": "Most body odor is the result of bacterial metabolism of the secretions produced by which gland?",
+        "options": ["Apocrine sweat glands", "Ceruminous glands", "Merocrine glands", "Sebaceous glands", "Eccrine glands"],
+        "answer": "Apocrine sweat glands",
+        "description": "Apocrine sweat glands produce a protein-rich secretion metabolized by bacteria, leading to body odor."
+    },
+    {
+        "text": "Which one of the following factors is responsible for increasing the melting temperature of DNA?",
+        "options": [
+            "Adenine and Thymine content of the DNA",
+            "Adenine and sugar content of the DNA",
+            "Guanine and Cytosine content of the DNA",
+            "Histone and sugar content of the DNA",
+            "Phosphate and sugar content of the DNA"
+        ],
+        "answer": "Guanine and Cytosine content of the DNA",
+        "description": "DNA with a higher guanine and cytosine content has a higher melting temperature due to stronger triple hydrogen bonds."
+    },
+    {
+        "text": "In a synovial joint, what covers the articular surface of the articulating bones?",
+        "options": ["Spongy bone", "Compact bone", "Hyaline cartilage", "Elastic cartilage", "Fibrocartilage"],
+        "answer": "Hyaline cartilage",
+        "description": "Hyaline cartilage covers the articular surfaces of bones in synovial joints, reducing friction and absorbing shock."
+    },
+    {
+        "text": "A 36-year-old man presents to the emergency department with a 2-week history of diarrhea. He is admitted to the hospital for dehydration. His stool specimen is positive for parasitic eggs. Which type of white blood cells would have an elevated number?",
+        "options": ["B lymphocytes", "Eosinophils", "Monocytes", "Neutrophils", "T lymphocytes"],
+        "answer": "Eosinophils",
+        "description": "Eosinophils are responsible for combating parasitic infections and are elevated in such conditions."
+    },
+    {
+        "text": "The professor of anatomy asked the students at the end of his learning activity, which one of the following structures has a 'Nine Triplets' arrangement of microtubules?",
+        "options": ["Cilia", "Centriole", "Flagellum", "Villi", "Microvilli"],
+        "answer": "Centriole",
+        "description": "Centrioles have a 'Nine Triplets' arrangement of microtubules and play a crucial role in cell division."
+    },
+    {
+        "text": "Which one of the following is the most common implantation site in ectopic pregnancy?",
+        "options": ["Uterine tube", "Ovary", "Peritoneal cavity", "Mesentery", "Internal os of the uterus"],
+        "answer": "Uterine tube",
+        "description": "The uterine tube, particularly the ampulla, is the most common site for ectopic pregnancy."
+    },
+    {
+        "text": "The topic of discussion during an SGD session was 'Cell and its Organelle'. The facilitator asked the students which one of the following organelles is surrounded by a double membrane?",
+        "options": ["Ribosome", "Mitochondria", "Peroxisome", "Smooth endoplasmic reticulum", "Lysosome"],
+        "answer": "Mitochondria",
+        "description": "Mitochondria are double-membrane organelles responsible for energy production in cells."
+    },
+    {
+        "text": "Which of the following is mainly responsible for the establishment of resting membrane potential?",
+        "options": ["Active transport of K+ ions by Na+-K+ Pump", "Active transport of Na+ ions by Na+-K+ Pump", "Outflux of K+ ions through leak channels", "Facilitated diffusion of K+ ions", "Influx of Na+ ions through leak channels"],
+        "answer": "Outflux of K+ ions through leak channels",
+        "description": "The resting membrane potential is primarily established by the outward flow of K+ ions through leak channels."
+    },
+    {
+        "text": "Fluid exudation into the tissue in an acute inflammatory reaction is most likely due to which of the following?",
+        "options": ["Decreased blood pressure", "Decreased protein in the interstitium", "Increased clotting factors", "Increased vascular permeability", "Obstruction of the lymph vessels"],
+        "answer": "Increased vascular permeability",
+        "description": "Increased vascular permeability allows fluids and proteins to leak into tissues, contributing to inflammation."
+    },
+    {
+        "text": "Which of the following is the MOST APPROPRIATE combination therapy for a patient suffering from megaloblastic anemia?",
+        "options": ["Ferrous fumarate + Folic acid", "Ferrous sulfate + Folic acid", "Erythropoietin + Hydroxocobalamin", "Folic acid + Hydroxocobalamin", "Hydroxocobalamin + Ferrous sulfate"],
+        "answer": "Folic acid + Hydroxocobalamin",
+        "description": "Megaloblastic anemia is commonly treated with folic acid and hydroxocobalamin (vitamin B12)."
+    },
+    {
+        "text": "The axon of a neuron is stimulated experimentally with a 25-millivolt pulse, which initiates an action potential with a velocity of 50 meters per second. The axon is then stimulated with a 100-millivolt pulse. What is the action potential velocity after the 100-millivolt stimulation pulse (in meters per second)?",
+        "options": ["25", "50", "75", "100", "125"],
+        "answer": "50",
+        "description": "Action potential velocity is constant once the threshold is met, regardless of the stimulus intensity."
+    },
+    {
+        "text": "The placenta is a fetomaternal organ and is the primary site of nutrient and gas exchange between the mother and fetus. Which of the following embryonic structures forms the fetal part of the placenta?",
+        "options": ["Amniotic sac", "Chorionic sac", "Umbilical cord", "Chorion frondosum", "Smooth chorion"],
+        "answer": "Chorion frondosum",
+        "description": "The chorion frondosum forms the fetal part of the placenta, facilitating nutrient and gas exchange."
+    },
+    {
+        "text": "The facilitator of the anatomy department was explaining the parts of the Light Microscope to the students of 1st year MBBS. He asked the students what is the resolving power of the human eye to see an object?",
+        "options": ["2 mm", "20 µm", "200 µm", "0.2 µm", "5 mm"],
+        "answer": "200 µm",
+        "description": "The human eye can distinguish objects separated by a minimum of 200 µm."
+    },
+    {
+        "text": "A pregnant lady has been prescribed iron supplements. Which one of the following should she avoid in order to have good absorption of iron?",
+        "options": ["Calcium supplements", "Folic acid supplements", "Leafy vegetables", "Meat", "Orange"],
+        "answer": "Calcium supplements",
+        "description": "Calcium supplements can interfere with iron absorption and should be avoided during supplementation."
+    },
+    {
+        "text": "The nucleus of most cells contains a patchwork of granules rich in RNA called the Nucleolus. Which of the following functions is associated with nucleoli?",
+        "options": ["DNA Synthesis", "Lipid Synthesis", "Protein Synthesis", "RNA Synthesis", "Steroid Synthesis"],
+        "answer": "RNA Synthesis",
+        "description": "The nucleolus is the site of ribosomal RNA synthesis, essential for protein production."
+    },
+    {
+        "text": "A 30-year-old man has difficulty swallowing. His blood picture shows Hb 8.5 mg/dL, MCV 50, microcytic hypochromic. Which of the following is the most likely diagnosis?",
+        "options": ["Autoimmune hemolytic anemia", "Folic acid deficiency", "Hereditary spherocytosis", "Iron deficiency", "Vitamin B12 deficiency"],
+        "answer": "Iron deficiency",
+        "description": "Iron deficiency anemia presents with microcytic hypochromic red blood cells and can cause difficulty swallowing in some cases."
+    },
+   
+    {
+        "text": "Blood from the placenta is oxygenated about 80%. However, mixture with unoxygenated blood at various points reduces the oxygen content. Which of the following vessels contains blood with the highest oxygen content?",
+        "options": ["Abdominal aorta", "Common carotid artery", "Ductus arteriosus", "Pulmonary artery", "Pulmonary vein"],
+        "answer": "Common carotid artery",
+        "description": "The common carotid artery receives the most oxygenated blood due to preferential streaming from the ductus venosus and heart."
+    },
+    {
+        "text": "Protein C is an anticoagulant. Protein C most likely causes anticoagulant activity by inactivating which of the following clotting factors?",
+        "options": ["Fibrinogen Prothrombin", "Va and VIIIa", "VIIa and XIa", "IXa and Xa", "Thrombin"],
+        "answer": "Va and VIIIa",
+        "description": "Protein C inactivates factors Va and VIIIa, which are essential cofactors in the clotting cascade."
+    },
+    {
+        "text": "Bublée failed the block exam. After failure, she started reacting to small things in a big way. She is blaming teachers for her failure instead of reevaluating her preparation for the exam. Her attitude is best explained by which category?",
+        "options": ["Victim role", "Anxious", "Angry", "Fearful", "None"],
+        "answer": "Victim role",
+        "description": "Adopting a victim role involves blaming others and avoiding personal accountability for one's failures."
+    },
+    {
+        "text": "Your patient is 13 years old, who has been brought into the hospital because of a fracture in the leg. Her attendant, mother, is trying to explain the allergy she has with certain medicine. In this condition, what should the doctor do?",
+        "options": ["Active listening", "Rushing towards patient", "Ignoring the attendant", "Scolding the attendant", "None"],
+        "answer": "Active listening",
+        "description": "Active listening is essential for effective communication and understanding patient or attendant concerns."
+    },
+    {
+        "text": "Adrenal (suprarenal) glands are located on the upper pole of the kidney. It has an outer cortex and inner medulla. The adrenal cortex is derived from which of the following germ layers?",
+        "options": ["Neural tube of neuro-ectoderm", "Neural crest of neuro-ectoderm", "Paraxial mesoderm", "Intermediate mesoderm", "Lateral plate mesoderm"],
+        "answer": "Lateral plate mesoderm",
+        "description": "The adrenal cortex develops from the lateral plate mesoderm, whereas the medulla is derived from the neural crest."
+    },
+    {
+        "text": "The myelin sheath of peripheral nerves is produced by the Schwann cells of the peripheral nervous system. It consists of segments of the myelin sheath interrupted at regular intervals. What are these interruptions called?",
+        "options": ["Internode", "Synapse", "Nodes of Ranvier", "Synaptic clefts", "Initial segment"],
+        "answer": "Nodes of Ranvier",
+        "description": "Nodes of Ranvier are gaps in the myelin sheath that facilitate rapid conduction of nerve impulses through saltatory conduction."
+    },
+    {
+        "text": "An HIV-AIDS patient has visited his general physician in his clinic. The maximum risk of the doctor being infected with HIV/AIDS is during:",
+        "options": ["Examining the patient", "Giving the injection", "Giving the intravenous fluid", "Handling the biopsy material", "Recapping the used needle on the syringe"],
+        "answer": "Recapping the used needle on the syringe",
+        "description": "Recapping needles is the most common cause of needlestick injuries, which pose the highest risk of HIV transmission in healthcare settings."
+    },
+    {
+        "text": "When blood vessels develop within chorionic villi, they are called:",
+        "options": ["Stem villi", "Tertiary villi", "Anchoring villi", "Mature villi", "Branching villi"],
+        "answer": "Tertiary villi",
+        "description": "Tertiary villi are chorionic villi that have developed blood vessels, allowing for fetal-maternal nutrient and gas exchange."
+    },
+    {
+        "text": "What technique involves fertilization outside the body of the female?",
+        "options": ["Intrauterine fertilization", "In vitro fertilization", "In vivo fertilization", "Ex vivo fertilization", "Surgical implantation of ovum"],
+        "answer": "In vitro fertilization",
+        "description": "In vitro fertilization (IVF) is a technique where fertilization occurs outside the female body, typically in a laboratory setting."
+    },
+    {
+        "text": "12-year-old Arham did not need to be told that he had failed his exam. On returning home, he could guess by the looks on his father’s face and his posture what his result was. This is an example of:",
+        "options": ["Involvement of visual modality", "Nonverbal communication", "Effective communication", "Extra sensory perception", "None"],
+        "answer": "Nonverbal communication",
+        "description": "Nonverbal communication involves the interpretation of facial expressions, body language, and posture to convey messages without words."
+    },
+    {
+        "text": "What is the connective tissue covering of individual muscle fibers called?",
+        "options": ["Epimysium", "Perimysium", "Endomysium", "Sarcolemma", "Sarcoplasm"],
+        "answer": "Endomysium",
+        "description": "The endomysium is the thin connective tissue layer surrounding each individual muscle fiber, providing structural support and separating fibers."
+    },
+    {
+        "text": "A young girl of age 16 years presents to the ER with a history of a hysterical attack. She is diagnosed with respiratory alkalosis. Which one of the following is the primary event in this case?",
+        "options": ["Increase in plasma bicarbonate", "Decrease in plasma chloride", "Rise in pCO2", "Decrease in pCO2", "Decrease in plasma bicarbonate"],
+        "answer": "Decrease in pCO2",
+        "description": "Respiratory alkalosis is primarily caused by hyperventilation, leading to excessive exhalation of CO2 and decreased pCO2 levels in the blood."
+    },
+    {
+        "text": "A 15-year-old girl comes to a hematologist clinic with hemolytic anemia. Apart from pallor of skin and mucous membranes, what is the most common sign that the doctor is supposed to look for in the patient?",
+        "options": ["Buzidenski sign", "Jaundice", "Koilonychia", "Kernig sign", "Neck stiffness"],
+        "answer": "Jaundice",
+        "description": "Jaundice is a common sign in hemolytic anemia, caused by increased breakdown of red blood cells and subsequent elevation of bilirubin levels."
+    },
+    {
+        "text": "Human blood can be differentiated from animal blood by:",
+        "options": ["Benzedine Test", "Kastle Meyer Test", "Takayama Test", "Precipitin Test", "Hemin Crystal Test"],
+        "answer": "Precipitin Test",
+        "description": "The Precipitin Test is a serological test that can differentiate human blood from animal blood by detecting specific antigens and antibodies."
+    },
+    {
+        "text": "During development, primary chorionic villi are formed during which of the following weeks?",
+        "options": ["1st week", "2nd week", "3rd week", "4th week", "9th week"],
+        "answer": "2nd week",
+        "description": "Primary chorionic villi begin to form during the 2nd week of development as cellular projections from the cytotrophoblast into the syncytiotrophoblast."
+    },
+    {
+        "text": "Odontoblasts of teeth give rise to dentin of teeth. They are derived from which of the following germ layers?",
+        "options": ["Surface ectoderm", "Neural tube", "Neural crest", "Lateral plate mesoderm", "Paraxial mesoderm"],
+        "answer": "Neural crest",
+        "description": "Odontoblasts, responsible for producing dentin, are derived from the neural crest, which gives rise to various craniofacial structures."
+    },
+    {
+        "text": "A 35-year-old male is brought to the hospital with jaundice. Investigations revealed hemoglobin 10 g/dl, and peripheral smear showed odd-shaped, large nucleated RBCs. What is the most likely cause of his disease?",
+        "options": ["Folic acid deficiency", "Iron deficiency", "Vitamin B12 deficiency", "Vitamin C deficiency", "Vitamin K deficiency"],
+        "answer": "Folic acid deficiency",
+        "description": "Folic acid deficiency leads to megaloblastic anemia, characterized by the presence of large, nucleated red blood cells and jaundice."
+    },
+    {
+        "text": "Which of the following organelles is responsible for detoxification of drugs administered in the body?",
+        "options": ["Rough Endoplasmic Reticulum", "Smooth Endoplasmic Reticulum", "Lysosome", "Mitochondria", "Peroxisome"],
+        "answer": "Smooth Endoplasmic Reticulum",
+        "description": "The smooth endoplasmic reticulum is involved in the detoxification of drugs and metabolism of lipids."
+    },
+    {
+        "text": "Which of the following control systems is most important and controls most of the homeostatic functions?",
+        "options": ["Adaptive control system", "Feed forward control system", "Negative feedback control system", "Non-adaptive control system", "Positive feedback control system"],
+        "answer": "Negative feedback control system",
+        "description": "Negative feedback control systems maintain homeostasis by counteracting deviations from a set point."
+    },
+    {
+        "text": "If the flux of a substance across a cell membrane is directly proportional to the concentration gradient of that substance, the transport process is most likely:",
+        "options": ["Active transport", "Facilitated diffusion", "Na+ coupled co-transport", "Na+ coupled counter-transport", "Simple diffusion"],
+        "answer": "Simple diffusion",
+        "description": "Simple diffusion involves passive transport of molecules down their concentration gradient without energy expenditure."
+    },
+    {
+        "text": "Glucose is absorbed by the intestinal mucosa. Which of the following transport mechanisms is most likely involved in the absorption of glucose?",
+        "options": ["Facilitated diffusion", "Osmosis", "Primary active transport", "Secondary active transport", "Simple diffusion"],
+        "answer": "Secondary active transport",
+        "description": "Glucose is absorbed via secondary active transport using a sodium-glucose co-transporter."
+    },
+    {
+        "text": "A young boy asked for his neighbor's personal information, and a colleague shared it without consent. What did the colleague do?",
+        "options": ["Breach the colleague confidentiality", "Sympathize towards old neighbor", "Shows inappropriate attitude", "Making acquaintance with Usman", "None"],
+        "answer": "Breach the colleague confidentiality",
+        "description": "Sharing a colleague's personal information without their consent violates confidentiality policies."
+    },
+    {
+        "text": "Which of the following is a mature bone cell and is found within lacunae of the bone matrix?",
+        "options": ["Osteoprogenitor cells", "Osteoblasts", "Osteoclasts", "Osteocyte", "Osteoid"],
+        "answer": "Osteocyte",
+        "description": "Osteocytes are mature bone cells embedded within the bone matrix and involved in maintaining bone tissue."
+    },
+    {
+        "text": "Which of the following is the co-factor for E. coli DNA Ligase?",
+        "options": ["FAD+", "FADH", "NAD+", "NADP+", "NADPH"],
+        "answer": "NAD+",
+        "description": "NAD+ acts as a co-factor for E. coli DNA ligase during the ligation of DNA strands."
+    },
+    {
+        "text": "Which of the following structures in a cell is known as the ultimate unit of heredity?",
+        "options": ["Centrosome", "Histones", "Genes", "Nucleoside", "Telomeres"],
+        "answer": "Genes",
+        "description": "Genes are segments of DNA that serve as the fundamental units of heredity, determining traits and cellular functions."
+    },
+    {
+        "text": "Which of the following is the best example of psychosocial stress?",
+        "options": ["Noise", "Economic validity", "Disease", "Temperature", "None"],
+        "answer": "Economic validity",
+        "description": "Economic challenges and financial strain are common sources of psychosocial stress impacting mental health."
+    },
+    {
+        "text": "Which of the following ribosomal RNA is most important in the initiation of translation?",
+        "options": ["5S Subunit", "5.8S Subunit", "16S Subunit", "23S Subunit", "30S Subunit"],
+        "answer": "16S Subunit",
+        "description": "The 16S rRNA in the small ribosomal subunit is crucial for the initiation of translation by aligning the mRNA with the ribosome."
+    },
+    {
+        "text": "The least malignant and most common type of skin cancer is:",
+        "options": ["Basal cell carcinoma", "Merkel cell carcinoma", "Malignant melanoma", "Sebaceous carcinoma", "Squamous cell carcinoma"],
+        "answer": "Basal cell carcinoma",
+        "description": "Basal cell carcinoma is the most common and least aggressive type of skin cancer, usually linked to prolonged sun exposure."
+    },
+    {
+        "text": "The connective tissue cells that store fat are called:",
+        "options": ["Fibroblasts", "Histiocytes", "Adipocytes", "Mast cells", "Melanocytes"],
+        "answer": "Adipocytes",
+        "description": "Adipocytes are specialized cells within connective tissue that store fat for energy and insulation."
+    },
+    {
+        "text": "Hematopoiesis occurs at different sites at different stages of pregnancy. Which of the following is the most likely site of hematopoiesis in the early embryonic stage?",
+        "options": ["Bone marrow", "Liver", "Lymph nodes", "Spleen", "Yolk sac"],
+        "answer": "Yolk sac",
+        "description": "In the early embryonic stage, hematopoiesis begins in the yolk sac, which produces the first blood cells."
+    },
+    {
+        "text": "A 40-year-old lady visited the clinic with heavy menstrual bleeding. Her laboratory investigation showed hemoglobin 10 mg/dl, MCV 78 fl, and hypochromic red blood cells. What is the most likely cause of her anemia?",
+        "options": ["Folic acid deficiency", "Iron deficiency", "Vitamin B12 deficiency", "Vitamin C deficiency", "Vitamin K deficiency"],
+        "answer": "Iron deficiency",
+        "description": "Iron deficiency anemia is characterized by hypochromic, microcytic red blood cells and is common in patients with chronic blood loss."
+    },
+
+    {
+    "text": "A 45-year-old woman presents with fatigue and pallor. Her blood test reveals a hemoglobin level of 9 g/dl, an MCV of 72, and microcytic hypochromic red blood cells. What is the most likely cause of her condition?",
+    "options": ["Vitamin D deficiency", "Iron deficiency", "Folic acid deficiency", "Chronic kidney disease", "Lead poisoning"],
+    "answer": "Iron deficiency",
+    "description": "Iron deficiency anemia is the most common cause of microcytic hypochromic anemia and often presents with fatigue, pallor, and a low MCV. It is usually due to insufficient iron intake or loss of iron, such as in gastrointestinal bleeding or heavy menstrual cycles."
+},
+
+    {
+        "text": "During an SGD session with 1st-year students, the topic of discussion was 'characteristics of a synovial joint.' The facilitator asked the students that 'watch dog action' is a characteristic of which part of the synovial joint?",
+        "options": ["Synovial membrane", "Ligament", "Articular cartilage", "Capsule of the joint", "Muscle around the joint"],
+        "answer": "Capsule of the joint",
+        "description": "The capsule of a synovial joint is involved in the 'watch dog action,' which helps detect changes and protects the joint."
+    },
+    {
+        "text": "Pernicious anemia is most likely due to the destruction of:",
+        "options": ["Gastric parietal cells", "Chief cells", "Intestinal epithelial cells", "Pluripotential stem cells", "Platelets"],
+        "answer": "Gastric parietal cells",
+        "description": "Pernicious anemia is caused by the destruction of gastric parietal cells, leading to reduced intrinsic factor and vitamin B12 absorption."
+    },
+    {
+        "text": "Which one of the following is least likely immediately after vessel injury?",
+        "options": ["Blood vessel constricts", "It is partly a local phenomenon", "It is totally a reflex phenomenon", "Platelet secretion contributes to vasoconstriction", "Usually, arterioles and small arteries constrict"],
+        "answer": "It is totally a reflex phenomenon",
+        "description": "Vasoconstriction after vessel injury is partly a local phenomenon mediated by endothelin and other substances; it is not purely reflex."
+    },
+    {
+        "text": "Sideroblastic anemia is a disorder in which the body has adequate iron stores, but is unable to incorporate the iron into hemoglobin. Which of the following will be the characteristic feature of sideroblastic anemia?",
+        "options": ["Decreased serum iron", "Normal to increased TIBC", "Elevated ferritin levels", "Normal transferrin", "Decreased ferritin levels"],
+        "answer": "Elevated ferritin levels",
+        "description": "Sideroblastic anemia often presents with elevated ferritin levels due to ineffective utilization of iron and abnormal storage."
+    },
+    {
+        "text": "Which of the following substances, if taken by the mother during the first trimester, can cause cleft lip, neural tube defects, and retarded growth in the fetus?",
+        "options": ["Aspirin and NSAIDs", "Ergotamine and steroids", "Tetracyclines and sulpha drugs", "Coumarin and phenytoin", "Carbamazepine and phenytoin"],
+        "answer": "Carbamazepine and phenytoin",
+        "description": "Carbamazepine and phenytoin are teratogenic and can cause cleft lip, neural tube defects, and growth retardation if taken during the first trimester."
+    },
+    {
+        "text": "The Professor of anatomy asked the students at the end of his learning session about the classification of joints, that the incudo-stapedial joint of auditory ossicles is which type of joint?",
+        "options": ["Plane synovial joint", "Primary cartilaginous joint", "Secondary cartilaginous joint", "Condylar joint", "Ball and socket joint"],
+        "answer": "Plane synovial joint",
+        "description": "The incudo-stapedial joint of auditory ossicles is a plane synovial joint, allowing small gliding movements necessary for sound conduction."
+    },
+    {
+        "text": "A 35-year-old man is injured during a quarrel with a stab wound to the most medial side of the proximal portion of the cubital fossa. Which of the following structures would most likely be damaged?",
+        "options": ["Biceps brachii tendon", "Brachial artery", "Median nerve", "Radial nerve", "Radial recurrent artery"],
+        "answer": "Median nerve",
+        "description": "The median nerve lies medially in the cubital fossa and is vulnerable to injury in this location."
+    },
+    {
+        "text": "Ghazala, age 7 years, was brought to Pediatric OPD with a history of excessive bleeding on minor injuries during playing. She was diagnosed with classic hemophilia. What is the most likely possibility that she, being female, is suffering from hemophilia?",
+        "options": [
+            "Her autosomes carry the mutant gene for hemophilia",
+            "Her father had hemophilia & mother was a hemophilia carrier",
+            "Her mother was a hemophilia carrier",
+            "One of her X chromosomes codes for the deficiency of Factor VIII",
+            "She is suffering from von Willebrand’s disease"
+        ],
+        "answer": "Her father had hemophilia & mother was a hemophilia carrier",
+        "description": "For a female to inherit hemophilia, she must receive the defective gene from her carrier mother and her hemophilic father."
+    },
+    {
+        "text": "Which one is least likely an effect of polycythemia on the body?",
+        "options": [
+            "Decrease venous return towards the heart",
+            "Decrease blood flow in arterioles",
+            "Decrease systemic blood pressure",
+            "Increased blood viscosity",
+            "Increased tendency towards spontaneous bleeding"
+        ],
+        "answer": "Decrease systemic blood pressure",
+        "description": "Polycythemia increases blood viscosity, which usually raises blood pressure due to increased resistance."
+    },
+    {
+        "text": "A tissue preparation which is experimentally subjected to a hypoxic environment shows cellular swelling and clumping of chromatin. ATPases are activated and ATP production decreases. Which of the following ions accumulating in mitochondria and the cytosol contributes most to these findings and eventually to cell death?",
+        "options": ["Bicarbonate", "Calcium", "Chloride", "Potassium", "Sodium"],
+        "answer": "Calcium",
+        "description": "Calcium accumulation leads to mitochondrial damage and activation of enzymes that promote cell death."
+    },
+    {
+        "text": "Which of the following statements clarify that glucose and mannose are epimers of each other?",
+        "options": [
+            "Both of them are mirror images of each other",
+            "Both of them are different in configuration around a single carbon atom",
+            "Both of them rotate the plane of polarized light in opposite directions",
+            "Both of them rotate the plane of polarized light in the same direction",
+            "Both of them are ketohexoses"
+        ],
+        "answer": "Both of them are different in configuration around a single carbon atom",
+        "description": "Epimers differ in configuration around only one specific carbon atom."
+    },
+    {
+        "text": "Which one of the following terms denotes the spherical structures seen microscopically as a sliced onion in the medulla of the thymus gland?",
+        "options": ["Corpora amylacea", "Corpora arenacea", "Concretions", "Psammoma bodies", "Hassal's corpuscle"],
+        "answer": "Hassal's corpuscle",
+        "description": "Hassal's corpuscles are characteristic structures found in the thymus gland."
+    },
+    {
+        "text": "Which of the following nucleotides is used for epimerization of Galactose to Glucose?",
+        "options": ["ADP", "ATP", "CTP", "GTP", "UTP"],
+        "answer": "ATP",
+        "description": "ATP is involved in the epimerization process converting galactose into glucose in metabolic pathways."
+    },
+    {
+        "text": "Which one of the following structures is made of dense bundles of collagen type I fibers?",
+        "options": ["Intervertebral disc", "Ligamenta flava", "Stroma of liver", "External ear", "Epiglottis"],
+        "answer": "Intervertebral disc",
+        "description": "The annulus fibrosus of the intervertebral disc is composed primarily of type I collagen."
+    },
+    {
+        "text": "Which of the following glycosaminoglycans is present in cartilage, cornea, and horny structures formed of dead cells?",
+        "options": [
+            "Chondroitin sulfate",
+            "Dermatan sulfate",
+            "Hyaluronic acid",
+            "Keratan sulfate",
+            "Heparan sulfate"
+        ],
+        "answer": "Keratan sulfate",
+        "description": "Keratan sulfate is abundant in structures such as cartilage, the cornea, and other keratinized tissues."
+    },
+    {
+        "text": "Adult hemoglobin (HbA) is a tetramer consisting of which of the following chains?",
+        "options": ["alpha2beta2", "alpha2sigma2", "alpha2delta2", "beta4", "alpha4"],
+        "answer": "alpha2beta2",
+        "description": "Adult hemoglobin (HbA) is composed of two alpha chains and two beta chains, making up its functional tetrameric structure."
+    },
+    {
+        "text": "Which one is least likely regarding the effect of aging on the immune system?",
+        "options": [
+            "The disease morbidity and mortality increase after age 50",
+            "Thymus remains functionally active more than 50% in adults",
+            "Reactivation of latent viruses starts to appear soon after age 50",
+            "Reduction in cells starts soon after age 40",
+            "Reduction in B and T cell production occurs"
+        ],
+        "answer": "Thymus remains functionally active more than 50% in adults",
+        "description": "The thymus significantly decreases in size and function with age, impacting T-cell production."
+    },
+    {
+        "text": "Niacin at doses of 1.5 g/day (100 times RDA) strongly inhibits lipolysis in adipose tissues, thus decreasing TAG and cholesterol synthesis in the liver. Therefore, it is recommended in which of the following conditions?",
+        "options": [
+            "BCKD deficiency",
+            "Korsakoff syndrome",
+            "Type-2b Hyperlipoproteinemia",
+            "Type-2 DM",
+            "Type-3 Hyperlipidemia"
+        ],
+        "answer": "Type-2b Hyperlipoproteinemia",
+        "description": "Niacin is used therapeutically to reduce triglycerides and LDL cholesterol, particularly in hyperlipoproteinemia."
+    },
+    {
+        "text": "The cell bodies of motor neurons whose axons form the ventral or motor root of a spinal nerve are located in the:",
+        "options": [
+            "Anterior gray horn of spinal cord",
+            "In the effector muscles",
+            "In the dorsal root ganglia",
+            "In the cerebrum",
+            "Along the motor nerve fibers"
+        ],
+        "answer": "Anterior gray horn of spinal cord",
+        "description": "The anterior gray horn contains the motor neuron cell bodies responsible for innervating skeletal muscles."
+    },
+    {
+        "text": "The adrenal/suprarenal gland is located on the upper pole of the kidney. It has an outer cortex and inner medulla. The adrenal medulla is derived from which of the following germ layers?",
+        "options": [
+            "Neural tube of neuro-ectoderm",
+            "Neural crest of neuro-ectoderm",
+            "Paraxial mesoderm",
+            "Intermediate mesoderm",
+            "Lateral plate mesoderm"
+        ],
+        "answer": "Neural crest of neuro-ectoderm",
+        "description": "The adrenal medulla originates from neural crest cells, which give rise to chromaffin cells producing catecholamines."
+    },
+    {
+        "text": "The embryo is suspended along with its amniotic cavity and yolk sac into the chorionic cavity by a connecting stalk. Which of the following structures forms the chorion?",
+        "options": [
+            "Splanchnic layer of extra-embryonic mesoderm",
+            "Somatic layer of extra-embryonic mesoderm",
+            "Somatic layer of extra-embryonic mesoderm and cytotrophoblast",
+            "Somatic layer of extra-embryonic mesoderm and syncytiotrophoblast",
+            "Somatic layer of extra-embryonic mesoderm and trophoblast"
+        ],
+        "answer": "Somatic layer of extra-embryonic mesoderm and trophoblast",
+        "description": "The chorion is formed by the trophoblast and the somatic layer of extra-embryonic mesoderm."
+    },
+    {
+        "text": "For the developing new human being, the prerequisite for the continuation of the second meiotic division of the oocyte to produce the haploid ovum is:",
+        "options": [
+            "Fertilization by a spermatozoon",
+            "The presence of human chorionic gonadotropin (hCG)",
+            "Elevated progesterone levels",
+            "Fertilization by a spermatozoon",
+            "Contractions of the fallopian tube"
+        ],
+        "answer": "Fertilization by a spermatozoon",
+        "description": "The completion of the second meiotic division in the oocyte is triggered by sperm penetration during fertilization."
+    },
+    {
+        "text": "The Bohr Effect is the ability of hemoglobin to deliver oxygen to tissues at:",
+        "options": ["Low pH", "pH less than 7.1", "Neutral pH", "High pH", "pH greater than 7.5"],
+        "answer": "Low pH",
+        "description": "The Bohr Effect describes hemoglobin's decreased oxygen affinity in acidic environments, facilitating oxygen release to tissues."
+    },
+    {
+        "text": "A lack of which of these will result in abnormally large red blood cells and a condition called megaloblastic anemia?",
+        "options": [
+            "Carbon dioxide",
+            "Oxygen",
+            "Vitamin C",
+            "Vitamin B-12 and folic acid",
+            "Vitamin D"
+        ],
+        "answer": "Vitamin B-12 and folic acid",
+        "description": "Vitamin B-12 and folic acid are essential for DNA synthesis, and their deficiency leads to megaloblastic anemia."
+    },
+    {
+        "text": "Which of the following will most likely result in an increase in the rate of diffusion of a particle across the cell membrane?",
+        "options": [
+            "The area of the membrane decreases",
+            "The concentration gradient decreases",
+            "The lipid solubility of the substance increases",
+            "The size of the particle increases",
+            "The thickness of the membrane increases"
+        ],
+        "answer": "The lipid solubility of the substance increases",
+        "description": "Lipid-soluble substances can diffuse more readily through the lipid bilayer of the cell membrane."
+    },
+    {
+        "text": "Which of the following will most likely result in an increase in the rate of diffusion of a particle across the cell membrane?",
+        "options": ["The area of the membrane decreases", "The concentration gradient decreases", "The lipid solubility of the substance increases", "The size of the particle increases", "The thickness of the membrane increases"],
+        "answer": "The lipid solubility of the substance increases",
+        "description": "Higher lipid solubility enables particles to diffuse more readily through the lipid bilayer of the cell membrane."
+    },
+    {
+        "text": "Which blood cell can barely be seen by the naked eye?",
+        "options": ["Basophil", "Eosinophil", "Macrophages", "Neutrophil", "Lymphocyte"],
+        "answer": "Macrophages",
+        "description": "Macrophages are relatively large, but individual cells are difficult to distinguish with the naked eye without specialized preparation."
+    },
+    {
+        "text": "Which one is least likely regarding polycythemia?",
+        "options": ["Decrease blood volume", "Decrease venous return", "Increase blood viscosity", "Increase in hematocrit value", "Increase in hemoglobin"],
+        "answer": "Decrease blood volume",
+        "description": "Polycythemia typically leads to an increase in blood viscosity and volume, as it involves elevated red blood cell mass."
+    },
+    {
+        "text": "Oxidative Phosphorylation of Pyruvate and α-Keto-Glutarate plays a key role in the energy metabolism of most cells and is particularly most important in which of the following tissues?",
+        "options": ["CNS", "Liver", "Kidneys", "GIT", "Skin"],
+        "answer": "CNS",
+        "description": "The CNS relies heavily on oxidative metabolism to meet its high energy demands."
+    },
+    {
+        "text": "When the professor of anatomy completed his session at the end of LCF, he asked the students which one of the following structures has its epithelium derived from mesoderm?",
+        "options": ["Stomach", "Pancreas", "Duodenum", "Colon", "Ureter"],
+        "answer": "Ureter",
+        "description": "The ureter's epithelium is derived from mesoderm, as it arises from the intermediate mesoderm."
+    },
+    {
+        "text": "Which one of the following will differentiate primary polycythemia from secondary polycythemia?",
+        "options": ["Decrease venous return", "Genetic mutation", "Hypertension", "Increase in hemoglobin level", "Increase RBC number"],
+        "answer": "Genetic mutation",
+        "description": "Primary polycythemia is caused by genetic mutations, often in the JAK2 gene, distinguishing it from secondary causes."
+    },
+    {
+        "text": "The depolarization phase of action potential in nerve fibers is most likely due to the opening of:",
+        "options": ["Calcium-sodium channels", "Chloride channels", "Fast sodium channels", "Potassium channels", "Sodium-potassium pump"],
+        "answer": "Fast sodium channels",
+        "description": "The rapid influx of sodium ions through fast sodium channels is the primary driver of the depolarization phase in neurons."
+    },
+    {
+        "text": "Regarding general histology of the nervous system, bipolar neurons are found in which of the following regions?",
+        "options": ["Anterior horn cells of spinal cord", "Cerebellum", "Cerebral cortex", "Dorsal root ganglia of spinal nerves", "Olfactory epithelium"],
+        "answer": "Olfactory epithelium",
+        "description": "Bipolar neurons are specialized sensory neurons found in the olfactory epithelium and retina."
+    },
+    {
+        "text": "In a neuron, the structures which extend along the length of axons and which form a means for axoplasmic transport are the:",
+        "options": ["Nissl bodies", "Synaptic vesicles", "Nodes of Ranvier", "Schwann cells", "Microtubules"],
+        "answer": "Microtubules",
+        "description": "Microtubules serve as tracks for the transport of organelles, vesicles, and molecules along axons."
+    },
+    {
+        "text": "Hematopoiesis occurs at different sites at different stages of pregnancy. Which of the following is most likely the major site for RBC production in the middle trimester of pregnancy?",
+        "options": ["Bone marrow", "Liver", "Lymph nodes", "Spleen", "Yolk sac"],
+        "answer": "Liver",
+        "description": "During the middle trimester, the liver is the primary site of hematopoiesis before the bone marrow becomes dominant."
+    },
+    {
+        "text": "What does the biopsychosocial model NOT postulate?",
+        "options": ["There is a single cause to disease", "Health and illness have many causes", "Connection between mental illness and biological changes", "Infectious disease has been replaced by chronic disease", "Environment plays a significant role"],
+        "answer": "There is a single cause to disease",
+        "description": "The biopsychosocial model emphasizes the multifactorial nature of health, rejecting the notion of a single cause for disease."
+    },
+    {
+        "text": "A 21-year-old man comes to the emergency clinic after falling from a tree, injuring his shoulder and arm. On examination, it is found that he cannot adduct his arm. Which of the following muscles is most probably paralyzed?",
+        "options": ["Infraspinatus", "Latissimus dorsi", "Serratus anterior", "Supraspinatus", "Teres minor"],
+        "answer": "Latissimus dorsi",
+        "description": "The latissimus dorsi is a key muscle responsible for adduction and extension of the arm."
+    },
+    {
+        "text": "Which of the following nucleotides may have a possible role in the differentiation of extrahepatic obstruction from intrahepatic obstruction in situations where other biochemical findings are inconclusive?",
+        "options": ["Cyclic-AMP", "Cyclic-ATP", "Cyclic-CMP", "Cyclic-CTP", "Cyclic-GMP"],
+        "answer": "Cyclic-AMP",
+        "description": "Cyclic-AMP can be a biomarker for certain pathophysiological conditions, aiding in differential diagnosis."
+    },
+    {
+        "text": "If you touch someone and shout 'You’re it!' in a game of tag, people get it, but if you are in the grocery store tapping strangers on the shoulder and yelling at them, this is an example of which communication style?",
+        "options": ["Nonverbal and visual communication", "Written communication", "Verbal communication", "Contextual meaning", "None of the above"],
+        "answer": "Contextual meaning",
+        "description": "The communication style depends heavily on the social and cultural context for interpretation."
+    },
+    {
+        "text": "Which one of the following is the role of bile salts as surface-active agents?",
+        "options": ["Normalize surface tension", "Keep surface tension constant", "Decrease surface area", "Decrease surface tension", "Increase surface tension"],
+        "answer": "Decrease surface tension",
+        "description": "Bile salts reduce surface tension, aiding in the emulsification of fats for digestion."
+    },
+    {
+        "text": "A 35-year-old man is a habitual smoker. If a biopsy is taken from the respiratory tract in this man, the epithelium of the respiratory tract is most likely to show:",
+        "options": ["Mucous hyperplasia", "Squamous cell anaplasia", "Squamous cell hypertrophy", "Smooth-muscle hyperplasia", "Stratified squamous metaplasia"],
+        "answer": "Stratified squamous metaplasia",
+        "description": "In response to chronic irritation like smoking, respiratory epithelium undergoes squamous metaplasia to adapt to the environment."
+    },
+    {
+        "text": "Which one of the following cells removes damaged cells or pathogens from the connective tissue?",
+        "options": ["Fibroblasts", "Adipocytes", "Histiocytes", "Mast cells", "Lymphocytes"],
+        "answer": "Histiocytes",
+        "description": "Histiocytes are resident macrophages in connective tissue that phagocytize pathogens and cellular debris."
+    },
+    {
+        "text": "Somites are the structures formed during the development of the embryo. Sclerotomes are derived from which wall of the somite?",
+        "options": ["Dorsal wall", "Ventral wall", "Dorsal and ventral wall", "Medial wall", "Medial and ventral wall"],
+        "answer": "Medial and ventral wall",
+        "description": "Sclerotomes arise from the medial and ventral walls of the somite and contribute to axial skeleton formation."
+    },
+    {
+        "text": "Regarding general histology, which one of the following cells is a resident (fixed) connective tissue cell?",
+        "options": ["Plasma cells", "Mast cells", "Fibroblasts", "Macrophages", "Microglia"],
+        "answer": "Fibroblasts",
+        "description": "Fibroblasts are fixed connective tissue cells involved in producing extracellular matrix components."
+    },
+
+{
+    "text": "A 40-year-old lady visited the Gynea/Obs OPD with a history of heavy menstrual bleeding for the last two to three years, for which she has seen many doctors. Her lab reports show an RBC count of 3.5 million and Hb 9 gm/dl. What would be the picture on the peripheral smear?",
+    "options": ["Macrocytic, hyperchromic RBCs", "Macrocytic, hypochromic RBCs", "Microcytic, hypochromic RBCs", "Normochromic, normocytic RBCs", "Normocytic, hypochromic RBCs"],
+    "answer": "Microcytic, hypochromic RBCs",
+    "description": "This is typical of iron deficiency anemia, where chronic blood loss (such as heavy menstrual bleeding) leads to decreased hemoglobin production, resulting in small (microcytic) and pale (hypochromic) red blood cells on the peripheral smear."
+}
+
+
+
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+const userAnswers = [];
+const skippedQuestions = [];
+let timerInterval;
+const timePerQuestion = 66; // 1.1 minutes in seconds
+let totalQuizTime; // Total time for the quiz
+let timeRemaining; // Time left in the quiz
+
+// Progress Bar Functions
+let progressBarContainer;
+
+function createProgressBar(numQuestions) {
+    // Create a rectangular container with fixed height and scroll functionality
+    progressBarContainer = document.createElement("div");
+    progressBarContainer.id = "progress-bar-container";
+    progressBarContainer.style.textAlign = "center";
+    progressBarContainer.style.marginBottom = "20px";
+    progressBarContainer.style.height = "60px";  // Fixed height for the container
+    progressBarContainer.style.overflowX = "auto";  // Enable horizontal scrolling
+    progressBarContainer.style.whiteSpace = "nowrap";  // Ensure the boxes stay on the same line
+    progressBarContainer.style.border = "1px solid #e0e0e0";  // Rectangular border
+    progressBarContainer.style.borderRadius = "5px";  // Optional rounded corners
+    document.querySelector('.question-container').prepend(progressBarContainer);
+
+    for (let i = 0; i < numQuestions; i++) {
+        const square = document.createElement("div");
+        square.textContent = i + 1;
+        square.style.display = "inline-block";
+        square.style.width = "30px";
+        square.style.height = "30px";
+        square.style.lineHeight = "30px";
+        square.style.textAlign = "center";
+        square.style.margin = "5px";
+        square.style.border = "1px solid black";
+        square.style.borderRadius = "5px";
+        square.style.backgroundColor = "white";
+        square.dataset.index = i;
+        progressBarContainer.appendChild(square);
+    }
+}
+
+function updateProgressBar(index, status) {
+    const square = progressBarContainer.children[index];
+    if (status === "answered") {
+        square.style.backgroundColor = "green";
+        square.style.color = "white";
+    } else if (status === "skipped") {
+        square.style.backgroundColor = "yellow";
+        square.style.color = "black";
+    }
+}
+
+function removeProgressBar() {
+    if (progressBarContainer) {
+        progressBarContainer.remove();
+    }
+}
+
+// Quiz Logic
+function validateLogin() {
+    const name = document.getElementById("user-name").value;
+    const gmail = document.getElementById("user-gmail").value;
+    const userId = document.getElementById("user-id").value;
+
+    const user = allowedUsers.find(user => user.name === name && user.gmail === gmail && user.username === userId);
+    if (user) {
+        document.querySelector('.login-container').style.display = "none";
+        document.querySelector('.question-container').style.display = "block";
+        startQuiz();
+    } else {
+        alert("Invalid login credentials. Please try again.");
+    }
+}
+
+function startQuiz() {
+    createProgressBar(questions.length);
+    totalQuizTime = timePerQuestion * questions.length;
+    timeRemaining = totalQuizTime;
+
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.question-container').style.display = "block";
+    startTimer();
+    showQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const timerElement = document.getElementById("timer");
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `Time Left: ${minutes}m ${seconds}s`;
+}
+// This function hides the timer when the last question is reached
+function handleTimerVisibility() {
+    if (currentQuestion === questions.length - 1) {
+        clearInterval(timerInterval); // Stop the timer on the last question
+        document.getElementById("timer").style.display = "none";  // Hide the timer after the last question
+    }
+}
+// Call this function when moving to the next question
+function nextQuestion() {
+    // Your existing logic for the next question
+
+    // Check timer visibility when changing questions
+    handleTimerVisibility();
+}
+
+// End quiz and hide timer
+function endQuiz() {
+    // Your existing endQuiz logic goes here
+    clearInterval(timerInterval); // Ensure timer is stopped when quiz ends
+    document.getElementById("timer").style.display = "none";  // Hide timer after quiz ends
+}
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        const userAnswer = selectedOption.value;
+        userAnswers[currentQuestion] = userAnswer;
+        if (userAnswer === questions[currentQuestion].answer) {
+            score++;
+        }
+        updateProgressBar(currentQuestion, "answered");
+        questions[currentQuestion].answered = true;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            handleSkippedQuestions();
+        }
+    } else {
+        alert("Please select an answer or skip the question.");
+    }
+}
+
+function skipQuestion() {
+    if (!skippedQuestions.includes(currentQuestion)) {
+        skippedQuestions.push(currentQuestion);
+    }
+    updateProgressBar(currentQuestion, "skipped");
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        handleSkippedQuestions();
+    }
+}
+
+function showQuestion() {
+    if (currentQuestion >= questions.length) {
+        removeProgressBar();
+        endQuiz();
+        return;
+    }
+
+    const question = questions[currentQuestion];
+    if (question.answered) {
+        handleSkippedQuestions();
+        return;
+    }
+
+    document.querySelector('.question-container').style.display = "block";
+    document.getElementById("question").textContent = question.text;
+
+    let optionsHTML = '';
+    question.options.forEach(option => {
+        optionsHTML += `<label><input type="radio" name="answer" value="${option}"> ${option}</label><br>`;
+    });
+
+    document.getElementById("options").innerHTML = optionsHTML;
+    updateButtons();
+}
+
+function handleSkippedQuestions() {
+    if (skippedQuestions.length > 0) {
+        currentQuestion = skippedQuestions.shift();
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function updateButtons() {
+    const nextButton = document.getElementById("next-button");
+    if (skippedQuestions.length > 0) {
+        nextButton.textContent = currentQuestion === questions.length - 1 && skippedQuestions.length === 1 ? "Finish" : "Next";
+    } else {
+        nextButton.textContent = currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    }
+}
+function endQuiz() {
+    document.querySelector('.question-container').style.display = "none";
+    document.querySelector('.result-container').style.display = "block";
+    document.getElementById("score").textContent = score;
+
+    const answerKey = document.getElementById("answer-key");
+    answerKey.innerHTML = '';
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const resultItem = document.createElement("li");
+        resultItem.innerHTML = `
+            <div class="question">${question.text}</div>
+            <div class="options">
+                ${question.options.map(option => {
+                    let optionText = option;
+                    if (userAnswer === option) {
+                        // If the answer is incorrect, color "Your answer" red
+                        if (userAnswer !== question.answer) {
+                            optionText += " <span style='color: red;'>(Your answer)</span>";
+                        } else {
+                            optionText += " <span style='color: green;'>(Correct)</span>";
+                        }
+                    }
+                    if (option === question.answer && userAnswer !== option) {
+                        // For correct option (when the user didn't choose it), mark it as green
+                        optionText += " <span style='color: green;'>(Correct)</span>";
+                    }
+                    return `<div>${optionText}</div>`;
+                }).join('')}
+            </div>
+            <hr style="border: 1px solid #ccc; margin: 10px 0;">  <!-- Horizontal Line -->
+            <div class="description"><strong>Explanation:</strong> ${question.description}</div>
+        `;
+        answerKey.appendChild(resultItem);
+    });
+}
+
+function showLogin() {
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.login-container').style.display = "block";
+}
+
+
+</script>
+</body>
+</html>
