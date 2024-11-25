@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>
+
+       <!-- Include Bootstrap and DataTables CSS -->
+       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" />
+       <link rel="stylesheet" href="https://cdn.datatables.net/1.10.23/css/dataTables.bootstrap4.min.css" />
+       <!-- Include jQuery and DataTables JS -->
+       <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+       <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+       <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>
+    <style>
+      #protected-content {
+        display: none; /* Content is hidden initially */
+      }
+      .form-container {
+        max-width: 600px;
+        margin: auto;
+        margin-top: 50px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+        border-radius: 10px;
+      }
+      .form-container h4 {
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        color: #007bff;
+      }
+      .form-control {
+        border-radius: 5px;
+      }
+      button {
+        border-radius: 5px;
+        padding: 12px 20px;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <!-- Login Form -->
+    <div class="container" id="login-form-container">
+      <div class="form-container">
+        <h4 class="text-center mb-4">Admin Login</h4>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input
+              class="form-control"
+              type="text"
+              name="username"
+              id="username"
+              placeholder="Enter Username"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="gmail">Gmail:</label>
+            <input
+              class="form-control"
+              type="email"
+              name="gmail"
+              id="gmail"
+              placeholder="Enter Gmail"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input
+              class="form-control"
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Enter Password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">
+            Login
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Protected Content -->
+    <div id="protected-content">
+      <div class="bg-light">
+        <div class="container mt-5">
+            <h2 class="mb-4">Apply Form DataTable</h2>
+            <div class="row">
+                <table id="dataTable" class="table table-striped table-sm table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Father Name</th>
+                            <th>Gmail</th>
+                            <th>WhatsApp Number</th>
+                            <th>Address</th>
+                            <th>Medical College</th>
+                            <th>Year of Study</th>
+                            <th>Practice Test</th>
+                            <th>Transaction ID</th>
+                            <th>Receipt</th>
+                            <th>Age</th>
+                            <th>Ex</th>
+                            <th>Media</th
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Your Google Apps Script URL for login validation
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyU0g8Zb0Qbz3gdsb-OSOpdMrtml669zndrMPz8B7yNF60vRfZWcl1ahVWumqxlM0DV/exec";
+
+      const form = document.getElementById("login-form");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const gmail = document.getElementById('gmail').value;
+        const password = document.getElementById('password').value;
+
+        // Create a FormData object with the login details
+        const formData = new FormData();
+        formData.append("username", username);
+        formData.append("gmail", gmail);
+        formData.append("password", password);
+
+        // Validate login with the credentials using Google Apps Script
+        await validateLogin(formData);
+      });
+
+      async function validateLogin(formData) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.disabled = true;
+        submitButton.innerText = "Loading...";
+
+        try {
+          // Send the credentials to Google Apps Script for validation
+          const response = await fetch(scriptURL, { method: "POST", body: formData });
+          const data = await response.json();
+
+          if (data.success) {
+            swal("Success", "Login successful.", "success");
+            // Show protected content and hide the login form
+            document.getElementById("login-form-container").style.display = "none";
+            document.getElementById("protected-content").style.display = "block";
+          } else {
+            swal("Error", "Invalid credentials. Please try again!", "error");
+          }
+        } catch (error) {
+          swal("Error", "Something went wrong. Please try again!", "error");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.innerText = "Login";
+        }
+      }
+      $(document).ready(function () {
+            const webAppUrl = 'https://script.google.com/macros/s/AKfycbxlLShXBoA3ibk-eN5TbGUsT4dNVy9zmJdIbxMI5Kq168aAYHpfbjWHSEEkQplAeqPErg/exec';
+
+            fetch(webAppUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('tableBody');
+                    data.forEach(row => {
+                        let tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row['full_name']}</td>
+                            <td>${row['father_name']}</td>
+                            <td>${row['gmail']}</td>
+                            <td>${row['whatsapp_number']}</td>
+                            <td>${row['address']}</td>
+                            <td>${row['medical_college']}</td>
+                            <td>${row['year_of_study']}</td>
+                            <td>${row['practice_test']}</td>
+                            <td>${row['transaction_id']}</td>
+                            <td>${row['receipt']}</td>
+                            <td>${row['age']}</td>
+                            <td>${row['ex']}</td>
+                            <td><a href='${row['media']}' target='_blank'>Open Link</a></td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+
+                    $('#dataTable').DataTable({
+                        paging: true,
+                        searching: true,
+                        info: true,
+                        responsive: true,
+                        lengthChange: true,
+                        autoWidth: false
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+  </body>
+</html>
