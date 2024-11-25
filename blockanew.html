@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #progress-bar-container {
+            background-color: #f9f8f8;
+    border: 1px solid #c3c3c5;
+    }
+        .container {
+            text-align: center;
+            max-width: 80%;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 58%;
+        }
+    
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+    
+        button:hover {
+            background: #2575fc;
+        }
+    
+        .question-container, .result-container, .login-container {
+            display: none;
+        }
+    
+        .question-container {
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            background-color: white;
+            border: 1px solid white;
+            border-radius: 8px;
+            min-height: 300px;
+           
+        }
+    
+        .options label {
+            display: block;
+            margin: -10px 0;
+        }
+    
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+    
+        .result-container ul {
+            text-align: left;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-container ul li {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .result-container ul li .question {
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-container ul li .options {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+    
+        .result-container ul li .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Enhanced Timer Styles */
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6a00, #ee0979); /* Gradient background */
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    
+        #timer:hover {
+            transform: scale(1.1); /* Slight scaling effect on hover */
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Change gradient on hover */
+        }
+    
+        #timer span {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Timer animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        #timer {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+    
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin: 20px auto;
+        }
+    
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    
+        .form-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    
+        .form-container input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .form-container button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 37%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .form-container button:hover {
+            background: #2575fc;
+        }
+    
+        .login-container input {
+            width: 51%;
+            padding: 13px;
+            margin: 16px;
+        }
+    
+        .login-container button {
+            width: 16%;
+            margin-top: 10px;
+        }
+    
+        p {
+            float: left;
+            padding: 2px 48px;
+            text-align: left;
+            line-height: 20px;
+        }
+    
+        #question {
+            font-size: 20px;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #timer {
+                font-size: 18px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+            .form-container {
+                width: 90%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            #timer {
+                font-size: 16px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .para1{
+                padding: 0px 20px;
+            }
+            .login-credentials{
+                font-size: 1.5em ;
+                line-height: 33px;
+            }
+            .login-container button {
+                width: 25%;
+                padding: 10px 25px;
+                margin-top: 10px;
+                text-align: center;
+            }
+    
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .login-container input {
+                width: 71%;
+                padding: 13px;
+                margin: 16px;
+            }
+    
+            .form-container {
+                width: 73%;
+            }
+            button {
+                font-size: 12px;
+                padding: 10px 25px;
+            }
+            #timer {
+                font-size: 9px;
+            }
+            .form-container h2 {
+                font-size: 18px;
+            }
+            .form-container input {
+                width: 84%;
+            }
+            #question {
+                font-size: 16px;
+            }
+            .options label {
+                font-size: 14px;
+            }
+        }
+
+       
+         
+    </style>
+    
+    
+</head>
+<body>
+ 
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-container">
+            <h1 class=" login-credentials">Enter Your Login Credentials </h1>
+            <input type="text" id="user-name" placeholder="Enter your Name" class="login-input"> <br>
+            <input type="email" id="user-gmail" placeholder="Enter your Gmail" class="login-input"> <br>
+            <input type="text" id="user-id" placeholder="Enter your ID" class="login-input"> <br>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input"> <br>
+            <button onclick="validateLogin()">Start Quiz</button>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation-buttons">
+                <button id="previous-button" onclick="previousQuestion()" style="display:none;">Previous</button>
+                <button id="next-button" onclick="nextQuestion()">Next</button>
+                <button id="skip-button" onclick="skipQuestion()">Skip</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+            <h1>Quiz Result</h1>
+            <h2>Your Score: <span id="score"></span></h2>
+            <ul id="answer-key"></ul>
+
+            <div class="form-container">
+                <h2>Submit Your Details</h2>
+                <form onsubmit="sendmail(event)">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Start Container -->
+        <div class="start-container">
+            <h1>Welcome to the Block A Pre-Proff Practice Test</h1>
+            <h3>Important Instructions for Online Quiz</h3>
+            <p class="para1">
+
+                Please note that this online quiz is time-restricted and consists of 120 multiple-choice questions. It is essential to attempt the quiz within the allotted time frame. <br>  <br>
+                
+                <strong>Security Notice:</strong> This quiz contains highly sensitive material, and any attempts to capture screenshots or screen recordings will result in immediate blocking of access. <br> <br>
+                
+               <strong> Availability:</strong> This quiz will be available to you until your final exam. <br> <br>
+                
+                To access the quiz, please provide the following information: <br> <br>
+                <strong>
+                - Username<br>
+                - Gmail address<br>
+                - User ID<br>
+                - password</strong> <br>  <br>
+                Please note that selected MCQ options cannot be changed, so choose carefully. After attempting all main questions, click 'Finish' to review skipped questions. Skipped MCQs will appear immediately, and clicking 'Next' after the last skipped question will display your results. Review each question thoughtfully, as submissions are final. <br>  <br> <strong> <em>Please enter your username in the designated input area at the bottom of the results section to confirm your submission.</em> </strong> <br> <br>
+                
+               We appreciate your cooperation and adherence to these guidelines. <br>  <br> </p>
+            <button onclick="showLogin()">Start</button>
+        </div>
+
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdP3lE-1OjWkzp7za");
+        })();
+
+        function sendmail(event) {
+            event.preventDefault();
+
+            const params = {
+                username: document.getElementById("username").value,
+                score: document.getElementById("score").textContent,
+            };
+
+            emailjs.send("lmhservice3541", "lmhtemplate3541", params)
+                .then(
+                    (res) => {
+                        alert("Email sent successfully! Status: " + res.status);
+                    },
+                    (err) => {
+                        console.error("Failed to send email:", err);
+                        alert("Failed to send email. Please try again.");
+                    }
+                );
+        }
+
+        const allowedUsers = [
+            { name: "John Doe", gmail: "john.doe@example.com", username: "user123" , password: "user123"},
+            { name: "Jane Smith", gmail: "jane.smith@example.com", username: "test456",password: "user123" },
+            { name: "Admin User", gmail: "admin.user@example.com", username: "admin789", password: "user123"}
+        ];
+        const questions = [
+        {
+        "text": "Which one of the following layers of the skin is responsible for mitotic activity?",
+        "options": ["Stratum corneum", "Stratum lucidum", "Stratum granulosum", "Stratum spinosum", "Stratum basale"],
+        "answer": "Stratum basale",
+        "description": "The stratum basale contains actively dividing keratinocytes that replenish the skin."
+    },
+    {
+        "text": "A 45-year-old female presents with a neck mass and weight loss. Lab results show elevated T3 and T4. What type of feedback mechanism controls thyroid hormone release?",
+        "options": ["Positive feedback", "Feedforward mechanism", "Negative feedback", "Inhibitory modulation", "Lateral inhibition"],
+        "answer": "Negative feedback",
+        "description": "Elevated thyroid hormones inhibit TSH and TRH secretion via negative feedback."
+    },
+    {
+        "text": "Which of the following components is a major part of the glycocalyx on the plasma membrane?",
+        "options": ["Lipids", "Proteins", "Carbohydrates", "Cholesterol", "Nucleic acids"],
+        "answer": "Carbohydrates",
+        "description": "The glycocalyx is a carbohydrate-rich layer on the plasma membrane, crucial for cell signaling and adhesion."
+    },
+    {
+        "text": "A 25-year-old man was diagnosed with hereditary spherocytosis. Which organ is most likely responsible for the destruction of his abnormal RBCs?",
+        "options": ["Liver", "Bone marrow", "Spleen", "Kidney", "Pancreas"],
+        "answer": "Spleen",
+        "description": "In hereditary spherocytosis, the spleen removes the abnormally shaped RBCs, leading to anemia."
+    },
+    {
+        "text": "In cell histology, which of the following types of epithelium lines the alveoli of the lungs?",
+        "options": ["Stratified squamous epithelium", "Simple cuboidal epithelium", "Simple squamous epithelium", "Pseudostratified columnar epithelium", "Transitional epithelium"],
+        "answer": "Simple squamous epithelium",
+        "description": "Simple squamous epithelium allows efficient gas exchange in the alveoli."
+    },
+    {
+        "text": "A 60-year-old male presents with severe joint pain and swelling. Lab findings reveal elevated uric acid levels. Which of the following enzymes is most likely deficient in this patient?",
+        "options": ["Glucose-6-phosphatase", "Xanthine oxidase", "Hypoxanthine-guanine phosphoribosyltransferase", "Adenosine deaminase", "Superoxide dismutase"],
+        "answer": "Hypoxanthine-guanine phosphoribosyltransferase",
+        "description": "Deficiency of this enzyme is associated with gout and Lesch-Nyhan syndrome, leading to uric acid accumulation."
+    },
+    {
+        "text": "Which of the following blood vessels lacks valves?",
+        "options": ["Veins in the limbs", "Pulmonary veins", "Inferior vena cava", "Coronary veins", "Internal jugular vein"],
+        "answer": "Pulmonary veins",
+        "description": "Pulmonary veins carry oxygenated blood to the heart and do not have valves."
+    },
+    {
+        "text": "A medical student accidentally ingested a cyanide compound. Cyanide inhibits which of the following mitochondrial enzymes?",
+        "options": ["Cytochrome oxidase", "ATP synthase", "Citrate synthase", "Pyruvate dehydrogenase", "Succinate dehydrogenase"],
+        "answer": "Cytochrome oxidase",
+        "description": "Cyanide inhibits cytochrome oxidase (complex IV), halting the electron transport chain."
+    },
+   
+    {
+        "text": "A man suffers from a severe allergic reaction after consuming peanuts. Which of the following cells is primarily responsible for histamine release?",
+        "options": ["Neutrophils", "Basophils", "Eosinophils", "Monocytes", "Platelets"],
+        "answer": "Basophils",
+        "description": "Basophils release histamine during allergic reactions, contributing to symptoms."
+    },
+    {
+        "text": "The enzyme DNA polymerase functions in which of the following cellular processes?",
+        "options": ["Transcription", "Translation", "DNA replication", "Protein folding", "Glycosylation"],
+        "answer": "DNA replication",
+        "description": "DNA polymerase is essential for synthesizing new DNA strands during replication."
+    },
+    {
+        "text": "A 25-year-old male presents with frequent episodes of heartburn and regurgitation. On examination, there is no significant abdominal tenderness. What is the most likely cause of his symptoms?",
+        "options": ["Peptic ulcer disease", "Gallstones", "Gastroesophageal reflux disease (GERD)", "Esophageal varices", "Irritable bowel syndrome"],
+        "answer": "Gastroesophageal reflux disease (GERD)",
+        "description": "GERD is caused by the backflow of stomach contents into the esophagus, leading to symptoms like heartburn and regurgitation."
+    },
+    {
+        "text": "The brush border of the small intestine contains enzymes that aid in the digestion of carbohydrates. Which of the following enzymes is found in the brush border?",
+        "options": ["Amylase", "Lipase", "Lactase", "Pepsin", "Trypsin"],
+        "answer": "Lactase",
+        "description": "Lactase is a brush border enzyme that breaks down lactose into glucose and galactose."
+    },
+    {
+        "text": "A 60-year-old woman with chronic back pain is prescribed a bisphosphonate. What is the primary action of this drug?",
+        "options": ["Promotes bone resorption", "Stimulates bone formation", "Inhibits osteoclast activity", "Increases calcium absorption in the intestine", "Activates vitamin D synthesis"],
+        "answer": "Inhibits osteoclast activity",
+        "description": "Bisphosphonates inhibit osteoclast activity, reducing bone resorption and increasing bone density."
+    },
+    {
+        "text": "Which of the following neurotransmitters is primarily inhibitory in the central nervous system?",
+        "options": ["Acetylcholine", "Dopamine", "GABA", "Glutamate", "Serotonin"],
+        "answer": "GABA",
+        "description": "GABA (gamma-aminobutyric acid) is the primary inhibitory neurotransmitter in the central nervous system, reducing neuronal excitability."
+    },
+    {
+        "text": "During fetal circulation, most of the blood bypasses the lungs through which of the following structures?",
+        "options": ["Ductus venosus", "Foramen ovale", "Ductus arteriosus", "Umbilical vein", "Umbilical artery"],
+        "answer": "Ductus arteriosus",
+        "description": "The ductus arteriosus allows blood to bypass the lungs by connecting the pulmonary artery to the aorta during fetal circulation."
+    },
+    {
+        "text": "A 50-year-old man presents with progressive memory loss, confusion, and personality changes. MRI shows atrophy of the hippocampus. What is the most likely diagnosis?",
+        "options": ["Alzheimer’s disease", "Parkinson’s disease", "Huntington’s disease", "Vascular dementia", "Creutzfeldt-Jakob disease"],
+        "answer": "Alzheimer’s disease",
+        "description": "Alzheimer’s disease is characterized by hippocampal atrophy and presents with progressive memory loss and cognitive decline."
+    },
+    {
+        "text": "The blood-brain barrier is formed by which of the following types of cells?",
+        "options": ["Astrocytes", "Microglia", "Oligodendrocytes", "Schwann cells", "Ependymal cells"],
+        "answer": "Astrocytes",
+        "description": "Astrocytes contribute to the formation of the blood-brain barrier by regulating the permeability of capillaries in the central nervous system."
+    },
+    {
+        "text": "Which of the following vitamins is necessary for the synthesis of clotting factors II, VII, IX, and X?",
+        "options": ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin K", "Vitamin E"],
+        "answer": "Vitamin K",
+        "description": "Vitamin K is essential for the carboxylation of clotting factors II, VII, IX, and X, which are necessary for blood coagulation."
+    },
+    {
+        "text": "A 70-year-old woman presents with a wrist fracture after a fall. Her bone density scan reveals a T-score of -2.8. What is the most likely diagnosis?",
+        "options": ["Osteomalacia", "Osteomyelitis", "Osteoporosis", "Paget's disease", "Rheumatoid arthritis"],
+        "answer": "Osteoporosis",
+        "description": "A T-score of -2.8 indicates osteoporosis, a condition characterized by reduced bone density and increased fracture risk."
+    },
+    {
+        "text": "A 25-year-old athlete presents with pain and swelling in his right leg after a sports injury. An ultrasound reveals a thrombus in the popliteal vein. What is the primary risk of this condition?",
+        "options": ["Arterial embolism", "Pulmonary embolism", "Cerebral hemorrhage", "Myocardial infarction", "Systemic infection"],
+        "answer": "Pulmonary embolism",
+        "description": "A thrombus in a deep vein can dislodge and travel to the lungs, causing a potentially fatal pulmonary embolism."
+    },
+    {
+        "text": "Which of the following hormones is secreted by the posterior pituitary gland?",
+        "options": ["Prolactin", "Oxytocin", "Growth hormone", "Thyroid-stimulating hormone", "Adrenocorticotropic hormone"],
+        "answer": "Oxytocin",
+        "description": "The posterior pituitary secretes oxytocin, which stimulates uterine contractions and milk ejection during breastfeeding."
+    },
+    {
+        "text": "A 40-year-old woman has persistent fatigue and pallor. Her blood test reveals a low hemoglobin level and an elevated mean corpuscular volume (MCV). What is the most likely cause?",
+        "options": ["Iron deficiency anemia", "Thalassemia", "Folic acid deficiency", "Sickle cell anemia", "Hemolytic anemia"],
+        "answer": "Folic acid deficiency",
+        "description": "Macrocytic anemia with elevated MCV is commonly caused by folic acid deficiency, leading to ineffective red blood cell production."
+    },
+    {
+        "text": "The resting membrane potential of a neuron is maintained primarily by which of the following mechanisms?",
+        "options": ["Calcium pumps", "Sodium-potassium pump", "Voltage-gated sodium channels", "Ligand-gated ion channels", "Passive diffusion of ions"],
+        "answer": "Sodium-potassium pump",
+        "description": "The sodium-potassium pump maintains the resting membrane potential by actively transporting Na+ out and K+ into the cell."
+    },
+    {
+        "text": "A patient with uncontrolled diabetes presents with an increased anion gap metabolic acidosis. What is the most likely cause?",
+        "options": ["Lactic acidosis", "Uremia", "Ketoacidosis", "Salicylate poisoning", "Alcohol poisoning"],
+        "answer": "Ketoacidosis",
+        "description": "Diabetic ketoacidosis is characterized by an increased anion gap metabolic acidosis due to the accumulation of ketone bodies."
+    },
+    {
+        "text": "Which of the following components of the innate immune system forms pores in the membranes of pathogens?",
+        "options": ["Interleukins", "Complement proteins", "Natural killer cells", "Antibodies", "Macrophages"],
+        "answer": "Complement proteins",
+        "description": "Complement proteins form the membrane attack complex, creating pores in pathogen membranes and leading to cell lysis."
+    },
+    {
+    "text": "A 60-year-old man presents with a history of severe fatigue and a lemon-yellow complexion. Laboratory findings reveal hemoglobin 8 g/dl, MCV 105 fL, and hypersegmented neutrophils. What is the most likely cause of his anemia?",
+    "options": ["Iron deficiency", "Vitamin B12 deficiency", "Folic acid deficiency", "Chronic kidney disease", "Thalassemia"],
+    "answer": "Vitamin B12 deficiency",
+    "description": "Vitamin B12 deficiency anemia typically presents as macrocytic anemia with hypersegmented neutrophils and neurological symptoms such as paresthesias."
+},
+{
+    "text": "A 25-year-old male comes to the ER with a 3-day history of fever and a bright red rash over his cheeks and trunk. His lab tests reveal a drop in hemoglobin, reticulocyte count of 0.5%, and positive anti-B19 IgM antibodies. Which of the following conditions is most likely associated with his anemia?",
+    "options": ["Hemoglobinopathy", "Parvovirus B19 infection", "Autoimmune hemolysis", "Iron deficiency", "Sideroblastic anemia"],
+    "answer": "Parvovirus B19 infection",
+    "description": "Parvovirus B19 can cause transient aplastic crisis, particularly in individuals with underlying hemolytic anemias."
+},
+{
+    "text": "Which of the following structures in the liver is the primary site of gluconeogenesis?",
+    "options": ["Kupffer cells", "Hepatocytes", "Sinusoids", "Bile canaliculi", "Central vein"],
+    "answer": "Hepatocytes",
+    "description": "Hepatocytes are the main functional cells of the liver responsible for gluconeogenesis, urea synthesis, and other metabolic activities."
+},
+{
+    "text": "During a physiology lecture, the professor explains that the majority of the carbon dioxide transported in blood is in the form of:",
+    "options": ["Dissolved CO2", "Carbaminohemoglobin", "Bicarbonate", "Carbonic acid", "Carbon monoxide"],
+    "answer": "Bicarbonate",
+    "description": "Most carbon dioxide in the blood is transported as bicarbonate ion, formed by the hydration of CO2 catalyzed by carbonic anhydrase."
+},
+{
+    "text": "A 45-year-old man with a 20-year history of smoking presents with a chronic productive cough and exertional dyspnea. Chest X-ray shows hyperinflated lungs and a flat diaphragm. Which of the following is the most likely pathology in this patient?",
+    "options": ["Interstitial lung disease", "Chronic bronchitis", "Emphysema", "Asthma", "Lung cancer"],
+    "answer": "Emphysema",
+    "description": "Emphysema is characterized by alveolar destruction and loss of elastic recoil, often resulting from long-term smoking."
+},
+{
+    "text": "A medical student during a dissection identifies the structure forming the floor of the cubital fossa. What is the most likely structure?",
+    "options": ["Brachialis muscle", "Biceps brachii tendon", "Pronator teres", "Flexor carpi radialis", "Supinator muscle"],
+    "answer": "Brachialis muscle",
+    "description": "The brachialis muscle forms the floor of the cubital fossa along with the supinator."
+},
+{
+    "text": "A 50-year-old woman presents with fatigue, jaundice, and splenomegaly. Her peripheral blood smear reveals spherocytes. Coombs test is positive. What is the most likely cause of her condition?",
+    "options": ["Sickle cell disease", "Hereditary spherocytosis", "Autoimmune hemolytic anemia", "Thalassemia major", "G6PD deficiency"],
+    "answer": "Autoimmune hemolytic anemia",
+    "description": "Autoimmune hemolytic anemia is characterized by spherocytes, positive Coombs test, and extravascular hemolysis."
+},
+{
+    "text": "During a group discussion, a student asks about the nerve responsible for the 'power grip' of the hand. Which nerve provides this function?",
+    "options": ["Median nerve", "Ulnar nerve", "Radial nerve", "Axillary nerve", "Musculocutaneous nerve"],
+    "answer": "Ulnar nerve",
+    "description": "The ulnar nerve innervates muscles such as the flexor carpi ulnaris and intrinsic hand muscles critical for power grip."
+},
+{
+    "text": "A 3-year-old child presents with severe bone pain, pallor, and frequent infections. Blood smear shows blasts with scant cytoplasm and large nuclei. What is the most likely diagnosis?",
+    "options": ["Aplastic anemia", "Acute lymphoblastic leukemia", "Chronic myeloid leukemia", "Iron deficiency anemia", "Beta-thalassemia major"],
+    "answer": "Acute lymphoblastic leukemia",
+    "description": "Acute lymphoblastic leukemia (ALL) is common in children and presents with pancytopenia, blasts on peripheral smear, and symptoms such as bone pain and infections."
+},
+{
+    "text": "In the electron transport chain, which complex is responsible for transferring electrons from cytochrome c to oxygen?",
+    "options": ["Complex I", "Complex II", "Complex III", "Complex IV", "ATP synthase"],
+    "answer": "Complex IV",
+    "description": "Complex IV, also known as cytochrome c oxidase, transfers electrons from cytochrome c to molecular oxygen, forming water."
+
+},
+{
+        "text": "Which of the following is most likely to trigger ovulation in the menstrual cycle?",
+        "options": [
+            "Increase in estrogen levels",
+            "Decrease in progesterone levels",
+            "Surge in luteinizing hormone (LH)",
+            "Rise in follicle-stimulating hormone (FSH)",
+            "Secretion of gonadotropin-releasing hormone (GnRH)"
+        ],
+        "answer": "Surge in luteinizing hormone (LH)",
+        "description": "Ovulation is triggered by a sudden surge in luteinizing hormone (LH) levels, typically around the middle of the menstrual cycle."
+    },
+    {
+        "text": "The term 'shift to the left' in a blood count typically indicates an increase in which of the following cell types?",
+        "options": [
+            "Eosinophils",
+            "Immature neutrophils (bands)",
+            "Lymphocytes",
+            "Monocytes",
+            "Basophils"
+        ],
+        "answer": "Immature neutrophils (bands)",
+        "description": "A 'shift to the left' refers to an increased number of band cells (immature neutrophils) in the peripheral blood, often seen in bacterial infections."
+    },
+    {
+        "text": "Which of the following vitamins is essential for the synthesis of clotting factors in the liver?",
+        "options": [
+            "Vitamin A",
+            "Vitamin B12",
+            "Vitamin C",
+            "Vitamin D",
+            "Vitamin K"
+        ],
+        "answer": "Vitamin K",
+        "description": "Vitamin K is required for the synthesis of clotting factors II, VII, IX, and X in the liver."
+    },
+    {
+        "text": "Which of the following is most likely to increase cardiac output?",
+        "options": [
+            "Decrease in heart rate",
+            "Decrease in stroke volume",
+            "Increase in venous return",
+            "Decrease in contractility",
+            "Increase in peripheral resistance"
+        ],
+        "answer": "Increase in venous return",
+        "description": "Increased venous return leads to greater end-diastolic volume, enhancing stroke volume and consequently cardiac output (Frank-Starling mechanism)."
+    },
+    {
+        "text": "Which hormone is primarily responsible for the development of the corpus luteum after ovulation?",
+        "options": [
+            "Progesterone",
+            "Estrogen",
+            "Luteinizing hormone (LH)",
+            "Follicle-stimulating hormone (FSH)",
+            "Prolactin"
+        ],
+        "answer": "Luteinizing hormone (LH)",
+        "description": "LH is critical for the formation and maintenance of the corpus luteum, which secretes progesterone to support early pregnancy."
+    },
+    {
+        "text": "In which phase of the cardiac cycle is the majority of coronary blood flow to the myocardium delivered?",
+        "options": [
+            "Isovolumetric contraction",
+            "Isovolumetric relaxation",
+            "Ventricular systole",
+            "Early diastole",
+            "Late diastole"
+        ],
+        "answer": "Early diastole",
+        "description": "Coronary blood flow peaks during early diastole when the myocardium is relaxed and ventricular pressure is low."
+    },
+    {
+        "text": "Which organelle is primarily responsible for energy production in the cell?",
+        "options": [
+            "Ribosome",
+            "Lysosome",
+            "Mitochondrion",
+            "Golgi apparatus",
+            "Endoplasmic reticulum"
+        ],
+        "answer": "Mitochondrion",
+        "description": "The mitochondrion is the powerhouse of the cell, generating ATP through oxidative phosphorylation."
+    },
+    {
+        "text": "Which of the following is the main site of iron absorption in the gastrointestinal tract?",
+        "options": [
+            "Stomach",
+            "Duodenum",
+            "Jejunum",
+            "Ileum",
+            "Colon"
+        ],
+        "answer": "Duodenum",
+        "description": "Iron is primarily absorbed in the duodenum, where it enters enterocytes and is transported into the bloodstream."
+    },
+    {
+        "text": "Which of the following types of connective tissue cells is most active during wound healing?",
+        "options": [
+            "Adipocytes",
+            "Fibroblasts",
+            "Mast cells",
+            "Lymphocytes",
+            "Osteoblasts"
+        ],
+        "answer": "Fibroblasts",
+        "description": "Fibroblasts play a key role in wound healing by producing collagen and other extracellular matrix components."
+    },
+    {
+        "text": "Which organ is the primary site of erythropoietin (EPO) production in adults?",
+        "options": [
+            "Bone marrow",
+            "Liver",
+            "Kidneys",
+            "Spleen",
+            "Lungs"
+        ],
+        "answer": "Kidneys",
+        "description": "The kidneys produce the majority of erythropoietin in response to hypoxia, stimulating red blood cell production in the bone marrow."
+    },
+    {
+        "text": "Which of the following is the most likely mechanism for maintaining resting membrane potential in neurons?",
+        "options": [
+            "Active transport of calcium ions",
+            "Passive diffusion of chloride ions",
+            "Active transport of sodium and potassium ions",
+            "Passive transport of potassium ions",
+            "Diffusion of glucose molecules"
+        ],
+        "answer": "Active transport of sodium and potassium ions",
+        "description": "The sodium-potassium pump actively transports sodium out and potassium into the cell, maintaining the resting membrane potential."
+    },
+    {
+        "text": "Which phase of the cell cycle is characterized by DNA synthesis?",
+        "options": [
+            "G0 phase",
+            "G1 phase",
+            "S phase",
+            "G2 phase",
+            "M phase"
+        ],
+        "answer": "S phase",
+        "description": "The S phase is the part of the cell cycle where DNA replication occurs, preparing the cell for division."
+    },
+    {
+        "text": "Which of the following changes is most likely in chronic obstructive pulmonary disease (COPD)?",
+        "options": [
+            "Increase in tidal volume",
+            "Increase in vital capacity",
+            "Increase in residual volume",
+            "Decrease in residual volume",
+            "Decrease in functional residual capacity"
+        ],
+        "answer": "Increase in residual volume",
+        "description": "COPD is associated with air trapping and hyperinflation, leading to an increase in residual volume."
+    },
+    {
+        "text": "Which type of cartilage is most abundant in the human body?",
+        "options": [
+            "Elastic cartilage",
+            "Hyaline cartilage",
+            "Fibrocartilage",
+            "Calcified cartilage",
+            "Epiphyseal cartilage"
+        ],
+        "answer": "Hyaline cartilage",
+        "description": "Hyaline cartilage is the most abundant type of cartilage, found in joints, the respiratory tract, and the nasal septum."
+    },
+    {
+        "text": "Which enzyme is responsible for unwinding DNA during replication?",
+        "options": [
+            "DNA ligase",
+            "DNA polymerase",
+            "Helicase",
+            "Primase",
+            "Topoisomerase"
+        ],
+        "answer": "Helicase",
+        "description": "Helicase unwinds the DNA double helix at the replication fork, allowing replication to proceed."
+    },
+    {
+        "text": "Which of the following neurotransmitters is inhibitory in the central nervous system?",
+        "options": [
+            "Acetylcholine",
+            "Dopamine",
+            "Glutamate",
+            "Gamma-aminobutyric acid (GABA)",
+            "Serotonin"
+        ],
+        "answer": "Gamma-aminobutyric acid (GABA)",
+        "description": "GABA is the primary inhibitory neurotransmitter in the central nervous system, reducing neuronal excitability."
+    },
+    {
+        "text": "Which of the following ions is primarily responsible for maintaining osmotic balance in extracellular fluid?",
+        "options": [
+            "Potassium",
+            "Sodium",
+            "Calcium",
+            "Chloride",
+            "Magnesium"
+        ],
+        "answer": "Sodium",
+        "description": "Sodium is the main cation in the extracellular fluid and is crucial for maintaining osmotic pressure and fluid balance."
+    },
+    {
+        "text": "Which of the following hormones is secreted by the adrenal medulla in response to stress?",
+        "options": [
+            "Cortisol",
+            "Aldosterone",
+            "Adrenaline",
+            "Androgens",
+            "Prolactin"
+        ],
+        "answer": "Adrenaline",
+        "description": "The adrenal medulla secretes adrenaline (epinephrine) during the 'fight or flight' response to stress."
+    },
+    {
+        "text": "During glycolysis, which of the following enzymes catalyzes the phosphorylation of glucose to glucose-6-phosphate?",
+        "options": [
+            "Hexokinase",
+            "Phosphofructokinase",
+            "Pyruvate kinase",
+            "Aldolase",
+            "Phosphoglucose isomerase"
+        ],
+        "answer": "Hexokinase",
+        "description": "Hexokinase catalyzes the first step of glycolysis, converting glucose to glucose-6-phosphate by utilizing ATP."
+    },
+    {
+        "text": "Which of the following processes occurs during the S phase of the cell cycle?",
+        "options": [
+            "Mitosis",
+            "DNA replication",
+            "Cytokinesis",
+            "RNA transcription",
+            "Protein synthesis"
+        ],
+        "answer": "DNA replication",
+        "description": "The S phase of the cell cycle is characterized by the replication of DNA, preparing the cell for division."
+    },
+    {
+        "text": "In the nephron, which segment is primarily responsible for the reabsorption of sodium and chloride without water?",
+        "options": [
+            "Proximal convoluted tubule",
+            "Descending loop of Henle",
+            "Ascending loop of Henle",
+            "Distal convoluted tubule",
+            "Collecting duct"
+        ],
+        "answer": "Ascending loop of Henle",
+        "description": "The ascending limb of the loop of Henle is impermeable to water but reabsorbs sodium and chloride actively."
+    },
+    {
+        "text": "Which of the following mechanisms is responsible for the resting membrane potential in neurons?",
+        "options": [
+            "Calcium influx",
+            "Sodium influx",
+            "Chloride efflux",
+            "Potassium efflux",
+            "Glucose transport"
+        ],
+        "answer": "Potassium efflux",
+        "description": "The resting membrane potential is primarily maintained by the efflux of potassium ions through leak channels."
+    },
+    {
+        "text": "Which immunoglobulin class is primarily involved in mucosal immunity?",
+        "options": [
+            "IgG",
+            "IgA",
+            "IgE",
+            "IgM",
+            "IgD"
+        ],
+        "answer": "IgA",
+        "description": "IgA is the main immunoglobulin in mucosal surfaces, providing protection against pathogens in areas such as the respiratory and gastrointestinal tracts."
+    },
+    {
+        "text": "Which phase of the cardiac cycle is associated with the closure of the atrioventricular valves?",
+        "options": [
+            "Atrial systole",
+            "Ventricular systole",
+            "Isovolumetric contraction",
+            "Isovolumetric relaxation",
+            "Late diastole"
+        ],
+        "answer": "Isovolumetric contraction",
+        "description": "The atrioventricular valves close at the start of isovolumetric contraction to prevent backflow of blood into the atria."
+    },
+    {
+        "text": "Which of the following is the primary driving force for glomerular filtration in the kidneys?",
+        "options": [
+            "Oncotic pressure",
+            "Hydrostatic pressure in Bowman's capsule",
+            "Glomerular capillary hydrostatic pressure",
+            "Tubular hydrostatic pressure",
+            "Active transport"
+        ],
+        "answer": "Glomerular capillary hydrostatic pressure",
+        "description": "The hydrostatic pressure in glomerular capillaries is the main force driving the filtration of plasma into Bowman's capsule."
+    },
+    {
+        "text": "Which of the following cells in the pancreas secrete somatostatin?",
+        "options": [
+            "Alpha cells",
+            "Beta cells",
+            "Delta cells",
+            "F cells",
+            "Acinar cells"
+        ],
+        "answer": "Delta cells",
+        "description": "Delta cells in the pancreas secrete somatostatin, which regulates the secretion of insulin and glucagon."
+    },
+    {
+        "text": "Which of the following is the primary function of the juxtaglomerular apparatus in the kidney?",
+        "options": [
+            "Regulate calcium reabsorption",
+            "Produce aldosterone",
+            "Regulate sodium filtration",
+            "Secrete renin",
+            "Concentrate urine"
+        ],
+        "answer": "Secrete renin",
+        "description": "The juxtaglomerular apparatus secretes renin, which plays a key role in the renin-angiotensin-aldosterone system (RAAS) to regulate blood pressure."
+    },
+    {
+        "text": "In skeletal muscle, calcium ions bind to which protein to initiate contraction?",
+        "options": [
+            "Actin",
+            "Myosin",
+            "Troponin",
+            "Tropomyosin",
+            "Calmodulin"
+        ],
+        "answer": "Troponin",
+        "description": "Calcium binds to troponin, causing a conformational change that moves tropomyosin, allowing actin-myosin interaction and contraction."
+    },
+    {
+        "text": "Which neurotransmitter is most commonly associated with the parasympathetic nervous system?",
+        "options": [
+            "Dopamine",
+            "Norepinephrine",
+            "Acetylcholine",
+            "Serotonin",
+            "Glutamate"
+        ],
+        "answer": "Acetylcholine",
+        "description": "Acetylcholine is the primary neurotransmitter of the parasympathetic nervous system, mediating its effects through muscarinic receptors."
+    },
+    {
+        "text": "Which of the following enzymes is responsible for the breakdown of hydrogen peroxide in cells?",
+        "options": [
+            "Superoxide dismutase",
+            "Catalase",
+            "Peroxidase",
+            "Glutathione reductase",
+            "Lipase"
+        ],
+        "answer": "Catalase",
+        "description": "Catalase is an enzyme that decomposes hydrogen peroxide into water and oxygen, protecting cells from oxidative damage."
+    },
+    {
+        "text": "Which of the following arteries is a direct branch of the abdominal aorta?",
+        "options": [
+            "Internal iliac artery",
+            "Superior mesenteric artery",
+            "Common carotid artery",
+            "Subclavian artery",
+            "Brachiocephalic artery"
+        ],
+        "answer": "Superior mesenteric artery",
+        "description": "The superior mesenteric artery is a direct branch of the abdominal aorta and supplies blood to the midgut structures."
+    },
+    {
+        "text": "Which of the following best describes the Frank-Starling law of the heart?",
+        "options": [
+            "Heart rate increases with exercise",
+            "Stroke volume increases with preload",
+            "Cardiac output decreases with blood pressure",
+            "Afterload decreases with increased contractility",
+            "Contractility decreases with decreased calcium levels"
+        ],
+        "answer": "Stroke volume increases with preload",
+        "description": "The Frank-Starling law states that an increase in ventricular filling (preload) leads to greater force of contraction and stroke volume."
+    },
+    {
+        "text": "Which of the following is the primary function of the large intestine?",
+        "options": [
+            "Protein absorption",
+            "Carbohydrate digestion",
+            "Water and electrolyte absorption",
+            "Vitamin D synthesis",
+            "Lipid emulsification"
+        ],
+        "answer": "Water and electrolyte absorption",
+        "description": "The large intestine is responsible for absorbing water and electrolytes from the remaining indigestible food matter."
+    },
+    {
+        "text": "Which of the following structures contains the highest concentration of cone cells?",
+        "options": [
+            "Optic nerve",
+            "Macula",
+            "Fovea centralis",
+            "Retina periphery",
+            "Ciliary body"
+        ],
+        "answer": "Fovea centralis",
+        "description": "The fovea centralis is the region of the retina with the highest concentration of cone cells, enabling high-acuity vision."
+    },
+    {
+    "text": "A 70-year-old male presents with sudden onset of severe chest pain radiating to the back. His blood pressure is 180/100 mmHg. A chest CT scan reveals a dissection of the aorta. What is the most likely cause of his condition?",
+    "options": ["Aortic aneurysm", "Acute myocardial infarction", "Pulmonary embolism", "Aortic dissection", "Pericarditis"],
+    "answer": "Aortic dissection",
+    "description": "Aortic dissection presents with severe chest pain and is often associated with high blood pressure. It is a life-threatening condition requiring urgent treatment."
+},
+{
+    "text": "A 50-year-old woman presents with fatigue, depression, and weight gain. Lab results show elevated TSH levels and low free T4. What is the most likely diagnosis?",
+    "options": ["Graves' disease", "Hyperthyroidism", "Hypothyroidism", "Addison's disease", "Cushing's syndrome"],
+    "answer": "Hypothyroidism",
+    "description": "The elevated TSH and low free T4 levels are characteristic of hypothyroidism, a condition where the thyroid gland is underactive."
+},
+{
+    "text": "A 40-year-old male presents with joint pain, swelling, and morning stiffness in multiple joints, particularly the wrists and knees. His ESR and CRP are elevated. What is the most likely diagnosis?",
+    "options": ["Rheumatoid arthritis", "Osteoarthritis", "Gout", "Systemic lupus erythematosus", "Psoriatic arthritis"],
+    "answer": "Rheumatoid arthritis",
+    "description": "Rheumatoid arthritis is characterized by symmetrical joint pain, swelling, morning stiffness, and elevated inflammatory markers like ESR and CRP."
+},
+    {
+        "text": "Which of the following clotting factors is most directly activated by tissue factor (TF) during the extrinsic pathway?",
+        "options": [
+            "Factor II",
+            "Factor VII",
+            "Factor VIII",
+            "Factor IX",
+            "Factor X"
+        ],
+        "answer": "Factor VII",
+        "description": "Tissue factor (TF) binds to and activates factor VII, which then participates in the activation of factor X in the extrinsic pathway."
+    },
+    {
+    "text": "Which of the following enzymes is primarily responsible for the elongation of the leading strand during DNA replication in prokaryotes?",
+    "options": ["DNA helicase", "DNA polymerase III", "DNA ligase", "Primase", "DNA polymerase I"],
+    "answer": "DNA polymerase III",
+    "description": "DNA polymerase III is the main enzyme responsible for adding nucleotides to the growing strand during DNA replication in prokaryotes."
+},
+{
+    "text": "A 55-year-old male with a history of chronic alcohol use presents with jaundice, ascites, and a tender liver. His laboratory results show elevated bilirubin and AST/ALT levels. What is the most likely cause of his condition?",
+    "options": ["Hepatitis A", "Chronic cirrhosis", "Acute hepatitis", "Non-alcoholic fatty liver disease", "Hemochromatosis"],
+    "answer": "Chronic cirrhosis",
+    "description": "Chronic alcohol consumption leads to liver damage, resulting in cirrhosis, which presents with jaundice, ascites, and elevated liver enzymes."
+},
+{
+    "text": "Which of the following is the coenzyme required for the decarboxylation of pyruvate in the citric acid cycle?",
+    "options": ["NAD+", "Coenzyme A", "FAD", "Thiamine pyrophosphate", "Biotin"],
+    "answer": "Thiamine pyrophosphate",
+    "description": "Thiamine pyrophosphate is the coenzyme that facilitates the decarboxylation of pyruvate to acetyl-CoA in the citric acid cycle."
+},
+{
+    "text": "Which of the following structures is essential for the propagation of the action potential in nerve cells?",
+    "options": ["Sodium-potassium pump", "Axon hillock", "Myelin sheath", "Synaptic vesicle", "Dendrites"],
+    "answer": "Myelin sheath",
+    "description": "The myelin sheath insulates nerve fibers, allowing for faster conduction of action potentials along the axon."
+},
+{
+    "text": "A 45-year-old woman presents with weight loss, excessive thirst, and frequent urination. Laboratory tests reveal elevated blood glucose levels. What is the most likely diagnosis?",
+    "options": ["Hypothyroidism", "Type 2 diabetes", "Cushing's syndrome", "Hyperthyroidism", "Addison's disease"],
+    "answer": "Type 2 diabetes",
+    "description": "The patient's symptoms of weight loss, excessive thirst, and frequent urination, along with elevated blood glucose levels, are consistent with Type 2 diabetes."
+},
+{
+    "text": "A 65-year-old man with a history of smoking presents with a persistent cough, weight loss, and hemoptysis. A chest X-ray reveals a mass in the right lung. What is the most likely diagnosis?",
+    "options": ["Chronic bronchitis", "Lung cancer", "Pulmonary tuberculosis", "Pneumonia", "Asthma"],
+    "answer": "Lung cancer",
+    "description": "The patient's smoking history, persistent cough, weight loss, and hemoptysis suggest lung cancer, which is common among smokers."
+},
+{
+    "text": "A 30-year-old male presents with fever, night sweats, and a swollen neck. A biopsy of the lymph node shows Reed-Sternberg cells. What is the most likely diagnosis?",
+    "options": ["Non-Hodgkin lymphoma", "Hodgkin lymphoma", "Tuberculosis", "Leukemia", "Thyroid cancer"],
+    "answer": "Hodgkin lymphoma",
+    "description": "Reed-Sternberg cells are characteristic of Hodgkin lymphoma, a type of cancer that affects lymphatic tissue."
+},
+{
+    "text": "A 25-year-old female presents with a history of chronic headaches, blurry vision, and nausea. Ophthalmologic examination reveals papilledema. What is the most likely cause of these symptoms?",
+    "options": ["Migraine", "Intracranial hypertension", "Glaucoma", "Tension headache", "Sinusitis"],
+    "answer": "Intracranial hypertension",
+    "description": "Papilledema, along with headache, nausea, and blurred vision, suggests increased intracranial pressure, often seen in conditions like idiopathic intracranial hypertension."
+},
+
+{
+    "text": "A 30-year-old woman presents with sudden onset of right lower quadrant pain, nausea, and fever. On examination, there is tenderness to palpation in the right lower abdomen. What is the most likely diagnosis?",
+    "options": ["Ovarian cyst rupture", "Appendicitis", "Ectopic pregnancy", "Pelvic inflammatory disease", "Diverticulitis"],
+    "answer": "Appendicitis",
+    "description": "The combination of right lower quadrant pain, fever, and nausea with localized tenderness suggests acute appendicitis, which requires surgical intervention."
+},
+{
+    "text": "A 60-year-old male with a history of chronic alcohol use presents with confusion, ataxia, and ophthalmoplegia. He is found to have vitamin B1 (thiamine) deficiency. What is the most likely diagnosis?",
+    "options": ["Wernicke's encephalopathy", "Korsakoff syndrome", "Cerebellar atrophy", "Delirium tremens", "Alcoholic hallucinosis"],
+    "answer": "Wernicke's encephalopathy",
+    "description": "Wernicke's encephalopathy is characterized by confusion, ataxia, and ophthalmoplegia, often due to thiamine deficiency in individuals with chronic alcohol use."
+},
+{
+    "text": "A 45-year-old woman presents with excessive thirst, polyuria, and fatigue. Her serum glucose is 220 mg/dL, and HbA1c is 8.2%. What is the most likely diagnosis?",
+    "options": ["Diabetes mellitus", "Hyperthyroidism", "Renal failure", "Cushing's syndrome", "Adrenal insufficiency"],
+    "answer": "Diabetes mellitus",
+    "description": "The symptoms of excessive thirst, frequent urination, and fatigue, along with elevated blood glucose and HbA1c, suggest poorly controlled diabetes mellitus."
+},
+{
+    "text": "A 60-year-old man presents with sudden onset of severe abdominal pain and vomiting. He has a history of hypertension. Abdominal X-ray shows dilated loops of bowel with air-fluid levels. What is the most likely diagnosis?",
+    "options": ["Acute pancreatitis", "Bowel obstruction", "Gastric ulcer perforation", "Mesenteric ischemia", "Cholecystitis"],
+    "answer": "Bowel obstruction",
+    "description": "Bowel obstruction is characterized by abdominal pain, vomiting, and radiological signs of dilated loops of bowel with air-fluid levels."
+},
+{
+    "text": "A 25-year-old male presents with frequent episodes of shortness of breath, wheezing, and coughing, especially at night. He has a history of allergy. What is the most likely diagnosis?",
+    "options": ["Asthma", "Chronic bronchitis", "Pneumonia", "COPD", "Tuberculosis"],
+    "answer": "Asthma",
+    "description": "Asthma presents with wheezing, shortness of breath, and coughing, especially at night, often triggered by allergens or other environmental factors."
+},
+{
+    "text": "A 35-year-old woman presents with fatigue, weight gain, and cold intolerance. Her thyroid function tests reveal low T3, T4, and elevated TSH levels. What is the most likely diagnosis?",
+    "options": ["Hyperthyroidism", "Hypothyroidism", "Thyroid cancer", "Graves' disease", "Hashimoto's thyroiditis"],
+    "answer": "Hypothyroidism",
+    "description": "The combination of low thyroid hormones (T3, T4) and elevated TSH levels indicates primary hypothyroidism, which can present with fatigue and weight gain."
+},
+{
+    "text": "Which of the following hormones is primarily responsible for the regulation of blood calcium levels?",
+    "options": ["Insulin", "Parathyroid hormone", "Thyroid hormone", "Aldosterone", "Growth hormone"],
+    "answer": "Parathyroid hormone",
+    "description": "Parathyroid hormone increases blood calcium levels by promoting the release of calcium from bones and enhancing calcium reabsorption in kidneys."
+},
+{
+    "text": "Which of the following cellular structures is most important for protein synthesis in both prokaryotic and eukaryotic cells?",
+    "options": ["Mitochondria", "Ribosomes", "Endoplasmic reticulum", "Golgi apparatus", "Lysosomes"],
+    "answer": "Ribosomes",
+    "description": "Ribosomes are the site of protein synthesis in both prokaryotic and eukaryotic cells."
+},
+{
+    "text": "Which of the following is an example of a second messenger molecule involved in intracellular signal transduction?",
+    "options": ["Insulin", "cAMP", "Glucose", "ATP", "Acetylcholine"],
+    "answer": "cAMP",
+    "description": "Cyclic AMP (cAMP) is a second messenger that mediates the effects of many hormones, such as epinephrine, in the cell."
+},
+
+{
+        "text": "During the formation of the notochord, what is the primary structure that forms as a result of mesodermal cells migrating?",
+        "options": ["Neural tube", "Somites", "Primitive streak", "Notochord", "Endodermal layer"],
+        "answer": "Notochord",
+        "description": "The notochord forms from mesodermal cells migrating along the midline of the embryo, serving as the precursor to the vertebral column."
+    },
+    {
+        "text": "Which of the following events occurs during the third week of development?",
+        "options": ["Formation of the heart", "Neurulation", "Gastrulation", "Fetal development", "Formation of limbs"],
+        "answer": "Gastrulation",
+        "description": "Gastrulation is the major event during the third week of development, where the three germ layers—ectoderm, mesoderm, and endoderm—are formed."
+    },
+    {
+        "text": "What is the primary outcome of gastrulation during embryonic development?",
+        "options": ["Formation of the neural tube", "Formation of the three germ layers", "Development of the heart", "Development of the somites", "Formation of the notochord"],
+        "answer": "Formation of the three germ layers",
+        "description": "Gastrulation is the process during which the three primary germ layers—ectoderm, mesoderm, and endoderm—are formed, giving rise to various tissues and organs."
+    },
+    {
+        "text": "During neurulation, which structure is formed from the ectoderm?",
+        "options": ["Neural crest", "Somites", "Neural tube", "Notochord", "Mesoderm"],
+        "answer": "Neural tube",
+        "description": "Neurulation is the process by which the neural tube is formed from the ectoderm, which later develops into the central nervous system."
+    },
+    {
+        "text": "The intra-embryonic coelom forms primarily from which of the following structures?",
+        "options": ["Mesoderm", "Ectoderm", "Endoderm", "Neural tube", "Notochord"],
+        "answer": "Mesoderm",
+        "description": "The intra-embryonic coelom forms from spaces within the mesoderm and will give rise to the body cavities such as the peritoneal, pleural, and pericardial cavities."
+    },
+    {
+        "text": "Which of the following is a derivative of the ectoderm?",
+        "options": ["Muscles", "Skin", "Bones", "Lungs", "Heart"],
+        "answer": "Skin",
+        "description": "The ectoderm gives rise to structures like the skin, nervous system, and sense organs."
+    },
+    {
+        "text": "Which of the following structures is derived from the mesoderm?",
+        "options": ["Heart", "Brain", "Skin", "Lungs", "Liver"],
+        "answer": "Heart",
+        "description": "The mesoderm develops into structures such as muscles, bones, the heart, kidneys, and the circulatory system."
+    },
+    {
+        "text": "Which of the following organs is derived from the endoderm?",
+        "options": ["Liver", "Kidneys", "Muscles", "Brain", "Skin"],
+        "answer": "Liver",
+        "description": "The endoderm gives rise to structures such as the digestive tract, liver, pancreas, and lungs."
+    },
+    {
+        "text": "During the development of the trophoblast, which of the following is the most important process?",
+        "options": ["Formation of the placenta", "Formation of the neural tube", "Gastrulation", "Neurulation", "Somite differentiation"],
+        "answer": "Formation of the placenta",
+        "description": "The trophoblast develops into the placenta, which provides nutrients and removes waste products for the developing embryo."
+    }
+,
+{
+        "text": "Which of the following is the most common cause of cell injury in response to external stimuli?",
+        "options": ["Hypoxia", "Infection", "Genetic mutation", "Inflammation", "Radiation"],
+        "answer": "Hypoxia",
+        "description": "Hypoxia, or reduced oxygen supply to cells, is one of the most common causes of cell injury, often leading to irreversible damage and cell death."
+    },
+    {
+        "text": "Which of the following cellular responses best describes the adaptation of cells to prolonged mild stress?",
+        "options": ["Apoptosis", "Necrosis", "Hypertrophy", "Atrophy", "Metaplasia"],
+        "answer": "Hypertrophy",
+        "description": "Hypertrophy is a cellular adaptation to stress, where cells increase in size to maintain function under increased demand, such as in muscle cells due to exercise."
+    },
+    {
+        "text": "In the case of ischemia, which mechanism is most likely responsible for cell injury?",
+        "options": ["Increased protein synthesis", "Oxidative phosphorylation", "Mitochondrial damage", "Activation of ion channels", "Enhanced autophagy"],
+        "answer": "Mitochondrial damage",
+        "description": "Ischemia impairs mitochondrial function, leading to decreased ATP production, which in turn triggers a cascade of events resulting in cell injury and death."
+    },
+    {
+        "text": "Which of the following adaptations occurs when a tissue is subjected to persistent stress or injury, leading to a change in cell type?",
+        "options": ["Metaplasia", "Atrophy", "Hypertrophy", "Dysplasia", "Neoplasia"],
+        "answer": "Metaplasia",
+        "description": "Metaplasia is the reversible transformation of one differentiated cell type into another in response to persistent injury or stress, often seen in epithelial cells."
+    },
+    {
+        "text": "Which of the following drug administration routes is most appropriate for drugs requiring a rapid onset of action with controlled drug delivery?",
+        "options": ["Oral", "Subcutaneous", "Intravenous", "Intramuscular", "Transdermal"],
+        "answer": "Intravenous",
+        "description": "Intravenous administration delivers drugs directly into the bloodstream, providing the fastest onset of action and allowing for precise control over the drug's delivery and effect."
+    },
+    {
+        "text": "Which of the following factors most directly affects the absorption of drugs administered orally?",
+        "options": ["pH of the stomach", "Blood-brain barrier permeability", "Size of the drug molecules", "Liver enzyme activity", "Circulatory status of the liver"],
+        "answer": "pH of the stomach",
+        "description": "The pH of the stomach influences the ionization of drugs, which in turn affects their absorption in the gastrointestinal tract. Drugs are better absorbed in their non-ionized form."
+    },
+    {
+        "text": "Somites are formed from which layer of the embryo?",
+        "options": ["Ectoderm", "Mesoderm", "Endoderm", "Neural crest", "Exoderm"],
+        "answer": "Mesoderm",
+        "description": "Somites are paired blocks of mesoderm that give rise to muscles, vertebrae, and dermis."
+    },
+
+{
+    "text": "Which of the following best describes the function of the TCA cycle in cellular metabolism?",
+    "options": ["Production of glucose", "ATP generation via oxidative phosphorylation", "Fatty acid synthesis", "Nucleotide synthesis", "Conversion of pyruvate to lactate"],
+    "answer": "ATP generation via oxidative phosphorylation",
+    "description": "The TCA cycle (Krebs cycle) produces electron carriers, which are used in oxidative phosphorylation to generate ATP."
+},
+{
+    "text": "A patient presents with a decreased level of hemoglobin, an increased RDW, and microcytic hypochromic anemia. Which of the following is most likely responsible for her condition?",
+    "options": ["Vitamin B12 deficiency", "Iron deficiency", "Sickle cell disease", "Thalassemia", "Polycythemia"],
+    "answer": "Iron deficiency",
+    "description": "Iron deficiency is the most common cause of microcytic hypochromic anemia, leading to decreased hemoglobin levels and increased RDW."
+},
+{
+    "text": "A 60-year-old male presents with fatigue, weakness, and weight loss. Laboratory results show elevated LDH, low hemoglobin, and reticulocytosis. What is the most likely cause of his anemia?",
+    "options": ["Chronic disease", "Hemolysis", "Iron deficiency", "Bone marrow failure", "Thalassemia"],
+    "answer": "Hemolysis",
+    "description": "The presence of elevated LDH and reticulocytosis suggests hemolysis as the cause of anemia, which is characterized by the destruction of red blood cells."
+},
+{
+    "text": "During a biochemistry class, the professor asked the students, 'What is the most likely outcome when an enzyme undergoes competitive inhibition?'",
+    "options": ["Increased enzyme activity", "Decreased enzyme activity", "Increased substrate affinity", "No change in enzyme activity", "Decreased substrate affinity"],
+    "answer": "Decreased enzyme activity",
+    "description": "Competitive inhibition decreases enzyme activity by competing with the substrate for the active site, preventing the enzyme from catalyzing the reaction."
+},
+{
+    "text": "Which of the following structures contains a ring of microtubules responsible for its motility?",
+    "options": ["Cilium", "Mitochondrion", "Golgi apparatus", "Smooth ER", "Lysosome"],
+    "answer": "Cilium",
+    "description": "Cilia are composed of microtubules arranged in a '9+2' structure, which is essential for their motility."
+},
+{
+    "text": "Which of the following is the characteristic feature of fibrous joints?",
+    "options": ["Articular cartilage", "Synovial fluid", "Dense connective tissue", "Hyaline cartilage", "Joint cavity"],
+    "answer": "Dense connective tissue",
+    "description": "Fibrous joints are united by dense connective tissue, providing stability but limiting movement."
+},
+{
+    "text": "Which of the following conditions is most likely to occur if the parotid gland is affected by a viral infection?",
+    "options": ["Cystic fibrosis", "Mumps", "Tuberculosis", "Cholera", "Hepatitis"],
+    "answer": "Mumps",
+    "description": "Mumps is a viral infection that primarily affects the parotid glands, leading to swelling and discomfort."
+},
+{
+    "text": "Which of the following is the enzyme responsible for the final step in the biosynthesis of DNA, linking Okazaki fragments together?",
+    "options": ["DNA helicase", "DNA polymerase", "DNA ligase", "Primase", "Topoisomerase"],
+    "answer": "DNA ligase",
+    "description": "DNA ligase catalyzes the final step of DNA replication, sealing the nicks between Okazaki fragments to form a continuous strand."
+},
+
+
+{
+    "text": "Which of the following substances is most important for the regulation of osmotic pressure in the bloodstream?",
+    "options": ["Albumin", "Hemoglobin", "Cholesterol", "Insulin", "Glucagon"],
+    "answer": "Albumin",
+    "description": "Albumin is the primary protein responsible for maintaining osmotic pressure and fluid balance in the blood."
+},
+{
+    "text": "Which of the following is most likely to result in an increase in blood pH (alkalosis)?",
+    "options": ["Hyperventilation", "Hypoventilation", "Diabetic ketoacidosis", "Renal failure", "Lung cancer"],
+    "answer": "Hyperventilation",
+    "description": "Hyperventilation causes excessive expulsion of CO2, leading to a decrease in carbonic acid and an increase in blood pH."
+}, {
+        "text": "Which of the following mechanisms of transmembrane drug transport requires energy and is characterized by the movement of drugs against their concentration gradient?",
+        "options": ["Passive diffusion", "Facilitated diffusion", "Active transport", "Endocytosis", "Exocytosis"],
+        "answer": "Active transport",
+        "description": "Active transport is an energy-dependent process that moves drugs across the cell membrane against their concentration gradient, often involving specific transporters or pumps."
+    },
+    {
+        "text": "Which of the following drug receptor types primarily mediates the action of neurotransmitters in the central nervous system?",
+        "options": ["G-protein coupled receptors", "Ion channel receptors", "Steroid hormone receptors", "Tyrosine kinase receptors", "Cytokine receptors"],
+        "answer": "G-protein coupled receptors",
+        "description": "G-protein coupled receptors (GPCRs) mediate many physiological responses, including those for neurotransmitters in the central nervous system, by activating intracellular signaling pathways."
+    },
+    {
+        "text": "Which of the following factors is most likely to influence the rate of drug metabolism in the liver?",
+        "options": ["Liver size", "Enzyme induction or inhibition", "Drug solubility", "Plasma protein binding", "Drug ionization"],
+        "answer": "Enzyme induction or inhibition",
+        "description": "Enzyme induction or inhibition in the liver can significantly alter the metabolism of drugs, either increasing or decreasing their clearance from the body."
+    },
+    {
+        "text": "Which of the following cellular adaptations is most commonly associated with tissue shrinkage and a decrease in functional capacity due to disuse or aging?",
+        "options": ["Hypertrophy", "Metaplasia", "Atrophy", "Dysplasia", "Necrosis"],
+        "answer": "Atrophy",
+        "description": "Atrophy is the decrease in cell size and tissue mass due to a reduction in functional demand, commonly seen in tissues that are not used or as a consequence of aging."
+    }
+
+
+
+
+
+
+
+
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+const userAnswers = [];
+const skippedQuestions = [];
+let timerInterval;
+const timePerQuestion = 66; // 1.1 minutes in seconds
+let totalQuizTime; // Total time for the quiz
+let timeRemaining; // Time left in the quiz
+
+// Progress Bar Functions
+let progressBarContainer;
+
+function createProgressBar(numQuestions) {
+    // Create a rectangular container with fixed height and scroll functionality
+    progressBarContainer = document.createElement("div");
+    progressBarContainer.id = "progress-bar-container";
+    progressBarContainer.style.textAlign = "center";
+    progressBarContainer.style.marginBottom = "20px";
+    progressBarContainer.style.height = "60px";  // Fixed height for the container
+    progressBarContainer.style.overflowX = "auto";  // Enable horizontal scrolling
+    progressBarContainer.style.whiteSpace = "nowrap";  // Ensure the boxes stay on the same line
+    progressBarContainer.style.border = "1px solid #e0e0e0";  // Rectangular border
+    progressBarContainer.style.borderRadius = "11px";  // Optional rounded corners
+    document.querySelector('.question-container').prepend(progressBarContainer);
+
+    for (let i = 0; i < numQuestions; i++) {
+        const square = document.createElement("div");
+        square.textContent = i + 1;
+        square.style.display = "inline-block";
+        square.style.width = "30px";
+        square.style.height = "30px";
+        square.style.lineHeight = "30px";
+        square.style.textAlign = "center";
+        square.style.margin = "5px";
+        square.style.border = "1px solid black";
+        square.style.borderRadius = "5px";
+        square.style.backgroundColor = "white";
+        square.dataset.index = i;
+        progressBarContainer.appendChild(square);
+    }
+}
+
+function updateProgressBar(index, status) {
+    const square = progressBarContainer.children[index];
+    if (status === "answered") {
+        square.style.backgroundColor = "green";
+        square.style.color = "white";
+    } else if (status === "skipped") {
+        square.style.backgroundColor = "yellow";
+        square.style.color = "black";
+    }
+}
+
+function removeProgressBar() {
+    if (progressBarContainer) {
+        progressBarContainer.remove();
+    }
+}
+
+// Quiz Logic
+function validateLogin() {
+    const name = document.getElementById("user-name").value;
+    const gmail = document.getElementById("user-gmail").value;
+    const userId = document.getElementById("user-id").value;
+
+    const user = allowedUsers.find(user => user.name === name && user.gmail === gmail && user.username === userId);
+    if (user) {
+        document.querySelector('.login-container').style.display = "none";
+        document.querySelector('.question-container').style.display = "block";
+        startQuiz();
+    } else {
+        alert("Invalid login credentials. Please try again.");
+    }
+}
+
+function startQuiz() {
+    createProgressBar(questions.length);
+    totalQuizTime = timePerQuestion * questions.length;
+    timeRemaining = totalQuizTime;
+
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.question-container').style.display = "block";
+    startTimer();
+    showQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const timerElement = document.getElementById("timer");
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `Time Left: ${minutes}m ${seconds}s`;
+}
+// This function hides the timer when the last question is reached
+function handleTimerVisibility() {
+    if (currentQuestion === questions.length - 1) {
+        clearInterval(timerInterval); // Stop the timer on the last question
+        document.getElementById("timer").style.display = "none";  // Hide the timer after the last question
+    }
+}
+// Call this function when moving to the next question
+function nextQuestion() {
+    // Your existing logic for the next question
+
+    // Check timer visibility when changing questions
+    handleTimerVisibility();
+}
+
+// End quiz and hide timer
+function endQuiz() {
+    // Your existing endQuiz logic goes here
+    clearInterval(timerInterval); // Ensure timer is stopped when quiz ends
+    document.getElementById("timer").style.display = "none";  // Hide timer after quiz ends
+}
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        const userAnswer = selectedOption.value;
+        userAnswers[currentQuestion] = userAnswer;
+        if (userAnswer === questions[currentQuestion].answer) {
+            score++;
+        }
+        updateProgressBar(currentQuestion, "answered");
+        questions[currentQuestion].answered = true;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            handleSkippedQuestions();
+        }
+    } else {
+        alert("Please select an answer or skip the question.");
+    }
+}
+
+function skipQuestion() {
+    if (!skippedQuestions.includes(currentQuestion)) {
+        skippedQuestions.push(currentQuestion);
+    }
+    updateProgressBar(currentQuestion, "skipped");
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        handleSkippedQuestions();
+    }
+}
+
+function showQuestion() {
+    if (currentQuestion >= questions.length) {
+        removeProgressBar();
+        endQuiz();
+        return;
+    }
+
+    const question = questions[currentQuestion];
+    if (question.answered) {
+        handleSkippedQuestions();
+        return;
+    }
+
+    document.querySelector('.question-container').style.display = "block";
+    document.getElementById("question").textContent = question.text;
+
+    let optionsHTML = '';
+    question.options.forEach(option => {
+        optionsHTML += `<label><input type="radio" name="answer" value="${option}"> ${option}</label><br>`;
+    });
+
+    document.getElementById("options").innerHTML = optionsHTML;
+    updateButtons();
+}
+
+function handleSkippedQuestions() {
+    if (skippedQuestions.length > 0) {
+        currentQuestion = skippedQuestions.shift();
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function updateButtons() {
+    const nextButton = document.getElementById("next-button");
+    if (skippedQuestions.length > 0) {
+        nextButton.textContent = currentQuestion === questions.length - 1 && skippedQuestions.length === 1 ? "Finish" : "Next";
+    } else {
+        nextButton.textContent = currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    }
+}
+function endQuiz() {
+    document.querySelector('.question-container').style.display = "none";
+    document.querySelector('.result-container').style.display = "block";
+    document.getElementById("score").textContent = score;
+
+    const answerKey = document.getElementById("answer-key");
+    answerKey.innerHTML = '';
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const resultItem = document.createElement("li");
+        resultItem.innerHTML = `
+            <div class="question">${question.text}</div>
+            <div class="options">
+                ${question.options.map(option => {
+                    let optionText = option;
+                    if (userAnswer === option) {
+                        // If the answer is incorrect, color "Your answer" red
+                        if (userAnswer !== question.answer) {
+                            optionText += " <span style='color: red;'>(Your answer)</span>";
+                        } else {
+                            optionText += " <span style='color: green;'>(Correct)</span>";
+                        }
+                    }
+                    if (option === question.answer && userAnswer !== option) {
+                        // For correct option (when the user didn't choose it), mark it as green
+                        optionText += " <span style='color: green;'>(Correct)</span>";
+                    }
+                    return `<div>${optionText}</div>`;
+                }).join('')}
+            </div>
+            <hr style="border: 1px solid #ccc; margin: 10px 0;">  <!-- Horizontal Line -->
+            <div class="description"><strong>Explanation:</strong> ${question.description}</div>
+        `;
+        answerKey.appendChild(resultItem);
+    });
+}
+
+function showLogin() {
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.login-container').style.display = "block";
+}
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pre-Proff Practice Test Registration Form</title>
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.12.15/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script> <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+      .form-container {
+        max-width: 600px;
+        margin: auto;
+        margin-top: 50px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background-color: #f9f9f9;
+        border-radius: 10px;
+      }
+      
+      .form-container h4 {
+        font-family: 'Arial', sans-serif;
+        font-weight: bold;
+        color: #007bff;
+      }
+      .form-control, .form-check-label {
+        border-radius: 5px;
+      }
+      button {
+        border-radius: 5px;
+        padding: 12px 20px;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container">
+      <div class="form-container">
+        <h4 class="text-center mb-4">Apply For Pre-Proff Practice Test</h4>
+        <form id="submit-to-google-sheet">
+          <div class="form-group">
+            <label for="full_name">Full Name:</label>
+            <input
+              class="form-control"
+              type="text"
+              name="full_name"
+              id="full_name"
+              placeholder="Enter Full Name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="father_name">Father's Name:</label>
+            <input
+              class="form-control"
+              type="text"
+              name="father_name"
+              id="father_name"
+              placeholder="Enter Father's Name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="gmail">Gmail:</label>
+            <input
+              class="form-control"
+              type="email"
+              name="gmail"
+              id="gmail"
+              placeholder="Enter Gmail"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="whatsapp_number">WhatsApp Number:</label>
+            <input
+              class="form-control"
+              type="text"
+              name="whatsapp_number"
+              id="whatsapp_number"
+              placeholder="Enter WhatsApp Number"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="address">Address:</label>
+            <textarea
+              class="form-control"
+              name="address"
+              id="address"
+              placeholder="Enter Address"
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="medical_college">Medical College:</label>
+            <input
+              class="form-control"
+              type="text"
+              name="medical_college"
+              id="medical_college"
+              placeholder="Enter Medical College Name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="year_of_study">Year of Study:</label>
+            <select class="form-control" name="year_of_study" id="year_of_study" required>
+              <option value="" disabled selected hidden>Select Year</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+              <option value="5">5th Year</option>
+            </select>
+          </div>
+          <div class="form-group" >
+            <label for="practice_test">Which Practice Test Do You Want?</label>
+            <select class="form-control" name="practice_test" id="practice_test" required>
+              <option value="" disabled selected hidden>Select Block</option>
+              <option value="Block A">Block A</option>
+              <option value="Block B">Block B</option>
+              <option value="Block C">Block C</option>
+              <option value="Block D">Block D</Datal></option>
+              <option value="Block E">Block E</option>
+              <option value="Previous Tests">Previous Tests</option>
+              <option value="All">All</option>
+
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="transaction_id">Transaction ID:</label>
+            <input
+              class="form-control"
+              type="text"
+              name="transaction_id"
+              id="transaction_id"
+              placeholder="Enter Transaction ID"
+              required
+            />
+          </div>
+          <div class="form-group mt-2">
+            <label for="receipt" class="form-check-label">Upload Payment Receipt:</label>
+            <input class="form-control-file" type="file" name="receipt" id="receipt" />
+          </div>
+
+          <div class="form-group form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="age" />
+            <label class="form-check-label" for="age"
+              >Check if you are over 18 years old</label
+            >
+          </div>
+
+          <div class="form-group form-check">
+            <input class="form-check-input" type="checkbox" id="ex" required />
+            <label class="form-check-label" for="ex"
+              >By checking this box I certify that I agree with the data
+              terms and policies.
+            </label>
+          </div>
+          <button type="submit" id= "submitbtn"class="btn btn-primary btn-block">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+
+   // Initialize EmailJS with your user ID
+   emailjs.init("SdP3lE-1OjWkzp7za");
+
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxlLShXBoA3ibk-eN5TbGUsT4dNVy9zmJdIbxMI5Kq168aAYHpfbjWHSEEkQplAeqPErg/exec";
+        const form = document.forms["submit-to-google-sheet"];
+        const fileInput = document.getElementById("receipt");
+
+        const yearOfStudy = document.getElementById("year_of_study");
+        const practiceTestSelect = document.getElementById("practice_test");
+
+          // Function to handle Year of Study selection
+   yearOfStudy.addEventListener("change", function () {
+     const selectedYear = yearOfStudy.value;
+     
+       // Clear the current options
+       practiceTestSelect.innerHTML = '<option value="" disabled selected hidden>Select Block</option>';
+
+// Show options based on the selected year
+if (selectedYear === "1") {
+  // 1st Year - Show Block A, B, C, All
+  const options = ["Block A", "Block B", "Block C","Previous Tests","All"];
+  options.forEach(function (block) {
+    const option = document.createElement("option");
+    option.value = block;
+    option.textContent = block;
+    practiceTestSelect.appendChild(option);
+  });
+} else if (selectedYear === "2") {
+       // 2nd Year - Show Block D, E
+       const options = ["Block D", "Block E"];
+       options.forEach(function (block) {
+         const option = document.createElement("option");
+         option.value = block;
+         option.textContent = block;
+         practiceTestSelect.appendChild(option);
+       });
+     } else {
+       // Handle other cases if needed
+       practiceTestSelect.innerHTML = '<option value="" disabled selected hidden>Select Block</option>';
+     }
+   });
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            var ex = document.getElementById("ex").checked;
+            var age = document.getElementById("age").checked;
+
+            if (age) {
+                formData.append("age", "Yes");
+            } else {
+                formData.append("age", "No");
+            }
+
+            if (ex) {
+                formData.append("ex", "Yes");
+            } else {
+                formData.append("ex", "No");
+            }
+
+            // Handle the file upload
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                // Size validation here, only less than 2MB allowed
+                if (file.size > 1024 * 1024 * 2) {
+                    swal("Error", "File size should be less than 2MB.", "error");
+                    return;
+                }
+
+                reader.onload = async function () {
+                    formData.append("media", reader.result.split(",")[1]); // Append base64 data as "media"
+
+                    await submitForm(formData);
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                // No file uploaded
+                await submitForm(formData);
+            }
+               // Send email notification through EmailJS
+        sendEmailNotification();
+        });
+
+        async function submitForm(formData) {
+            // Get the submit button and change its text to "Loading..."
+            const submitButton = document.querySelector("button[type='submit']");
+            submitButton.disabled = true;
+            submitButton.innerText = "Loading...";
+
+            // Submit the form data to the Google Sheet
+            fetch(scriptURL, { method: "POST", body: formData })
+                .then((response) => {
+                    swal("Done", "Submitted Successfully.", "success");
+                    form.reset();
+                })
+                .catch((error) => {
+                    swal("Error", "Something went wrong. Please try again!", "error");
+                })
+                .finally(() => {
+                    // Reset the submit button back to "Submit"
+                    submitButton.disabled = false;
+                    submitButton.innerText = "Submit";
+                });
+        }
+              // Send an email notification using EmailJS
+      function sendEmailNotification() {
+        const emailData = {
+          to_email: "word3541@gmail.com", // Replace with admin email
+          subject: "You have a new response",
+          message: "A new user has submitted a response through the registration form."
+        };
+
+        emailjs.send("service_3541", "template_aepgk28", emailData)
+          .then((response) => {
+            console.log("Email sent successfully", response);
+          })
+          .catch((error) => {
+            console.log("Failed to send email", error);
+          });
+      }
+    </script>
+    
+  </body>
+</html>

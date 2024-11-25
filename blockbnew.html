@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #progress-bar-container {
+            background-color: #f9f8f8;
+    border: 1px solid #c3c3c5;
+    }
+        .container {
+            text-align: center;
+            max-width: 80%;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 58%;
+        }
+    
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+    
+        button:hover {
+            background: #2575fc;
+        }
+    
+        .question-container, .result-container, .login-container {
+            display: none;
+        }
+    
+        .question-container {
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            background-color: white;
+            border: 1px solid white;
+            border-radius: 8px;
+            min-height: 300px;
+           
+        }
+    
+        .options label {
+            display: block;
+            margin: -10px 0;
+        }
+    
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+    
+        .result-container ul {
+            text-align: left;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-container ul li {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .result-container ul li .question {
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-container ul li .options {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+    
+        .result-container ul li .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Enhanced Timer Styles */
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6a00, #ee0979); /* Gradient background */
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    
+        #timer:hover {
+            transform: scale(1.1); /* Slight scaling effect on hover */
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Change gradient on hover */
+        }
+    
+        #timer span {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Timer animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        #timer {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+    
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin: 20px auto;
+        }
+    
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    
+        .form-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    
+        .form-container input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .form-container button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 37%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .form-container button:hover {
+            background: #2575fc;
+        }
+    
+        .login-container input {
+            width: 51%;
+            padding: 13px;
+            margin: 16px;
+        }
+    
+        .login-container button {
+            width: 16%;
+            margin-top: 10px;
+        }
+    
+        p {
+            float: left;
+            padding: 2px 48px;
+            text-align: left;
+            line-height: 20px;
+        }
+    
+        #question {
+            font-size: 20px;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #timer {
+                font-size: 18px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+            .form-container {
+                width: 90%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            #timer {
+                font-size: 16px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .para1{
+                padding: 0px 20px;
+            }
+            .login-credentials{
+                font-size: 1.5em ;
+                line-height: 33px;
+            }
+            .login-container button {
+                width: 25%;
+                padding: 10px 25px;
+                margin-top: 10px;
+                text-align: center;
+            }
+    
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .login-container input {
+                width: 71%;
+                padding: 13px;
+                margin: 16px;
+            }
+    
+            .form-container {
+                width: 73%;
+            }
+            button {
+                font-size: 12px;
+                padding: 10px 25px;
+            }
+            #timer {
+                font-size: 9px;
+            }
+            .form-container h2 {
+                font-size: 18px;
+            }
+            .form-container input {
+                width: 84%;
+            }
+            #question {
+                font-size: 16px;
+            }
+            .options label {
+                font-size: 14px;
+            }
+        }
+
+       
+         
+    </style>
+    
+    
+</head>
+<body>
+ 
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-container">
+            <h1 class=" login-credentials">Enter Your Login Credentials </h1>
+            <input type="text" id="user-name" placeholder="Enter your Name" class="login-input"> <br>
+            <input type="email" id="user-gmail" placeholder="Enter your Gmail" class="login-input"> <br>
+            <input type="text" id="user-id" placeholder="Enter your ID" class="login-input"> <br>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input"> <br>
+            <button onclick="validateLogin()">Start Quiz</button>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation-buttons">
+                <button id="previous-button" onclick="previousQuestion()" style="display:none;">Previous</button>
+                <button id="next-button" onclick="nextQuestion()">Next</button>
+                <button id="skip-button" onclick="skipQuestion()">Skip</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+            <h1>Quiz Result</h1>
+            <h2>Your Score: <span id="score"></span></h2>
+            <ul id="answer-key"></ul>
+
+            <div class="form-container">
+                <h2>Submit Your Details</h2>
+                <form onsubmit="sendmail(event)">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Start Container -->
+        <div class="start-container">
+            <h1>Welcome to the Block B Pre-Proff Practice Test</h1>
+            <h3>Important Instructions for Online Quiz</h3>
+            <p class="para1">
+
+                Please note that this online quiz is time-restricted and consists of 120 multiple-choice questions. It is essential to attempt the quiz within the allotted time frame. <br>  <br>
+                
+                <strong>Security Notice:</strong> This quiz contains highly sensitive material, and any attempts to capture screenshots or screen recordings will result in immediate blocking of access. <br> <br>
+                
+               <strong> Availability:</strong> This quiz will be available to you until your final exam. <br> <br>
+                
+                To access the quiz, please provide the following information: <br> <br>
+                <strong>
+                - Username<br>
+                - Gmail address<br>
+                - User ID<br>
+                - password</strong> <br>  <br>
+                Please note that selected MCQ options cannot be changed, so choose carefully. After attempting all main questions, click 'Finish' to review skipped questions. Skipped MCQs will appear immediately, and clicking 'Next' after the last skipped question will display your results. Review each question thoughtfully, as submissions are final. <br>  <br> <strong> <em>Please enter your username in the designated input area at the bottom of the results section to confirm your submission.</em> </strong> <br> <br>
+                
+               We appreciate your cooperation and adherence to these guidelines. <br>  <br> </p>
+            <button onclick="showLogin()">Start</button>
+        </div>
+
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdP3lE-1OjWkzp7za");
+        })();
+
+        function sendmail(event) {
+            event.preventDefault();
+
+            const params = {
+                username: document.getElementById("username").value,
+                score: document.getElementById("score").textContent,
+            };
+
+            emailjs.send("lmhservice3541", "lmhtemplate3541", params)
+                .then(
+                    (res) => {
+                        alert("Email sent successfully! Status: " + res.status);
+                    },
+                    (err) => {
+                        console.error("Failed to send email:", err);
+                        alert("Failed to send email. Please try again.");
+                    }
+                );
+        }
+
+        const allowedUsers = [
+            { name: "John Doe", gmail: "john.doe@example.com", username: "user123" , password: "user123"},
+            { name: "Jane Smith", gmail: "jane.smith@example.com", username: "test456",password: "user123" },
+            { name: "Admin User", gmail: "admin.user@example.com", username: "admin789", password: "user123"}
+        ];
+        const questions = [
+    
+        
+    {
+        "text": "Which of the following is the primary function of osseous tissue in the human body?",
+        "options": ["Storage of vitamins", "Blood cell production", "Muscle contraction", "Movement of joints", "Protection of vital organs"],
+        "answer": "Blood cell production",
+        "description": "Osseous tissue, or bone tissue, is responsible for the production of blood cells in the bone marrow, a process known as hematopoiesis."
+    },
+    {
+        "text": "Which of the following bones is NOT part of the axial skeleton?",
+        "options": ["Skull", "Ribs", "Spine", "Clavicle", "Sternum"],
+        "answer": "Clavicle",
+        "description": "The clavicle is part of the appendicular skeleton, while the axial skeleton includes bones like the skull, ribs, and spine."
+    },
+    {
+        "text": "Which of the following bone classifications is characterized by being cube-shaped and primarily composed of spongy bone?",
+        "options": ["Long bones", "Short bones", "Flat bones", "Irregular bones", "Sesamoid bones"],
+        "answer": "Short bones",
+        "description": "Short bones, such as the carpals and tarsals, are cube-shaped and primarily composed of spongy bone with a thin outer layer of compact bone."
+    },
+    {
+        "text": "Which of the following is the primary function of red bone marrow?",
+        "options": ["Storage of fat", "Production of white blood cells", "Storage of calcium", "Production of red blood cells", "Formation of bone matrix"],
+        "answer": "Production of red blood cells",
+        "description": "Red bone marrow is responsible for hematopoiesis, the production of red blood cells, white blood cells, and platelets."
+    },
+    {
+        "text": "A patient presents with bone pain, fractures, and a tendency to break bones easily. The patient’s diagnosis suggests a deficiency in bone mineralization. Which of the following conditions is most likely responsible?",
+        "options": ["Osteoporosis", "Osteomalacia", "Rickets", "Fracture", "Osteogenesis imperfecta"],
+        "answer": "Osteomalacia",
+        "description": "Osteomalacia is a condition characterized by the softening of bones due to a deficiency of vitamin D or calcium, leading to impaired mineralization."
+    },
+    {
+        "text": "Which of the following muscle fiber types is most efficient for prolonged endurance activities like long-distance running?",
+        "options": ["Type I fibers", "Type IIa fibers", "Type IIb fibers", "Type III fibers", "Type IV fibers"],
+        "answer": "Type I fibers",
+        "description": "Type I fibers, also known as slow-twitch fibers, are highly resistant to fatigue and are optimized for endurance activities."
+    },
+    {
+        "text": "Which of the following best describes the process of ossification?",
+        "options": ["The creation of bone marrow", "The hardening of bone matrix", "The formation of collagen in bones", "The conversion of cartilage into bone", "The destruction of bone tissue"],
+        "answer": "The conversion of cartilage into bone",
+        "description": "Ossification is the process by which cartilage is replaced by bone tissue, a key event during fetal development and the growth of long bones."
+    },
+    {
+        "text": "In a clinical scenario, a patient presents with difficulty lifting the arm after an injury to the shoulder. The condition is diagnosed as a tear in the rotator cuff muscles. Which of the following muscles is most likely affected?",
+        "options": ["Deltoid", "Biceps brachii", "Supraspinatus", "Pectoralis major", "Trapezius"],
+        "answer": "Supraspinatus",
+        "description": "The supraspinatus is one of the rotator cuff muscles responsible for initiating arm abduction, and is often injured in shoulder trauma."
+    },
+    {
+        "text": "Which of the following bones of the upper limb is most commonly fractured due to a direct fall onto the shoulder?",
+        "options": ["Humerus", "Scapula", "Clavicle", "Radius", "Ulna"],
+        "answer": "Clavicle",
+        "description": "The clavicle is commonly fractured due to its location and vulnerability to direct trauma, especially during falls onto the shoulder."
+    },
+    {
+        "text": "Which anatomical structure of the scapula serves as the point of attachment for the pectoralis minor muscle?",
+        "options": ["Coracoid process", "Acromion", "Spine of scapula", "Glenoid cavity", "Supraspinous fossa"],
+        "answer": "Coracoid process",
+        "description": "The pectoralis minor muscle attaches to the coracoid process of the scapula, which plays a role in stabilizing and moving the shoulder girdle."
+    },
+    {
+        "text": "A patient experiences difficulty flexing the arm after an injury to the upper arm. Upon examination, it is found that the biceps brachii is unable to function. Which of the following is the most likely site of injury?",
+        "options": ["Olecranon", "Radial tuberosity", "Coracoid process", "Supraglenoid tubercle", "Intertubercular groove"],
+        "answer": "Radial tuberosity",
+        "description": "The biceps brachii muscle attaches to the radial tuberosity. Injury to this attachment point can impair the muscle's ability to flex the forearm."
+    },
+    {
+        "text": "A patient with osteoporosis presents with a fractured humerus after a minor fall. Which of the following is the most likely underlying cause of this fracture?",
+        "options": ["Loss of bone mineral density", "Increased collagen production", "Excessive calcium deposition", "Increased bone strength", "Infection of bone tissue"],
+        "answer": "Loss of bone mineral density",
+        "description": "Osteoporosis is characterized by a decrease in bone mineral density, making bones more fragile and susceptible to fractures even with minor trauma."
+    }
+,
+{
+        "text": "Which of the following bones is most likely to be fractured in a patient who sustains a direct blow to the upper chest during a car accident?",
+        "options": ["Clavicle", "Scapula", "Sternum", "Humerus", "Radius"],
+        "answer": "Clavicle",
+        "description": "The clavicle is a commonly fractured bone due to its location and susceptibility to direct trauma, especially in motor vehicle accidents."
+    },
+    {
+        "text": "A person with a history of chronic bone pain and fragility fractures is diagnosed with osteogenesis imperfecta. Which of the following is a characteristic feature of this condition?",
+        "options": ["Softening of bones due to vitamin D deficiency", "Brittle bones due to collagen defects", "Enlarged bones due to overactive osteoblasts", "Decreased bone mineral density", "Reduced red blood cell production"],
+        "answer": "Brittle bones due to collagen defects",
+        "description": "Osteogenesis imperfecta is characterized by brittle bones caused by defective collagen synthesis, which weakens bone structure."
+    },
+    {
+        "text": "Which of the following muscles is responsible for extending the forearm at the elbow joint?",
+        "options": ["Biceps brachii", "Triceps brachii", "Brachialis", "Deltoid", "Flexor carpi radialis"],
+        "answer": "Triceps brachii",
+        "description": "The triceps brachii is the primary muscle responsible for extending the forearm at the elbow joint."
+    },
+    {
+        "text": "Which of the following conditions is characterized by the loss of bone density, leading to fragile bones that are more susceptible to fractures?",
+        "options": ["Osteomalacia", "Osteoarthritis", "Osteoporosis", "Rickets", "Paget's disease"],
+        "answer": "Osteoporosis",
+        "description": "Osteoporosis involves the loss of bone density, making bones brittle and more prone to fractures, particularly in the spine, hips, and wrists."
+    },
+    {
+        "text": "In which of the following scenarios would the deltoid muscle most likely be used?",
+        "options": ["Flexing the elbow", "Abducting the arm", "Rotating the forearm", "Extending the wrist", "Pronation of the forearm"],
+        "answer": "Abducting the arm",
+        "description": "The deltoid muscle is primarily responsible for abducting the arm at the shoulder joint."
+    },
+    {
+        "text": "Which of the following bones is part of the appendicular skeleton?",
+        "options": ["Coccyx", "Clavicle", "Sternum", "Skull", "Vertebrae"],
+        "answer": "Clavicle",
+        "description": "The clavicle is part of the appendicular skeleton, which includes the limbs and their associated girdles."
+    },
+    {
+        "text": "A patient sustains an injury to the radial nerve. Which of the following muscles is most likely affected in this patient?",
+        "options": ["Triceps brachii", "Biceps brachii", "Coracobrachialis", "Brachioradialis", "Pronator teres"],
+        "answer": "Triceps brachii",
+        "description": "The radial nerve innervates the triceps brachii, and injury to this nerve can impair the extension of the elbow."
+    },
+    {
+        "text": "Which type of ossification is responsible for the formation of the flat bones of the skull?",
+        "options": ["Endochondral ossification", "Intramembranous ossification", "Appositional ossification", "Perichondral ossification", "Fibrous ossification"],
+        "answer": "Intramembranous ossification",
+        "description": "Intramembranous ossification is the process by which flat bones, such as those in the skull, are formed directly from mesenchymal tissue."
+    },
+    {
+        "text": "Which of the following bones is the longest bone in the human body?",
+        "options": ["Femur", "Humerus", "Tibia", "Fibula", "Radius"],
+        "answer": "Femur",
+        "description": "The femur is the longest and strongest bone in the human body, forming the thigh and extending from the hip to the knee."
+    },
+    {
+        "text": "In a clinical scenario, a patient presents with muscle weakness and drooping eyelids. The diagnosis is myasthenia gravis. Which of the following mechanisms contributes to this condition?",
+        "options": ["Increased acetylcholine production", "Increased number of acetylcholine receptors", "Decreased acetylcholine receptor function", "Decreased dopamine secretion", "Overactivation of GABA receptors"],
+        "answer": "Decreased acetylcholine receptor function",
+        "description": "Myasthenia gravis is caused by autoimmune destruction or dysfunction of acetylcholine receptors at the neuromuscular junction, leading to muscle weakness."
+    },
+    {
+        "text": "Which of the following structures is the site of attachment for the supraspinatus muscle?",
+        "options": ["Acromion", "Greater tubercle of the humerus", "Coracoid process", "Glenoid cavity", "Spine of the scapula"],
+        "answer": "Greater tubercle of the humerus",
+        "description": "The supraspinatus muscle attaches to the greater tubercle of the humerus, playing a key role in the abduction of the arm."
+    },
+    {
+        "text": "Which of the following muscles is primarily responsible for flexing the forearm at the elbow joint?",
+        "options": ["Triceps brachii", "Biceps brachii", "Brachialis", "Coracobrachialis", "Deltoid"],
+        "answer": "Biceps brachii",
+        "description": "The biceps brachii is the major muscle responsible for flexing the forearm at the elbow joint."
+    },
+    {
+        "text": "A patient with a history of frequent fractures is diagnosed with osteogenesis imperfecta. Which of the following is the underlying cause of the fractures in this condition?",
+        "options": ["Defective collagen production", "Vitamin D deficiency", "Excessive osteoclast activity", "Deficiency of calcium in the bones", "Increased osteoblast activity"],
+        "answer": "Defective collagen production",
+        "description": "Osteogenesis imperfecta is caused by a defect in collagen production, leading to fragile bones that are prone to fractures."
+    },
+    {
+        "text": "Which of the following bone markings of the scapula serves as the site of attachment for the deltoid muscle?",
+        "options": ["Acromion", "Coracoid process", "Glenoid cavity", "Spine of scapula", "Supraspinous fossa"],
+        "answer": "Acromion",
+        "description": "The acromion is the bony prominence on the scapula where the deltoid muscle attaches, allowing for movement at the shoulder joint."
+    },
+    {
+        "text": "A patient with a fractured humerus presents with an inability to extend their elbow. Which of the following muscles is most likely to be affected in this scenario?",
+        "options": ["Biceps brachii", "Brachialis", "Triceps brachii", "Coracobrachialis", "Deltoid"],
+        "answer": "Triceps brachii",
+        "description": "The triceps brachii is responsible for extending the forearm at the elbow joint. A fracture of the humerus may impair its function."
+    },
+    {
+        "text": "Which of the following is the primary function of the periosteum in bone healing?",
+        "options": ["Providing blood supply to the bone", "Storing calcium", "Facilitating bone resorption", "Producing red blood cells", "Providing attachment for ligaments and tendons"],
+        "answer": "Providing blood supply to the bone",
+        "description": "The periosteum provides a rich blood supply to bones and plays a vital role in bone growth and healing, especially after fractures."
+    },
+    {
+        "text": "Which of the following is a common complication of a fractured clavicle?",
+        "options": ["Damage to the radial nerve", "Injury to the brachial plexus", "Compression of the subclavian artery", "Fracture of the humerus", "Damage to the ulnar nerve"],
+        "answer": "Injury to the brachial plexus",
+        "description": "A fractured clavicle can lead to injury to the brachial plexus, which may cause nerve damage and weakness or numbness in the arm."
+    },
+    {
+        "text": "Which type of joint is found between the bones of the skull?",
+        "options": ["Ball-and-socket joint", "Saddle joint", "Fibrous joint", "Hinge joint", "Pivot joint"],
+        "answer": "Fibrous joint",
+        "description": "The joints between the bones of the skull are fibrous joints, specifically sutures, which are immovable and provide stability to the skull."
+    },
+    {
+        "text": "Which of the following conditions is most likely to occur due to a deficiency of vitamin D, leading to defective bone mineralization?",
+        "options": ["Osteoporosis", "Osteomalacia", "Rickets", "Osteogenesis imperfecta", "Paget's disease"],
+        "answer": "Osteomalacia",
+        "description": "Osteomalacia is characterized by soft bones due to vitamin D deficiency, leading to defective bone mineralization."
+    },
+
+    {
+        "text": "A patient presents with weakness and atrophy of the muscles around the shoulder joint. Upon examination, it is found that the muscles of the rotator cuff are affected. Which of the following muscles is part of the rotator cuff?",
+        "options": ["Supraspinatus", "Pectoralis major", "Biceps brachii", "Deltoid", "Serratus anterior"],
+        "answer": "Supraspinatus",
+        "description": "The rotator cuff is composed of four muscles: supraspinatus, infraspinatus, teres minor, and subscapularis, all of which contribute to stabilizing the shoulder joint."
+    },
+    {
+        "text": "Which of the following muscles is primarily responsible for stabilizing the pectoral girdle?",
+        "options": ["Subclavius", "Deltoid", "Trapezius", "Pectoralis minor", "Biceps brachii"],
+        "answer": "Pectoralis minor",
+        "description": "The pectoralis minor helps stabilize the pectoral girdle by attaching to the coracoid process of the scapula and the ribs."
+    },
+    {
+        "text": "A patient with a clavicle fracture presents with a drooping shoulder and difficulty moving their arm. Which muscle would most likely be affected by this injury?",
+        "options": ["Pectoralis major", "Trapezius", "Subclavius", "Serratus anterior", "Deltoid"],
+        "answer": "Trapezius",
+        "description": "The trapezius muscle, which helps elevate and stabilize the scapula, can be affected by a clavicle fracture, leading to a drooping shoulder."
+    },
+    {
+        "text": "The brachial plexus is composed of roots, trunks, divisions, and cords. Which of the following cords gives rise to the musculocutaneous nerve?",
+        "options": ["Lateral cord", "Posterior cord", "Medial cord", "Superior trunk", "Inferior trunk"],
+        "answer": "Lateral cord",
+        "description": "The musculocutaneous nerve arises from the lateral cord of the brachial plexus, which supplies muscles in the anterior compartment of the arm."
+    },
+    {
+        "text": "A patient presents with weakness in their wrist flexors and numbness along the ulnar side of their hand. Which nerve injury is most likely responsible?",
+        "options": ["Median nerve injury", "Musculocutaneous nerve injury", "Ulnar nerve injury", "Radial nerve injury", "Axillary nerve injury"],
+        "answer": "Ulnar nerve injury",
+        "description": "The ulnar nerve innervates the intrinsic muscles of the hand and some wrist flexors, and injury to it can lead to weakness and sensory loss in the ulnar distribution."
+    },
+    {
+        "text": "A patient with shoulder pain has difficulty with abduction of the arm. Which muscle is primarily responsible for initiating this movement?",
+        "options": ["Supraspinatus", "Infraspinatus", "Deltoid", "Subscapularis", "Latissimus dorsi"],
+        "answer": "Supraspinatus",
+        "description": "The supraspinatus muscle initiates the first 15-30 degrees of arm abduction and is part of the rotator cuff."
+    },
+    {
+        "text": "In which of the following conditions is the axillary nerve most likely to be injured?",
+        "options": ["Fracture of the humeral neck", "Fracture of the clavicle", "Dislocation of the shoulder joint", "Fracture of the scapula", "Fracture of the radius"],
+        "answer": "Fracture of the humeral neck",
+        "description": "The axillary nerve, which supplies the deltoid and teres minor, is at risk in fractures of the humeral neck, leading to weakness in shoulder abduction."
+    },
+    {
+        "text": "Which muscle is most responsible for flexing the forearm at the elbow joint?",
+        "options": ["Biceps brachii", "Triceps brachii", "Brachialis", "Coracobrachialis", "Flexor carpi radialis"],
+        "answer": "Brachialis",
+        "description": "The brachialis muscle is the primary flexor of the forearm at the elbow joint, working alongside the biceps brachii."
+    },
+    {
+        "text": "A person has difficulty with shoulder external rotation. Which muscle is most likely affected in this scenario?",
+        "options": ["Infraspinatus", "Subscapularis", "Supraspinatus", "Teres minor", "Deltoid"],
+        "answer": "Infraspinatus",
+        "description": "The infraspinatus is responsible for external rotation of the shoulder and is part of the rotator cuff."
+    },
+    {
+        "text": "In a clinical scenario, a patient with a radial nerve injury has difficulty extending their wrist. Which of the following muscles is most likely affected?",
+        "options": ["Flexor carpi radialis", "Extensor carpi radialis longus", "Extensor digitorum", "Brachioradialis", "Palmaris longus"],
+        "answer": "Extensor carpi radialis longus",
+        "description": "The extensor carpi radialis longus is responsible for wrist extension, and a radial nerve injury can impair this function."
+    },
+    {
+        "text": "Which of the following muscles is innervated by the musculocutaneous nerve?",
+        "options": ["Biceps brachii", "Deltoid", "Triceps brachii", "Brachioradialis", "Infraspinatus"],
+        "answer": "Biceps brachii",
+        "description": "The biceps brachii is innervated by the musculocutaneous nerve and is responsible for flexing the forearm at the elbow."
+    },
+    {
+        "text": "A patient with a fractured ulna is having difficulty with pronation and supination of the forearm. Which muscle is most likely affected?",
+        "options": ["Pronator teres", "Brachialis", "Flexor carpi radialis", "Supinator", "Extensor carpi ulnaris"],
+        "answer": "Pronator teres",
+        "description": "The pronator teres muscle, which is involved in pronating the forearm, attaches to the ulna and is affected by a fracture of this bone."
+    },
+    {
+        "text": "A patient with a dislocated shoulder experiences weakness in shoulder flexion. Which of the following muscles is most likely involved?",
+        "options": ["Deltoid", "Pectoralis major", "Latissimus dorsi", "Subscapularis", "Supraspinatus"],
+        "answer": "Pectoralis major",
+        "description": "The pectoralis major is responsible for shoulder flexion, and dislocation can lead to weakness in this movement."
+    },
+    {
+        "text": "Which of the following muscles is primarily innervated by the lumbar plexus?",
+        "options": ["Quadratus lumborum", "Psoas major", "Gluteus medius", "Adductor magnus", "Sartorius"],
+        "answer": "Sartorius",
+        "description": "The sartorius muscle, responsible for hip flexion, is primarily innervated by the femoral nerve, a branch of the lumbar plexus."
+    },
+    {
+        "text": "A patient with difficulty extending the knee and loss of sensation over the anterior thigh is likely experiencing damage to which spinal nerve?",
+        "options": ["L2", "L3", "L4", "L5", "S1"],
+        "answer": "L4",
+        "description": "The L4 spinal nerve contributes to the femoral nerve, which innervates the quadriceps muscle responsible for knee extension. Damage to L4 can result in weakness of knee extension and sensory loss in the anterior thigh."
+    },
+    {
+        "text": "The L5 spinal nerve root is most likely associated with which of the following functions?",
+        "options": ["Hip flexion", "Knee extension", "Foot dorsiflexion", "Ankle plantarflexion", "Inversion of the foot"],
+        "answer": "Foot dorsiflexion",
+        "description": "The L5 spinal nerve is involved in innervating muscles that control foot dorsiflexion, such as the tibialis anterior."
+    },
+    {
+        "text": "Which of the following muscles is involved in scapular depression?",
+        "options": ["Trapezius", "Rhomboid major", "Serratus anterior", "Pectoralis minor", "Latissimus dorsi"],
+        "answer": "Pectoralis minor",
+        "description": "The pectoralis minor helps depress the scapula, as well as protract it, contributing to the stability of the shoulder girdle."
+    },
+    {
+        "text": "A patient presents with numbness and tingling along the medial aspect of the hand. Which nerve injury is most likely responsible?",
+        "options": ["Median nerve injury", "Ulnar nerve injury", "Radial nerve injury", "Musculocutaneous nerve injury", "Axillary nerve injury"],
+        "answer": "Ulnar nerve injury",
+        "description": "The ulnar nerve provides sensory innervation to the medial aspect of the hand, and its injury can lead to numbness or tingling in this area."
+    },
+    {
+        "text": "Which of the following muscles is part of the rotator cuff and aids in internal rotation of the shoulder joint?",
+        "options": ["Infraspinatus", "Teres minor", "Subscapularis", "Supraspinatus", "Deltoid"],
+        "answer": "Subscapularis",
+        "description": "The subscapularis muscle is part of the rotator cuff and is responsible for internal rotation of the shoulder joint."
+    },
+    {
+        "text": "The brachial artery is a continuation of which artery as it passes into the arm?",
+        "options": ["Subclavian artery", "Axillary artery", "Radial artery", "Ulnar artery", "Brachiocephalic artery"],
+        "answer": "Axillary artery",
+        "description": "The brachial artery is a continuation of the axillary artery and supplies blood to the arm, forearm, and hand."
+    },
+    {
+        "text": "Which of the following nerves provides motor innervation to the muscles of the posterior compartment of the arm?",
+        "options": ["Ulnar nerve", "Median nerve", "Radial nerve", "Musculocutaneous nerve", "Axillary nerve"],
+        "answer": "Radial nerve",
+        "description": "The radial nerve innervates the muscles of the posterior compartment of the arm, including the triceps brachii."
+    },
+    {
+        "text": "Which muscle is responsible for the flexion of the elbow joint and is innervated by the musculocutaneous nerve?",
+        "options": ["Biceps brachii", "Triceps brachii", "Brachialis", "Coracobrachialis", "Pronator teres"],
+        "answer": "Brachialis",
+        "description": "The brachialis muscle is the main flexor of the elbow joint and is innervated by the musculocutaneous nerve."
+    },
+    {
+        "text": "A patient presents with pain along the bottom of the foot, especially in the heel region. The pain is worse in the morning and improves after walking. Which condition is most likely responsible for these symptoms?",
+        "options": ["Plantar fasciitis", "Achilles tendonitis", "Tarsal tunnel syndrome", "Metatarsal fracture", "Bunions"],
+        "answer": "Plantar fasciitis",
+        "description": "Plantar fasciitis is characterized by heel pain, especially after periods of rest, such as after waking up in the morning, due to inflammation of the plantar fascia."
+    },
+    {
+    "text": "A patient presents with weakness in the lower leg muscles and difficulty with hip flexion. Which spinal nerve root is most likely affected?",
+        "options": ["L1", "L2", "L3", "L4", "L5"],
+        "answer": "L2",
+        "description": "The L2 spinal nerve root contributes to the innervation of muscles involved in hip flexion, including the iliopsoas muscle. Damage to this root can result in weakness in this area."
+    },
+    {
+        "text": "Which of the following spinal nerve components is responsible for transmitting motor information to skeletal muscles?",
+        "options": ["Dorsal root", "Ventral root", "Dorsal ramus", "Ventral ramus", "Gray rami communicantes"],
+        "answer": "Ventral root",
+        "description": "The ventral root of the spinal nerve carries motor (efferent) fibers from the spinal cord to skeletal muscles."
+    },
+    {
+        "text": "A 45-year-old male presents with numbness and tingling on the medial side of his thigh. Which spinal nerve is most likely involved?",
+        "options": ["L1", "L2", "L3", "L4", "S1"],
+        "answer": "L2",
+        "description": "The L2 spinal nerve contributes to the sensory innervation of the medial thigh, and damage to this nerve can result in sensory disturbances in this region."
+    },
+    {
+        "text": "Which of the following muscles is primarily responsible for dorsiflexion of the foot?",
+        "options": ["Tibialis anterior", "Gastrocnemius", "Flexor digitorum longus", "Peroneus longus", "Extensor digitorum longus"],
+        "answer": "Tibialis anterior",
+        "description": "The tibialis anterior muscle is responsible for dorsiflexion, which involves lifting the foot upwards towards the shin."
+    },
+    {
+        "text": "A patient with difficulty in walking and inability to lift their toes may have suffered damage to which of the following muscles?",
+        "options": ["Extensor hallucis longus", "Flexor hallucis longus", "Tibialis posterior", "Peroneus brevis", "Tibialis anterior"],
+        "answer": "Extensor hallucis longus",
+        "description": "The extensor hallucis longus is responsible for extending the great toe, and damage to this muscle can lead to difficulty lifting the toes, as seen in conditions like drop foot."
+    },
+    {
+        "text": "A patient experiences pain radiating down the leg from the lower back to the lateral aspect of the foot. This suggests compression of which nerve root?",
+        "options": ["L2", "L3", "L4", "L5", "S1"],
+        "answer": "L5",
+        "description": "The L5 nerve root is often associated with pain radiating down the leg, especially along the lateral aspect of the foot, as seen in conditions like sciatica."
+    },
+    {
+        "text": "Which of the following structures is most likely affected if a patient experiences weakness in the gluteus maximus and difficulty in hip extension?",
+        "options": ["L2 spinal nerve", "L3 spinal nerve", "L4 spinal nerve", "L5 spinal nerve", "S1 spinal nerve"],
+        "answer": "S1 spinal nerve",
+        "description": "The S1 spinal nerve contributes to the inferior gluteal nerve, which innervates the gluteus maximus. Damage to this nerve can result in weakness in hip extension."
+    },
+    {
+        "text": "Which of the following nerves is primarily responsible for innervating the muscles of the anterior thigh, including the quadriceps?",
+        "options": ["Femoral nerve", "Sciatic nerve", "Obturator nerve", "Gluteal nerve", "Tibial nerve"],
+        "answer": "Femoral nerve",
+        "description": "The femoral nerve, which is a branch of the lumbar plexus, innervates the anterior thigh muscles, including the quadriceps, which are involved in knee extension."
+    },
+    {
+        "text": "Which part of the spinal cord is responsible for the formation of the lumbar and sacral plexuses?",
+        "options": ["Cervical enlargement", "Thoracic region", "Lumbar enlargement", "Sacral region", "Coccygeal region"],
+        "answer": "Lumbar enlargement",
+        "description": "The lumbar and sacral plexuses are formed from the spinal nerves that emerge from the lumbar enlargement of the spinal cord."
+    },
+    {
+        "text": "A patient presents with weakness in the muscles of the lower leg and loss of sensation on the lateral side of the leg and dorsum of the foot. Which nerve is most likely affected?",
+        "options": ["Common fibular nerve", "Tibial nerve", "Femoral nerve", "Obturator nerve", "Saphenous nerve"],
+        "answer": "Common fibular nerve",
+        "description": "The common fibular nerve provides motor innervation to muscles involved in dorsiflexion and foot eversion, and sensory innervation to the lateral aspect of the leg and dorsum of the foot."
+    },
+    {
+        "text": "Which of the following ligaments plays a key role in maintaining the medial longitudinal arch of the foot?",
+        "options": ["Plantar fascia", "Anterior talofibular ligament", "Deltoid ligament", "Calcaneofibular ligament", "Spring ligament"],
+        "answer": "Plantar fascia",
+        "description": "The plantar fascia plays a key role in supporting the medial longitudinal arch of the foot, and damage to it can lead to conditions like plantar fasciitis."
+    },
+    {
+        "text": "Which of the following structures provides the main blood supply to the dorsum of the foot?",
+        "options": ["Posterior tibial artery", "Anterior tibial artery", "Fibular artery", "Peroneal artery", "Medial plantar artery"],
+        "answer": "Anterior tibial artery",
+        "description": "The anterior tibial artery supplies the dorsum of the foot and continues as the dorsalis pedis artery, which is commonly used for assessing peripheral pulses."
+    },
+    {
+        "text": "A patient experiences numbness and tingling along the medial aspect of the sole of the foot. Which nerve is most likely affected?",
+        "options": ["Tibial nerve", "Common fibular nerve", "Deep peroneal nerve", "Sural nerve", "Superficial peroneal nerve"],
+        "answer": "Tibial nerve",
+        "description": "The tibial nerve innervates the sole of the foot, and compression or injury to this nerve can lead to numbness or tingling in the medial aspect of the sole."
+    },
+    {
+        "text": "Which of the following muscles acts to evert the foot?",
+        "options": ["Tibialis posterior", "Flexor digitorum longus", "Peroneus longus", "Extensor hallucis longus", "Flexor hallucis longus"],
+        "answer": "Peroneus longus",
+        "description": "The peroneus longus is responsible for eversion of the foot, helping to turn the sole of the foot outward."
+    },
+    {
+        "text": "A patient with a high arch and chronic pain in the foot may be suffering from which condition, often associated with excessive strain on the plantar fascia?",
+        "options": ["Plantar fasciitis", "Flat feet", "Metatarsalgia", "Morton's neuroma", "Achilles tendinopathy"],
+        "answer": "Plantar fasciitis",
+        "description": "Plantar fasciitis often occurs in patients with high arches, as the increased strain on the plantar fascia leads to inflammation and pain, especially in the heel area."
+    },
+    {
+        "text": "In a case of excessive pronation, which of the following muscles would most likely be overworked to compensate for the foot's instability?",
+        "options": ["Tibialis anterior", "Tibialis posterior", "Flexor digitorum longus", "Extensor hallucis longus", "Peroneus brevis"],
+        "answer": "Tibialis posterior",
+        "description": "The tibialis posterior muscle helps support the medial arch of the foot, and excessive pronation can cause overuse of this muscle as it tries to stabilize the foot."
+    },
+    {
+        "text": "A patient with a flat foot may be experiencing weakness in which of the following muscles responsible for supporting the medial arch?",
+        "options": ["Tibialis posterior", "Flexor hallucis longus", "Extensor digitorum longus", "Peroneus longus", "Soleus"],
+        "answer": "Tibialis posterior",
+        "description": "The tibialis posterior muscle plays a key role in supporting the medial longitudinal arch of the foot. Weakness in this muscle can contribute to the development of flat feet."
+    }, {
+        "text": "Which of the following bone cells is responsible for the resorption of bone tissue?",
+        "options": ["Osteoblasts", "Osteoclasts", "Osteocytes", "Osteoprogenitor cells", "Endosteal cells"],
+        "answer": "Osteoclasts",
+        "description": "Osteoclasts are responsible for the resorption of bone tissue, which involves breaking down the mineralized bone matrix, releasing calcium into the bloodstream."
+    },
+    {
+        "text": "A patient presents with an inability to synthesize osteoid, leading to fragile bones. Which bone cell type is most likely impaired in this condition?",
+        "options": ["Osteoblasts", "Osteoclasts", "Osteocytes", "Chondrocytes", "Fibroblasts"],
+        "answer": "Osteoblasts",
+        "description": "Osteoblasts are responsible for synthesizing the bone matrix (osteoid), which is necessary for bone mineralization. Impairment of osteoblast function leads to fragile, osteoporotic bones."
+    },
+    {
+        "text": "Which type of cartilage is characterized by dense collagen fibers and is found in intervertebral discs and pubic symphysis?",
+        "options": ["Hyaline cartilage", "Elastic cartilage", "Fibrocartilage", "Articular cartilage", "Bone cartilage"],
+        "answer": "Fibrocartilage",
+        "description": "Fibrocartilage is characterized by dense collagen fibers, providing tensile strength and resistance to compression. It is found in areas that withstand high stress, such as the intervertebral discs and pubic symphysis."
+    },
+    {
+        "text": "A patient with a recent bone fracture is experiencing delayed healing. This may be due to insufficient function of which of the following bone cells?",
+        "options": ["Osteoblasts", "Osteoclasts", "Osteocytes", "Fibroblasts", "Chondrocytes"],
+        "answer": "Osteoblasts",
+        "description": "Osteoblasts are crucial for bone formation during the healing process. Inadequate osteoblast activity may lead to delayed or impaired bone repair."
+    },
+    {
+        "text": "Which of the following structures is characteristic of the lamellar bone but not the woven bone?",
+        "options": ["Haversian systems", "Osteocytes", "Collagen fibers arranged in a random pattern", "Cement lines", "Bone marrow"],
+        "answer": "Haversian systems",
+        "description": "Lamellar bone is organized into concentric rings known as Haversian systems or osteons, which is a distinguishing feature compared to woven bone, which has a more disorganized structure."
+    },
+    {
+        "text": "Which type of muscle tissue is most responsible for voluntary movement and has striations under the microscope?",
+        "options": ["Smooth muscle", "Cardiac muscle", "Skeletal muscle", "Voluntary muscle", "None of the above"],
+        "answer": "Skeletal muscle",
+        "description": "Skeletal muscle is responsible for voluntary movement and is characterized by striations, which are visible under the microscope due to the regular arrangement of actin and myosin filaments."
+    },
+    {
+        "text": "At what stage of lower limb development do limb buds first appear?",
+        "options": ["3 weeks", "4 weeks", "5 weeks", "6 weeks", "7 weeks"],
+        "answer": "4 weeks",
+        "description": "Limb buds for both the upper and lower limbs appear around the 4th week of embryonic development, marking the initial stages of limb formation."
+    },
+    {
+        "text": "A baby is born with underdeveloped lower limbs, including the absence of the fibula and other bones. Which of the following developmental abnormalities is most likely responsible for this condition?",
+        "options": ["Amelia", "Polydactyly", "Clubfoot", "Meromelia", "Syndactyly"],
+        "answer": "Amelia",
+        "description": "Amelia is a congenital condition characterized by the complete absence of a limb or limbs, which can involve the absence of bones such as the fibula during lower limb development."
+    },
+   
+    {
+        "text": "A patient with a history of cardiac arrhythmias presents with irregular contractions of the heart. Which of the following microscopic features of cardiac muscle is most likely to be involved?",
+        "options": ["Striations", "Intercalated discs", "Z lines", "T-tubules", "Endomysium"],
+        "answer": "Intercalated discs",
+        "description": "Intercalated discs are specialized junctions between cardiac muscle fibers that allow for coordinated contraction. Disruption of these structures can lead to arrhythmias and uncoordinated heartbeats."
+    },
+    {
+        "text": "Which type of cartilage has abundant elastic fibers and is found in structures like the external ear and epiglottis?",
+        "options": ["Fibrocartilage", "Hyaline cartilage", "Elastic cartilage", "Articular cartilage", "Bone cartilage"],
+        "answer": "Elastic cartilage",
+        "description": "Elastic cartilage contains a higher proportion of elastic fibers, which gives it flexibility. It is found in structures like the external ear and epiglottis, which need to maintain shape while allowing flexibility."
+    },
+
+    {
+        "text": "During lower limb development, which signaling molecule is primarily responsible for the patterning and elongation of the limb bud?",
+        "options": ["FGF (Fibroblast Growth Factor)", "SHH (Sonic Hedgehog)", "BMP (Bone Morphogenetic Proteins)", "WNT", "Hox genes"],
+        "answer": "SHH (Sonic Hedgehog)",
+        "description": "Sonic Hedgehog (SHH) is crucial for the anterior-posterior patterning of the limb and plays an essential role in the elongation and differentiation of the lower limb during embryogenesis."
+    },
+    {
+        "text": "A fetus is diagnosed with a condition where the foot is rotated inward and the sole faces downward. Which anomaly of the lower limb is most likely indicated by this description?",
+        "options": ["Clubfoot", "Polydactyly", "Cleft foot", "Congenital hip dislocation", "Syndactyly"],
+        "answer": "Clubfoot",
+        "description": "Clubfoot (talipes equinovarus) is a congenital deformity where the foot is twisted inward and downward. This abnormal positioning is a common developmental anomaly of the lower limb."
+    },
+    {
+        "text": "A patient experiences weakness and fatigue in skeletal muscles after prolonged activity. This is likely due to a lack of ATP production. Which of the following components of skeletal muscle fibers plays a critical role in ATP production during muscle contraction?",
+        "options": ["Sarcoplasm", "Sarcoplasmic reticulum", "Myofibrils", "Mitochondria", "Z disk"],
+        "answer": "Mitochondria",
+        "description": "Mitochondria are responsible for ATP production via oxidative phosphorylation, providing energy for sustained muscle contraction."
+    },
+    {
+        "text": "Which of the following best describes the role of the sarcoplasmic reticulum in skeletal muscle contraction?",
+        "options": ["It synthesizes myosin filaments", "It stores and releases calcium ions", "It contracts the muscle fiber", "It transmits action potentials to the muscle fiber", "It forms the Z disk"],
+        "answer": "It stores and releases calcium ions",
+        "description": "The sarcoplasmic reticulum stores calcium ions, which are released during muscle contraction to trigger the interaction between actin and myosin."
+    },
+    {
+        "text": "A bodybuilder focuses on lifting heavy weights to increase muscle mass. This type of exercise primarily affects which type of muscle fibers?",
+        "options": ["Type I fibers", "Type IIa fibers", "Type IIb fibers", "Type III fibers", "Type IV fibers"],
+        "answer": "Type IIb fibers",
+        "description": "Type IIb fibers are fast-twitch muscle fibers that are primarily engaged in activities requiring short bursts of strength, like heavy weightlifting."
+    },
+    {
+        "text": "In which part of the sarcomere would you find the thick filaments composed of myosin?",
+        "options": ["A band", "I band", "Z disk", "M line", "H zone"],
+        "answer": "A band",
+        "description": "The A band of the sarcomere contains the thick myosin filaments, which interact with the thin actin filaments to produce muscle contraction."
+    },
+    {
+        "text": "A patient with myasthenia gravis experiences severe muscle weakness. Which of the following mechanisms best explains the pathophysiology of this disorder?",
+        "options": ["Destruction of acetylcholine receptors at the neuromuscular junction", "Increased acetylcholine release at the neuromuscular junction", "Inhibition of acetylcholinesterase", "Overproduction of dopamine in the synaptic cleft", "Dysfunction of myosin ATPase in muscle fibers"],
+        "answer": "Destruction of acetylcholine receptors at the neuromuscular junction",
+        "description": "Myasthenia gravis is an autoimmune disorder in which antibodies destroy acetylcholine receptors at the neuromuscular junction, impairing muscle contraction."
+    },
+    {
+        "text": "Which of the following is responsible for the repolarization of the muscle cell membrane after an action potential during muscle contraction?",
+        "options": ["Calcium influx", "Sodium influx", "Potassium efflux", "Chloride efflux", "Acetylcholine release"],
+        "answer": "Potassium efflux",
+        "description": "After depolarization, potassium ions flow out of the muscle cell to restore the resting membrane potential during repolarization."
+    },
+    {
+        "text": "A person exercises regularly with a combination of running and sprinting. Which type of muscle fibers are most likely to be involved in sustained endurance activities like running?",
+        "options": ["Type I fibers", "Type IIa fibers", "Type IIb fibers", "Type III fibers", "Type IV fibers"],
+        "answer": "Type I fibers",
+        "description": "Type I fibers are slow-twitch fibers that are highly resistant to fatigue and are best suited for endurance activities like running."
+    },
+    {
+        "text": "Which of the following best describes the mechanism of action for drugs that block acetylcholine at the neuromuscular junction?",
+        "options": ["They prevent acetylcholine from binding to receptors", "They inhibit acetylcholinesterase activity", "They increase the release of acetylcholine", "They promote calcium ion release", "They block potassium channels"],
+        "answer": "They prevent acetylcholine from binding to receptors",
+        "description": "Drugs that block acetylcholine prevent it from binding to nicotinic receptors at the neuromuscular junction, thereby inhibiting muscle contraction."
+    },
+    {
+        "text": "Which of the following best characterizes the role of the Z disk in skeletal muscle fibers?",
+        "options": ["It anchors the thick myosin filaments", "It separates the A band from the I band", "It holds the thin actin filaments in place", "It facilitates calcium ion release", "It is the site of ATP synthesis"],
+        "answer": "It holds the thin actin filaments in place",
+        "description": "The Z disk serves as the anchoring point for the thin actin filaments in the sarcomere and defines the boundaries of each sarcomere."
+    },
+    {
+        "text": "In an isometric exercise, which of the following occurs in the muscle fibers?",
+        "options": ["Muscle length changes while tension remains constant", "Muscle tension changes while length remains constant", "There is no change in muscle tension", "The muscle fibers are completely relaxed", "The muscle fibers undergo hypertrophy without tension"],
+        "answer": "Muscle tension changes while length remains constant",
+        "description": "In isometric exercises, muscles generate force without changing length, maintaining a constant muscle length while tension increases."
+    },
+    {
+        "text": "Which of the following drugs enhances neuromuscular transmission by inhibiting acetylcholinesterase?",
+        "options": ["Succinylcholine", "Pyridostigmine", "Atropine", "Cisatracurium", "Dantrolene"],
+        "answer": "Pyridostigmine",
+        "description": "Pyridostigmine inhibits acetylcholinesterase, prolonging the action of acetylcholine at the neuromuscular junction, which enhances neuromuscular transmission."
+    },
+    {
+        "text": "Which of the following is the most likely cause of muscle fatigue during intense exercise?",
+        "options": ["Decreased calcium ion release", "Accumulation of lactic acid", "Increased ATP synthesis", "Hyperpolarization of the sarcolemma", "Increased acetylcholine release"],
+        "answer": "Accumulation of lactic acid",
+        "description": "During intense exercise, anaerobic metabolism produces lactic acid, which can accumulate in muscle tissue and contribute to fatigue."
+    },
+    {
+        "text": "What role do the titin microfilament molecules play in muscle contraction?",
+        "options": ["They facilitate the formation of cross-bridges between actin and myosin", "They store calcium ions in the sarcoplasmic reticulum", "They contribute to the elastic properties of the sarcomere", "They assist in the breakdown of ATP", "They regulate the release of acetylcholine"],
+        "answer": "They contribute to the elastic properties of the sarcomere",
+        "description": "Titin molecules are large proteins that provide elasticity and help stabilize the sarcomere structure during muscle contraction and relaxation."
+    },
+    {
+        "text": "A patient with a neuromuscular disorder is prescribed a drug that mimics acetylcholine at the neuromuscular junction. What effect would this drug have on muscle function?",
+        "options": ["It would increase muscle contraction strength", "It would inhibit muscle contraction", "It would decrease acetylcholine release", "It would block acetylcholine receptors", "It would cause hyperpolarization of muscle fibers"],
+        "answer": "It would increase muscle contraction strength",
+        "description": "A drug that mimics acetylcholine would enhance neuromuscular transmission by stimulating acetylcholine receptors, thereby increasing muscle contraction strength."
+    },
+    {
+        "text": "What is the effect of increasing the frequency of action potentials at the neuromuscular junction?",
+        "options": ["It decreases the amount of acetylcholine released", "It results in muscle relaxation", "It leads to a stronger muscle contraction due to summation", "It causes complete muscle paralysis", "It reduces the end-plate potential"],
+        "answer": "It leads to a stronger muscle contraction due to summation",
+        "description": "Increasing the frequency of action potentials leads to temporal summation, where the muscle does not have time to fully relax between stimuli, resulting in a stronger contraction."
+    },
+    {
+    "text": "A patient presents with a condition where the muscle fibers do not respond effectively to nervous stimulation, leading to muscle weakness. Which of the following could be the underlying cause of this issue?",
+    "options": ["Impaired acetylcholine release at the neuromuscular junction", "Overproduction of acetylcholine at the neuromuscular junction", "Excessive breakdown of calcium in the sarcoplasmic reticulum", "Overstimulation of the sarcoplasmic reticulum", "Deficiency of titin in the sarcomere"],
+    "answer": "Impaired acetylcholine release at the neuromuscular junction",
+    "description": "Impaired acetylcholine release at the neuromuscular junction, such as in conditions like myasthenia gravis, can prevent effective stimulation of the muscle fibers, leading to muscle weakness."
+},
+{
+        "text": "A patient with hypocalcemia presents with muscle cramps and spasms. Which of the following hormones is most likely to be involved in regulating calcium levels?",
+        "options": ["Calcitonin", "Parathyroid hormone", "Insulin", "Growth hormone", "Thyroid hormone"],
+        "answer": "Parathyroid hormone",
+        "description": "Parathyroid hormone increases blood calcium levels by promoting calcium release from bones, enhancing calcium absorption in the intestines, and reducing calcium excretion by the kidneys."
+    },
+    {
+        "text": "A patient is diagnosed with hyperkalemia after a blood test reveals elevated potassium levels. Which of the following organs plays a primary role in the excretion of excess potassium?",
+        "options": ["Liver", "Heart", "Kidneys", "Lungs", "Small intestine"],
+        "answer": "Kidneys",
+        "description": "The kidneys are responsible for the filtration and excretion of excess potassium to maintain electrolyte balance in the body."
+    },
+    {
+        "text": "Which of the following statements best explains the role of lithium in the body?",
+        "options": ["Lithium is essential for enzyme function in the liver", "Lithium helps in maintaining electrolyte balance in the kidneys", "Lithium affects the central nervous system and is used in the treatment of bipolar disorder", "Lithium promotes calcium absorption in the bones", "Lithium is involved in thyroid hormone production"],
+        "answer": "Lithium affects the central nervous system and is used in the treatment of bipolar disorder",
+        "description": "Lithium is a mood stabilizer used primarily in the treatment of bipolar disorder, affecting neurotransmission in the brain."
+    },
+    {
+        "text": "A deficiency in which of the following minerals is most likely to cause osteomalacia, a condition characterized by weakened bones and bone pain?",
+        "options": ["Calcium", "Sodium", "Iron", "Magnesium", "Fluoride"],
+        "answer": "Calcium",
+        "description": "Calcium is crucial for bone health, and a deficiency can lead to weakened bones, as seen in osteomalacia."
+    },
+    {
+        "text": "A person with chronic kidney disease is at risk of accumulating high levels of which element, potentially leading to toxicity?",
+        "options": ["Sodium", "Calcium", "Phosphorus", "Potassium", "Zinc"],
+        "answer": "Phosphorus",
+        "description": "Chronic kidney disease can impair phosphorus excretion, leading to an accumulation in the blood, which can result in mineral imbalances and bone disorders."
+    },
+    {
+        "text": "A person living in an area with high levels of fluoride in the drinking water is at risk for which condition if fluoride levels exceed the recommended daily allowance?",
+        "options": ["Osteoporosis", "Dental fluorosis", "Hyperkalemia", "Goiter", "Hypothyroidism"],
+        "answer": "Dental fluorosis",
+        "description": "Excessive fluoride intake can cause dental fluorosis, which results in discoloration and damage to teeth."
+    },
+    {
+        "text": "Which of the following is a potential consequence of aluminum toxicity?",
+        "options": ["Neurological damage", "Bone density loss", "Kidney failure", "Iron overload", "Thyroid dysfunction"],
+        "answer": "Neurological damage",
+        "description": "Excessive aluminum exposure has been linked to neurodegenerative conditions, particularly in patients with impaired kidney function."
+    },
+    {
+        "text": "What is the primary function of selenium in the body?",
+        "options": ["Antioxidant activity", "Calcium absorption", "Thyroid hormone synthesis", "Bone mineralization", "Immune response modulation"],
+        "answer": "Antioxidant activity",
+        "description": "Selenium acts as a key component of antioxidant enzymes, helping protect cells from oxidative damage."
+    },
+    {
+        "text": "A person with excessive consumption of sodium may be at risk for which of the following health conditions?",
+        "options": ["Hypercalcemia", "Hypertension", "Hypokalemia", "Osteomalacia", "Hypothyroidism"],
+        "answer": "Hypertension",
+        "description": "Excessive sodium intake can lead to increased blood pressure, contributing to the development of hypertension."
+    },
+    {
+        "text": "Which of the following elements is most commonly associated with the metabolism of glucose and insulin sensitivity?",
+        "options": ["Molybdenum", "Chromium", "Vanadium", "Zinc", "Selenium"],
+        "answer": "Chromium",
+        "description": "Chromium plays a significant role in enhancing insulin sensitivity and regulating blood glucose levels."
+    },
+    {
+        "text": "A patient presents with lead poisoning, which of the following conditions is most likely to be seen as a result of lead toxicity?",
+        "options": ["Anemia", "Hyperthyroidism", "Osteoporosis", "Hyperkalemia", "Goiter"],
+        "answer": "Anemia",
+        "description": "Lead toxicity can interfere with hemoglobin synthesis, leading to anemia, a condition characterized by reduced red blood cell production."
+    },
+    {
+        "text": "Excessive exposure to cadmium can lead to which of the following health issues?",
+        "options": ["Bone disease", "Kidney damage", "Hyperkalemia", "Hypocalcemia", "Decreased bone density"],
+        "answer": "Kidney damage",
+        "description": "Cadmium toxicity primarily affects the kidneys, causing renal damage and dysfunction."
+    },
+    {
+        "text": "Which of the following nutrients is most important for maintaining the health of connective tissues and skin?",
+        "options": ["Vitamin C", "Fluoride", "Zinc", "Chromium", "Molybdenum"],
+        "answer": "Vitamin C",
+        "description": "Vitamin C is essential for collagen synthesis, which is critical for maintaining the integrity of connective tissues and skin."
+    },
+    {
+        "text": "A person with low calcium levels may experience which of the following symptoms?",
+        "options": ["Muscle cramps", "High blood pressure", "Excessive thirst", "Fatigue", "Diarrhea"],
+        "answer": "Muscle cramps",
+        "description": "Low calcium levels can lead to muscle cramps and spasms, as calcium is important for muscle contraction and nerve function."
+    },
+    {
+        "text": "A deficiency in which of the following elements is most likely to cause immune system dysfunction and impaired wound healing?",
+        "options": ["Zinc", "Calcium", "Sodium", "Manganese", "Chromium"],
+        "answer": "Zinc",
+        "description": "Zinc is essential for proper immune function and wound healing, and its deficiency can lead to immune system impairments and delayed wound recovery."
+    },
+    {
+        "text": "A patient presents with symptoms of muscle weakness and fatigue. Blood tests reveal low serum calcium levels. Which of the following hormones is most likely deficient in this patient?",
+        "options": ["Parathyroid hormone", "Thyroid hormone", "Insulin", "Cortisol", "Growth hormone"],
+        "answer": "Parathyroid hormone",
+        "description": "Parathyroid hormone plays a key role in regulating calcium levels in the blood. A deficiency can lead to hypocalcemia, which may cause muscle weakness and fatigue."
+    },
+    {
+        "text": "A patient with chronic lower back pain is prescribed an NSAID for pain relief. Which of the following mechanisms best explains the action of NSAIDs?",
+        "options": ["Inhibition of cyclooxygenase enzymes", "Blocking neurotransmitter release in the spinal cord", "Inhibition of potassium channels in muscle cells", "Stimulating endorphin release from the pituitary", "Activating the parasympathetic nervous system"],
+        "answer": "Inhibition of cyclooxygenase enzymes",
+        "description": "NSAIDs work by inhibiting cyclooxygenase (COX) enzymes, which are involved in the production of prostaglandins that cause pain and inflammation."
+    },
+    {
+        "text": "Which of the following neuromuscular blocking agents is most commonly used during surgery to induce muscle paralysis for intubation?",
+        "options": ["Atracurium", "Dantrolene", "Pancuronium", "Benzocaine", "Morphine"],
+        "answer": "Atracurium",
+        "description": "Atracurium is a commonly used non-depolarizing neuromuscular blocking agent that induces muscle paralysis during surgical procedures, especially for intubation."
+    },
+    {
+        "text": "A factory worker develops musculoskeletal disorders (MSDs) due to repetitive motions at the workplace. Which of the following ergonomic interventions is most effective in preventing further injury?",
+        "options": ["Increasing the speed of work processes", "Providing cushioned seating and adjustable workstations", "Limiting breaks during shifts", "Reducing the number of workers", "Changing the shift length to 12 hours"],
+        "answer": "Providing cushioned seating and adjustable workstations",
+        "description": "Ergonomic interventions such as adjustable workstations and cushioned seating can help reduce repetitive strain and prevent musculoskeletal injuries in the workplace."
+    },
+    {
+        "text": "A patient with rheumatoid arthritis is prescribed corticosteroids to manage inflammation. Which of the following is a common side effect of prolonged corticosteroid use?",
+        "options": ["Osteoporosis", "Weight loss", "Decreased blood sugar", "Increased skin elasticity", "Hyperkalemia"],
+        "answer": "Osteoporosis",
+        "description": "Prolonged use of corticosteroids can lead to side effects like osteoporosis, as they can decrease bone density by inhibiting calcium absorption and bone formation."
+    },
+    {
+        "text": "In an office setting, a worker is experiencing upper limb musculoskeletal pain. Which of the following workplace changes is most likely to help reduce their symptoms?",
+        "options": ["Allowing the worker to sit continuously for long periods", "Providing ergonomic equipment like a properly positioned monitor and keyboard", "Reducing the height of the work chair", "Encouraging long, uninterrupted work sessions", "Providing a higher level of ambient noise"],
+        "answer": "Providing ergonomic equipment like a properly positioned monitor and keyboard",
+        "description": "Ergonomic equipment that ensures proper posture and reduces strain on the musculoskeletal system is key to preventing MSDs in office settings."
+    }
+
+
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+const userAnswers = [];
+const skippedQuestions = [];
+let timerInterval;
+const timePerQuestion = 66; // 1.1 minutes in seconds
+let totalQuizTime; // Total time for the quiz
+let timeRemaining; // Time left in the quiz
+
+// Progress Bar Functions
+let progressBarContainer;
+
+function createProgressBar(numQuestions) {
+    // Create a rectangular container with fixed height and scroll functionality
+    progressBarContainer = document.createElement("div");
+    progressBarContainer.id = "progress-bar-container";
+    progressBarContainer.style.textAlign = "center";
+    progressBarContainer.style.marginBottom = "20px";
+    progressBarContainer.style.height = "60px";  // Fixed height for the container
+    progressBarContainer.style.overflowX = "auto";  // Enable horizontal scrolling
+    progressBarContainer.style.whiteSpace = "nowrap";  // Ensure the boxes stay on the same line
+    progressBarContainer.style.border = "1px solid #e0e0e0";  // Rectangular border
+    progressBarContainer.style.borderRadius = "11px";  // Optional rounded corners
+    document.querySelector('.question-container').prepend(progressBarContainer);
+
+    for (let i = 0; i < numQuestions; i++) {
+        const square = document.createElement("div");
+        square.textContent = i + 1;
+        square.style.display = "inline-block";
+        square.style.width = "30px";
+        square.style.height = "30px";
+        square.style.lineHeight = "30px";
+        square.style.textAlign = "center";
+        square.style.margin = "5px";
+        square.style.border = "1px solid black";
+        square.style.borderRadius = "5px";
+        square.style.backgroundColor = "white";
+        square.dataset.index = i;
+        progressBarContainer.appendChild(square);
+    }
+}
+
+function updateProgressBar(index, status) {
+    const square = progressBarContainer.children[index];
+    if (status === "answered") {
+        square.style.backgroundColor = "green";
+        square.style.color = "white";
+    } else if (status === "skipped") {
+        square.style.backgroundColor = "yellow";
+        square.style.color = "black";
+    }
+}
+
+function removeProgressBar() {
+    if (progressBarContainer) {
+        progressBarContainer.remove();
+    }
+}
+
+// Quiz Logic
+function validateLogin() {
+    const name = document.getElementById("user-name").value;
+    const gmail = document.getElementById("user-gmail").value;
+    const userId = document.getElementById("user-id").value;
+
+    const user = allowedUsers.find(user => user.name === name && user.gmail === gmail && user.username === userId);
+    if (user) {
+        document.querySelector('.login-container').style.display = "none";
+        document.querySelector('.question-container').style.display = "block";
+        startQuiz();
+    } else {
+        alert("Invalid login credentials. Please try again.");
+    }
+}
+
+function startQuiz() {
+    createProgressBar(questions.length);
+    totalQuizTime = timePerQuestion * questions.length;
+    timeRemaining = totalQuizTime;
+
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.question-container').style.display = "block";
+    startTimer();
+    showQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const timerElement = document.getElementById("timer");
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `Time Left: ${minutes}m ${seconds}s`;
+}
+// This function hides the timer when the last question is reached
+function handleTimerVisibility() {
+    if (currentQuestion === questions.length - 1) {
+        clearInterval(timerInterval); // Stop the timer on the last question
+        document.getElementById("timer").style.display = "none";  // Hide the timer after the last question
+    }
+}
+// Call this function when moving to the next question
+function nextQuestion() {
+    // Your existing logic for the next question
+
+    // Check timer visibility when changing questions
+    handleTimerVisibility();
+}
+
+// End quiz and hide timer
+function endQuiz() {
+    // Your existing endQuiz logic goes here
+    clearInterval(timerInterval); // Ensure timer is stopped when quiz ends
+    document.getElementById("timer").style.display = "none";  // Hide timer after quiz ends
+}
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        const userAnswer = selectedOption.value;
+        userAnswers[currentQuestion] = userAnswer;
+        if (userAnswer === questions[currentQuestion].answer) {
+            score++;
+        }
+        updateProgressBar(currentQuestion, "answered");
+        questions[currentQuestion].answered = true;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            handleSkippedQuestions();
+        }
+    } else {
+        alert("Please select an answer or skip the question.");
+    }
+}
+
+function skipQuestion() {
+    if (!skippedQuestions.includes(currentQuestion)) {
+        skippedQuestions.push(currentQuestion);
+    }
+    updateProgressBar(currentQuestion, "skipped");
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        handleSkippedQuestions();
+    }
+}
+
+function showQuestion() {
+    if (currentQuestion >= questions.length) {
+        removeProgressBar();
+        endQuiz();
+        return;
+    }
+
+    const question = questions[currentQuestion];
+    if (question.answered) {
+        handleSkippedQuestions();
+        return;
+    }
+
+    document.querySelector('.question-container').style.display = "block";
+    document.getElementById("question").textContent = question.text;
+
+    let optionsHTML = '';
+    question.options.forEach(option => {
+        optionsHTML += `<label><input type="radio" name="answer" value="${option}"> ${option}</label><br>`;
+    });
+
+    document.getElementById("options").innerHTML = optionsHTML;
+    updateButtons();
+}
+
+function handleSkippedQuestions() {
+    if (skippedQuestions.length > 0) {
+        currentQuestion = skippedQuestions.shift();
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function updateButtons() {
+    const nextButton = document.getElementById("next-button");
+    if (skippedQuestions.length > 0) {
+        nextButton.textContent = currentQuestion === questions.length - 1 && skippedQuestions.length === 1 ? "Finish" : "Next";
+    } else {
+        nextButton.textContent = currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    }
+}
+function endQuiz() {
+    document.querySelector('.question-container').style.display = "none";
+    document.querySelector('.result-container').style.display = "block";
+    document.getElementById("score").textContent = score;
+
+    const answerKey = document.getElementById("answer-key");
+    answerKey.innerHTML = '';
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const resultItem = document.createElement("li");
+        resultItem.innerHTML = `
+            <div class="question">${question.text}</div>
+            <div class="options">
+                ${question.options.map(option => {
+                    let optionText = option;
+                    if (userAnswer === option) {
+                        // If the answer is incorrect, color "Your answer" red
+                        if (userAnswer !== question.answer) {
+                            optionText += " <span style='color: red;'>(Your answer)</span>";
+                        } else {
+                            optionText += " <span style='color: green;'>(Correct)</span>";
+                        }
+                    }
+                    if (option === question.answer && userAnswer !== option) {
+                        // For correct option (when the user didn't choose it), mark it as green
+                        optionText += " <span style='color: green;'>(Correct)</span>";
+                    }
+                    return `<div>${optionText}</div>`;
+                }).join('')}
+            </div>
+            <hr style="border: 1px solid #ccc; margin: 10px 0;">  <!-- Horizontal Line -->
+            <div class="description"><strong>Explanation:</strong> ${question.description}</div>
+        `;
+        answerKey.appendChild(resultItem);
+    });
+}
+
+function showLogin() {
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.login-container').style.display = "block";
+}
+
+
+</script>
+</body>
+</html>

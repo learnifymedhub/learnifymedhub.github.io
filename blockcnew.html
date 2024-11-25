@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Quiz</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #progress-bar-container {
+            background-color: #f9f8f8;
+    border: 1px solid #c3c3c5;
+    }
+        .container {
+            text-align: center;
+            max-width: 80%;
+            background: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 58%;
+        }
+    
+        button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px;
+        }
+    
+        button:hover {
+            background: #2575fc;
+        }
+    
+        .question-container, .result-container, .login-container {
+            display: none;
+        }
+    
+        .question-container {
+            text-align: left;
+            padding: 20px;
+            margin: 20px auto;
+            background-color: white;
+            border: 1px solid white;
+            border-radius: 8px;
+            min-height: 300px;
+           
+        }
+    
+        .options label {
+            display: block;
+            margin: -10px 0;
+        }
+    
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+    
+        .result-container ul {
+            text-align: left;
+            margin: 20px auto;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-container ul li {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .result-container ul li .question {
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .result-container ul li .options {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+    
+        .result-container ul li .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        /* Enhanced Timer Styles */
+        #timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #fff;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #ff6a00, #ee0979); /* Gradient background */
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+    
+        #timer:hover {
+            transform: scale(1.1); /* Slight scaling effect on hover */
+            background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Change gradient on hover */
+        }
+    
+        #timer span {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+    
+        /* Timer animation */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    
+        #timer {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+    
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+    
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            margin: 20px auto;
+        }
+    
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    
+        .form-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+    
+        .form-container input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .form-container button {
+            background: #6a11cb;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 37%;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        .form-container button:hover {
+            background: #2575fc;
+        }
+    
+        .login-container input {
+            width: 51%;
+            padding: 13px;
+            margin: 16px;
+        }
+    
+        .login-container button {
+            width: 16%;
+            margin-top: 10px;
+        }
+    
+        p {
+            float: left;
+            padding: 2px 48px;
+            text-align: left;
+            line-height: 20px;
+        }
+    
+        #question {
+            font-size: 20px;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+            #timer {
+                font-size: 18px;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 15px;
+            }
+            .form-container {
+                width: 90%;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+            #timer {
+                font-size: 16px;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            body {
+                flex-direction: column;
+                padding: 10px;
+            }
+            .para1{
+                padding: 0px 20px;
+            }
+            .login-credentials{
+                font-size: 1.5em ;
+                line-height: 33px;
+            }
+            .login-container button {
+                width: 25%;
+                padding: 10px 25px;
+                margin-top: 10px;
+                text-align: center;
+            }
+    
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            .login-container input {
+                width: 71%;
+                padding: 13px;
+                margin: 16px;
+            }
+    
+            .form-container {
+                width: 73%;
+            }
+            button {
+                font-size: 12px;
+                padding: 10px 25px;
+            }
+            #timer {
+                font-size: 9px;
+            }
+            .form-container h2 {
+                font-size: 18px;
+            }
+            .form-container input {
+                width: 84%;
+            }
+            #question {
+                font-size: 16px;
+            }
+            .options label {
+                font-size: 14px;
+            }
+        }
+
+       
+         
+    </style>
+    
+    
+</head>
+<body>
+ 
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-container">
+            <h1 class=" login-credentials">Enter Your Login Credentials </h1>
+            <input type="text" id="user-name" placeholder="Enter your Name" class="login-input"> <br>
+            <input type="email" id="user-gmail" placeholder="Enter your Gmail" class="login-input"> <br>
+            <input type="text" id="user-id" placeholder="Enter your ID" class="login-input"> <br>
+            <input type="password" id="password" placeholder="Enter your password" class="login-input"> <br>
+            <button onclick="validateLogin()">Start Quiz</button>
+        </div>
+
+        <!-- Question Container -->
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div id="options" class="options"></div>
+            <div class="navigation-buttons">
+                <button id="previous-button" onclick="previousQuestion()" style="display:none;">Previous</button>
+                <button id="next-button" onclick="nextQuestion()">Next</button>
+                <button id="skip-button" onclick="skipQuestion()">Skip</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div class="result-container">
+            <h1>Quiz Result</h1>
+            <h2>Your Score: <span id="score"></span></h2>
+            <ul id="answer-key"></ul>
+
+            <div class="form-container">
+                <h2>Submit Your Details</h2>
+                <form onsubmit="sendmail(event)">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Start Container -->
+        <div class="start-container">
+            <h1>Welcome to the Block C Pre-Proff Practice Test</h1>
+            <h3>Important Instructions for Online Quiz</h3>
+            <p class="para1">
+
+                Please note that this online quiz is time-restricted and consists of 120 multiple-choice questions. It is essential to attempt the quiz within the allotted time frame. <br>  <br>
+                
+                <strong>Security Notice:</strong> This quiz contains highly sensitive material, and any attempts to capture screenshots or screen recordings will result in immediate blocking of access. <br> <br>
+                
+               <strong> Availability:</strong> This quiz will be available to you until your final exam. <br> <br>
+                
+                To access the quiz, please provide the following information: <br> <br>
+                <strong>
+                - Username<br>
+                - Gmail address<br>
+                - User ID<br>
+                - password</strong> <br>  <br>
+                Please note that selected MCQ options cannot be changed, so choose carefully. After attempting all main questions, click 'Finish' to review skipped questions. Skipped MCQs will appear immediately, and clicking 'Next' after the last skipped question will display your results. Review each question thoughtfully, as submissions are final. <br>  <br> <strong> <em>Please enter your username in the designated input area at the bottom of the results section to confirm your submission.</em> </strong> <br> <br>
+                
+               We appreciate your cooperation and adherence to these guidelines. <br>  <br> </p>
+            <button onclick="showLogin()">Start</button>
+        </div>
+
+        <div id="timer"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdP3lE-1OjWkzp7za");
+        })();
+
+        function sendmail(event) {
+            event.preventDefault();
+
+            const params = {
+                username: document.getElementById("username").value,
+                score: document.getElementById("score").textContent,
+            };
+
+            emailjs.send("lmhservice3541", "lmhtemplate3541", params)
+                .then(
+                    (res) => {
+                        alert("Email sent successfully! Status: " + res.status);
+                    },
+                    (err) => {
+                        console.error("Failed to send email:", err);
+                        alert("Failed to send email. Please try again.");
+                    }
+                );
+        }
+
+        const allowedUsers = [
+            { name: "John Doe", gmail: "john.doe@example.com", username: "user123" , password: "user123"},
+            { name: "Jane Smith", gmail: "jane.smith@example.com", username: "test456",password: "user123" },
+            { name: "Admin User", gmail: "admin.user@example.com", username: "admin789", password: "user123"}
+        ];
+        const questions = [
+    
+        {
+        "text": "A patient presents with chest pain and difficulty breathing. An X-ray reveals fluid buildup around the heart. Which of the following conditions is most likely?",
+        "options": ["Cardiac tamponade", "Pericarditis", "Aortic dissection", "Myocardial infarction", "Pulmonary embolism"],
+        "answer": "Cardiac tamponade",
+        "description": "Cardiac tamponade is characterized by the accumulation of fluid in the pericardium, leading to pressure on the heart, which can cause difficulty in filling the heart and compromise cardiac function."
+    },
+    {
+        "text": "Which of the following is the primary blood supply to the left ventricle of the heart?",
+        "options": ["Left coronary artery", "Right coronary artery", "Superior vena cava", "Pulmonary arteries", "Aorta"],
+        "answer": "Left coronary artery",
+        "description": "The left coronary artery supplies blood to the left ventricle, left atrium, and parts of the interventricular septum, making it crucial for maintaining heart function."
+    },
+    {
+        "text": "During a clinical exam, a patient's heart sounds are irregular, and they report discomfort in the chest. Which part of the heart is most likely affected in this case?",
+        "options": ["Left ventricle", "Right atrium", "Superior vena cava", "Aortic valve", "Coronary arteries"],
+        "answer": "Left ventricle",
+        "description": "The left ventricle is responsible for pumping oxygenated blood to the body. Irregular heart sounds and chest discomfort may indicate a problem with the left ventricle, such as heart failure or valve dysfunction."
+    },
+    {
+        "text": "Which of the following structures is most likely to cause obstruction in a patient presenting with chest pain and shortness of breath due to fluid accumulation around the heart?",
+        "options": ["Pericardium", "Aortic valve", "Pulmonary arteries", "Right atrium", "Coronary veins"],
+        "answer": "Pericardium",
+        "description": "The pericardium is the sac surrounding the heart. Conditions like pericardial effusion or cardiac tamponade, which involve fluid accumulation within the pericardial space, can compress the heart and cause obstruction."
+    },
+    {
+        "text": "An angiogram shows blockage in the left anterior descending artery (LAD). Which part of the heart is primarily affected by this condition?",
+        "options": ["Left ventricle", "Right ventricle", "Left atrium", "Right atrium", "Aortic valve"],
+        "answer": "Left ventricle",
+        "description": "The left anterior descending artery (LAD) supplies blood to the left ventricle, which is responsible for pumping oxygenated blood to the body. Blockage in this artery can lead to ischemia and infarction of the left ventricle."
+    },
+    {
+        "text": "A patient with chronic pericarditis presents with swelling in the lower extremities and difficulty breathing. What is the most likely cause of these symptoms?",
+        "options": ["Cardiac tamponade", "Myocardial infarction", "Aortic dissection", "Pericardial effusion", "Hypertension"],
+        "answer": "Cardiac tamponade",
+        "description": "Cardiac tamponade results from the accumulation of fluid in the pericardial sac, which compresses the heart and impairs its ability to pump efficiently, leading to symptoms such as edema and shortness of breath."
+    },
+    {
+        "text": "Which of the following arteries supplies the posterior portion of the interventricular septum and parts of the left and right ventricles?",
+        "options": ["Right coronary artery", "Left coronary artery", "Pulmonary artery", "Aortic arch", "Superior vena cava"],
+        "answer": "Right coronary artery",
+        "description": "The right coronary artery supplies blood to the right atrium, right ventricle, and part of the interventricular septum. It also gives rise to the posterior descending artery (PDA), which supplies the posterior portion of the interventricular septum."
+    },
+    {
+        "text": "Which of the following conditions is most commonly associated with an inflammation of the pericardium?",
+        "options": ["Pericarditis", "Aortic aneurysm", "Pulmonary embolism", "Atrial fibrillation", "Heart failure"],
+        "answer": "Pericarditis",
+        "description": "Pericarditis is the inflammation of the pericardium, the sac surrounding the heart. It is commonly associated with chest pain and can lead to complications like pericardial effusion and cardiac tamponade."
+    },
+    {
+        "text": "A patient undergoes a CT scan showing enlargement of the right atrium and superior vena cava. Which surface marking is most likely involved?",
+        "options": ["Superior vena cava", "Left ventricle", "Aortic arch", "Left atrium", "Right ventricle"],
+        "answer": "Superior vena cava",
+        "description": "The superior vena cava returns deoxygenated blood from the upper body to the heart. Enlargement of the right atrium and superior vena cava may indicate conditions like superior vena cava syndrome."
+    },
+    {
+        "text": "A patient presents with irregular heartbeats and chest pain. A histological examination of the heart tissue reveals distinct dark bands at the junctions between muscle cells. What is the likely structure identified in this case?",
+        "options": ["Intercalated discs", "Z lines", "M lines", "T tubules", "Sarcomere"],
+        "answer": "Intercalated discs",
+        "description": "Intercalated discs are specialized junctions between cardiac muscle cells, consisting of desmosomes and gap junctions, which allow for synchronized contraction of the heart muscle."
+    },
+    {
+        "text": "Which of the following structural features differentiates cardiac muscle from skeletal muscle under microscopic examination?",
+        "options": ["Presence of intercalated discs", "Presence of multiple nuclei per fiber", "Striated appearance", "Presence of T-tubules", "Presence of a central nucleus"],
+        "answer": "Presence of intercalated discs",
+        "description": "Intercalated discs are unique to cardiac muscle, facilitating the electrical and mechanical coupling of adjacent cells to ensure coordinated heart contraction."
+    },
+    {
+        "text": "A patient with a heart disease presents with a histological sample showing elongated fibers with a single central nucleus and striations. Which muscle type does this sample most likely represent?",
+        "options": ["Cardiac muscle", "Skeletal muscle", "Smooth muscle", "Both skeletal and smooth muscle", "Both cardiac and skeletal muscle"],
+        "answer": "Cardiac muscle",
+        "description": "Cardiac muscle fibers are striated and have a single central nucleus. They are also connected by intercalated discs, distinguishing them from skeletal muscle fibers, which have multiple nuclei."
+    },
+    {
+        "text": "Which component of the intercalated disc is responsible for facilitating communication between adjacent cardiac muscle cells, allowing for coordinated contraction?",
+        "options": ["Gap junctions", "Desmosomes", "Tight junctions", "Fascia adherens", "Sarcomeres"],
+        "answer": "Gap junctions",
+        "description": "Gap junctions in the intercalated disc allow for the rapid transmission of electrical impulses between adjacent cardiac muscle cells, ensuring synchronized heart contractions."
+    },
+    {
+        "text": "A newborn baby presents with difficulty breathing and cyanosis. Upon examination, it is found that there is a failure of proper closure of the foramen ovale. Which congenital heart anomaly is most likely responsible for this condition?",
+        "options": ["Atrial Septal Defect (ASD)", "Ventricular Septal Defect (VSD)", "Patent Ductus Arteriosus (PDA)", "Tetralogy of Fallot", "Transposition of the Great Vessels"],
+        "answer": "Atrial Septal Defect (ASD)",
+        "description": "An ASD is a congenital heart defect where there is a hole between the left and right atria. The failure of the foramen ovale to close results in blood shunting between the two atria, leading to symptoms like cyanosis and difficulty breathing."
+    },
+    {
+        "text": "A 2-day-old infant is diagnosed with a persistent ductus arteriosus (PDA), which has not closed after birth. What physiological change is expected if the PDA remains open?",
+        "options": ["Increased pulmonary circulation", "Increased systemic vascular resistance", "Decreased pulmonary blood flow", "Increased oxygenation of the body", "Decreased blood flow to the lungs"],
+        "answer": "Increased pulmonary circulation",
+        "description": "A PDA allows blood to flow from the aorta to the pulmonary artery, leading to increased pulmonary circulation. This condition can cause pulmonary hypertension and heart failure if left untreated."
+    },
+    {
+        "text": "A neonate is found to have a combination of four congenital heart defects: right ventricular hypertrophy, pulmonary stenosis, overriding aorta, and ventricular septal defect (VSD). What is the most likely diagnosis?",
+        "options": ["Tetralogy of Fallot", "Ventricular Septal Defect (VSD)", "Atrial Septal Defect (ASD)", "Transposition of the Great Vessels", "Patent Ductus Arteriosus (PDA)"],
+        "answer": "Tetralogy of Fallot",
+        "description": "Tetralogy of Fallot is characterized by a combination of four defects: right ventricular hypertrophy, pulmonary stenosis, overriding aorta, and VSD. These defects lead to cyanosis and difficulty in oxygenating the blood."
+    },
+    {
+        "text": "A pregnant woman is informed that her unborn child has a condition where the great arteries are transposed, meaning the aorta originates from the right ventricle and the pulmonary artery originates from the left ventricle. What is the likely diagnosis?",
+        "options": ["Transposition of the Great Vessels", "Tetralogy of Fallot", "Ventricular Septal Defect (VSD)", "Patent Ductus Arteriosus (PDA)", "Atrial Septal Defect (ASD)"],
+        "answer": "Transposition of the Great Vessels",
+        "description": "Transposition of the Great Vessels is a congenital heart defect where the aorta and pulmonary artery are switched, leading to oxygen-poor blood circulating in the body and oxygen-rich blood circulating in the lungs, which requires immediate intervention after birth."
+    },
+    {
+        "text": "A newborn is diagnosed with a hemangioma, which is a benign growth of blood vessels. This condition is most likely related to which of the following vascular anomalies?",
+        "options": ["Hemangiomas", "Telangiectasia", "Atrial Septal Defect (ASD)", "Ventricular Septal Defect (VSD)", "Patent Ductus Arteriosus (PDA)"],
+        "answer": "Hemangiomas",
+        "description": "Hemangiomas are benign tumors composed of blood vessels, often appearing as a red or purple mark on the skin. They are common in infants and are usually not life-threatening."
+    },
+    {
+        "text": "During the cardiac cycle, which of the following events corresponds with the closure of the mitral and tricuspid valves?",
+        "options": ["Systole", "Diastole", "Isovolumetric contraction", "Isovolumetric relaxation", "Ventricular ejection"],
+        "answer": "Systole",
+        "description": "The closure of the mitral and tricuspid valves marks the beginning of ventricular systole, preventing backflow of blood into the atria."
+    },
+    {
+        "text": "A patient presents with a heart murmur indicating aortic valve stenosis. What is the expected hemodynamic effect of this condition?",
+        "options": ["Increased preload and decreased afterload", "Decreased preload and increased afterload", "Increased preload and increased afterload", "Decreased preload and decreased afterload", "No effect on preload or afterload"],
+        "answer": "Increased preload and increased afterload",
+        "description": "Aortic stenosis increases resistance to ventricular ejection, raising afterload, and often leads to increased preload due to incomplete ejection of blood."
+    },
+    {
+        "text": "In a patient with heart failure, an increased venous return could improve cardiac output. Which mechanism is responsible for this improvement?",
+        "options": ["Frank-Starling mechanism", "Sympathetic stimulation", "Increased preload", "Decreased afterload", "All of the above"],
+        "answer": "Frank-Starling mechanism",
+        "description": "The Frank-Starling mechanism explains how an increased venous return leads to a greater stretch of the heart muscle, resulting in a more forceful contraction and improved cardiac output."
+    },
+    {
+        "text": "During exercise, which of the following organs receives the most significant increase in blood flow?",
+        "options": ["Brain", "Heart", "Liver", "Kidneys", "Skin"],
+        "answer": "Heart",
+        "description": "During exercise, the heart receives increased blood flow to meet the higher oxygen demands due to the increased cardiac output."
+    },
+    {
+        "text": "A 45-year-old patient presents with hypotension, tachycardia, and weak pulse. Based on these signs, which of the following types of shock is most likely?",
+        "options": ["Cardiogenic shock", "Hemorrhagic shock", "Neurogenic shock", "Septic shock", "Anaphylactic shock"],
+        "answer": "Hemorrhagic shock",
+        "description": "Hemorrhagic shock is characterized by loss of blood volume, leading to hypotension, tachycardia, and weak pulse as the body attempts to compensate for the decreased circulating blood volume."
+    },
+    {
+        "text": "Which of the following is a key characteristic of cardiac muscle compared to skeletal muscle?",
+        "options": ["Multinucleated", "Striated", "Voluntary control", "Intercalated discs", "No calcium regulation"],
+        "answer": "Intercalated discs",
+        "description": "Cardiac muscle is unique for its intercalated discs, which allow coordinated contraction and communication between cardiac muscle cells."
+    },
+    {
+        "text": "The Frank-Starling mechanism helps to increase cardiac output when which factor is altered?",
+        "options": ["Venous return", "Afterload", "Heart rate", "Cardiac contractility", "All of the above"],
+        "answer": "Venous return",
+        "description": "The Frank-Starling mechanism indicates that an increase in venous return (preload) leads to an increased stroke volume and, hence, cardiac output."
+    },
+    {
+        "text": "A patient with severe dehydration presents with a decreased cardiac output. Which factor most likely contributes to this reduced output?",
+        "options": ["Decreased venous return", "Increased preload", "Decreased afterload", "Increased contractility", "Increased heart rate"],
+        "answer": "Decreased venous return",
+        "description": "Dehydration leads to a reduction in blood volume, which decreases venous return to the heart, thereby reducing cardiac output."
+    },
+    {
+        "text": "A person who is undergoing intense physical exercise will likely experience increased blood flow to the muscles. Which local factor primarily drives this increased flow?",
+        "options": ["Vasodilation", "Vasoconstriction", "Autoregulation", "Sympathetic stimulation", "Increased calcium concentration"],
+        "answer": "Vasodilation",
+        "description": "During exercise, vasodilation occurs in the working muscles due to the local metabolic demands, increasing blood flow to those areas."
+    },
+    {
+        "text": "A patient is diagnosed with atrial septal defect (ASD). Which part of the cardiac cycle is most affected by this condition?",
+        "options": ["Atrial contraction", "Ventricular ejection", "Isovolumetric contraction", "Isovolumetric relaxation", "Ventricular filling"],
+        "answer": "Atrial contraction",
+        "description": "An ASD causes abnormal communication between the atria, which can affect normal atrial contraction and blood flow from the right atrium to the left."
+    },
+    {
+        "text": "In the case of aortic valve regurgitation, which phase of the cardiac cycle is most affected by the backflow of blood?",
+        "options": ["Systole", "Diastole", "Isovolumetric contraction", "Ventricular ejection", "Ventricular filling"],
+        "answer": "Diastole",
+        "description": "In aortic regurgitation, blood flows back into the left ventricle during diastole, leading to volume overload and increased left ventricular end-diastolic volume."
+    },
+    {
+        "text": "What is the effect of sympathetic stimulation on the heart during exercise?",
+        "options": ["Decreased heart rate", "Decreased contractility", "Increased heart rate", "Decreased blood pressure", "Increased venous return"],
+        "answer": "Increased heart rate",
+        "description": "Sympathetic stimulation increases heart rate and contractility, which helps meet the higher oxygen demands during exercise."
+    },
+    {
+        "text": "What is the role of the atria during the cardiac cycle?",
+        "options": ["To initiate electrical impulses", "To pump blood to the lungs", "To pump blood to the ventricles", "To regulate blood pressure", "To contract during isovolumetric contraction"],
+        "answer": "To pump blood to the ventricles",
+        "description": "During the cardiac cycle, the atria contract to push blood into the ventricles before the ventricles contract."
+    },
+    {
+        "text": "Which of the following is true regarding the relationship between blood pressure, blood flow, and resistance?",
+        "options": ["As blood pressure increases, blood flow decreases", "As resistance increases, blood flow increases", "As resistance increases, blood flow decreases", "As blood flow decreases, pressure increases", "All of the above"],
+        "answer": "As resistance increases, blood flow decreases",
+        "description": "According to Poiseuille's law, when resistance increases, the blood flow through the vessels decreases, assuming pressure remains constant."
+    },
+    {
+        "text": "Which of the following factors increases myocardial oxygen demand?",
+        "options": ["Increased heart rate", "Decreased preload", "Decreased afterload", "Increased parasympathetic activity", "Decreased contractility"],
+        "answer": "Increased heart rate",
+        "description": "An increase in heart rate leads to an increased demand for oxygen by the heart muscle due to higher contractility and metabolic demands."
+    },
+    {
+        "text": "During circulatory shock, which of the following conditions is likely to result in decreased cardiac output?",
+        "options": ["Hemorrhagic shock", "Septic shock", "Cardiogenic shock", "Neurogenic shock", "All of the above"],
+        "answer": "All of the above",
+        "description": "Each form of circulatory shock, whether hemorrhagic, septic, cardiogenic, or neurogenic, can result in decreased cardiac output due to different mechanisms, such as reduced blood volume, vasodilation, or heart dysfunction."
+    },
+    {
+        "text": "A patient with severe blood loss is showing signs of shock. Which physiological compensatory mechanism is likely to help restore blood pressure?",
+        "options": ["Increased heart rate", "Vasodilation", "Decreased blood volume", "Increased venous return", "Increased urine output"],
+        "answer": "Increased heart rate",
+        "description": "In response to blood loss, the body compensates by increasing heart rate (tachycardia) to maintain cardiac output and help restore blood pressure."
+    },
+    {
+        "text": "A 25-year-old patient presents with high blood pressure and high cholesterol levels. Which of the following conditions is most likely to be associated with the increased blood pressure?",
+        "options": ["Atherosclerosis", "Arterial vasodilation", "Decreased peripheral resistance", "Hemorrhagic shock", "Low heart rate"],
+        "answer": "Atherosclerosis",
+        "description": "Atherosclerosis, the buildup of plaque in the arteries, leads to increased peripheral resistance and subsequently elevated blood pressure."
+    },
+    {
+        "text": "The relationship between pressure, flow, and resistance in blood vessels can be best explained by which principle?",
+        "options": ["Ohm's law", "Poiseuille's law", "Starling's law", "Frank-Starling mechanism", "Boyle's law"],
+        "answer": "Poiseuille's law",
+        "description": "Poiseuille's law describes the relationship between pressure, flow, and resistance, stating that flow is directly proportional to the pressure gradient and inversely proportional to resistance."
+    },
+    {
+        "text": "Which of the following is a primary effect of an increase in preload on the heart's performance?",
+        "options": ["Decreased stroke volume", "Decreased heart rate", "Increased stroke volume", "Decreased end-diastolic volume", "Increased afterload"],
+        "answer": "Increased stroke volume",
+        "description": "An increase in preload, due to increased venous return, leads to a greater stretch of the ventricles and a more forceful contraction, thereby increasing stroke volume."
+    },
+    {
+        "text": "In septic shock, which of the following is a primary cause of hypotension?",
+        "options": ["Decreased cardiac output", "Increased vascular resistance", "Decreased venous return", "Increased vascular permeability", "Increased preload"],
+        "answer": "Decreased cardiac output",
+        "description": "Septic shock is characterized by widespread vasodilation and decreased cardiac output, both of which contribute to hypotension."
+    },
+    {
+        "text": "A 30-year-old marathon runner experiences a sudden drop in blood pressure post-race. Which of the following is most likely responsible?",
+        "options": ["Neurogenic shock", "Postural hypotension", "Anaphylactic shock", "Cardiogenic shock", "Hemorrhagic shock"],
+        "answer": "Postural hypotension",
+        "description": "Postural hypotension is common in athletes after intense exercise due to changes in blood flow and venous return upon stopping activity."
+    },
+    {
+        "text": "Which of the following substances is most likely to cause vasodilation and increase blood flow to a region in need of oxygen?",
+        "options": ["Endothelin", "Norepinephrine", "Acetylcholine", "Angiotensin II", "Prostaglandins"],
+        "answer": "Acetylcholine",
+        "description": "Acetylcholine promotes vasodilation, particularly in endothelial cells, and is important in regulating local blood flow in response to metabolic demands."
+    },
+    {
+        "text": "Which of the following is most likely to occur during systole in the cardiac cycle?",
+        "options": ["Ventricular filling", "Atrial contraction", "Ventricular contraction", "Mitral valve closure", "Aortic valve opening"],
+        "answer": "Ventricular contraction",
+        "description": "Systole is the phase of the cardiac cycle where the ventricles contract to pump blood into the aorta and pulmonary artery, increasing ventricular pressure."
+    },
+    {
+        "text": "A 65-year-old patient with long-standing hypertension presents with left ventricular hypertrophy (LVH). Which of the following changes in cardiac function is most likely?",
+        "options": ["Increased ventricular compliance", "Decreased afterload", "Increased stroke volume", "Decreased preload", "Increased afterload"],
+        "answer": "Increased afterload",
+        "description": "Chronic hypertension increases the resistance the left ventricle must work against, leading to increased afterload and subsequent ventricular hypertrophy."
+    },
+    {
+        "text": "During exercise, which of the following occurs to ensure adequate oxygen delivery to active muscles?",
+        "options": ["Vasoconstriction of skeletal muscle arterioles", "Vasodilation of coronary vessels", "Decreased blood flow to kidneys", "Increased blood flow to the digestive system", "Increased venous return to the heart"],
+        "answer": "Increased venous return to the heart",
+        "description": "During exercise, increased venous return to the heart helps to augment cardiac output, which is essential for delivering oxygen to the active muscles."
+    },
+    {
+        "text": "Which of the following is the primary physiological effect of cardiac tamponade?",
+        "options": ["Decreased preload", "Increased myocardial contractility", "Decreased end-diastolic volume", "Increased stroke volume", "Decreased heart rate"],
+        "answer": "Decreased preload",
+        "description": "Cardiac tamponade, where fluid accumulates in the pericardial sac, restricts the heart's ability to expand fully, leading to decreased preload and reduced stroke volume."
+    },
+    {
+        "text": "In the Frank-Starling mechanism, which of the following occurs as a result of an increase in venous return?",
+        "options": ["Decreased myocardial contractility", "Increased end-diastolic volume", "Decreased stroke volume", "Decreased heart rate", "Increased afterload"],
+        "answer": "Increased end-diastolic volume",
+        "description": "The Frank-Starling mechanism states that increased venous return leads to a greater end-diastolic volume, which increases stroke volume and cardiac output."
+    },
+    {
+        "text": "Which of the following factors primarily regulates the flow of blood in capillaries?",
+        "options": ["Venous pressure", "Arterial pressure", "Capillary hydrostatic pressure", "Systolic blood pressure", "Cardiac output"],
+        "answer": "Capillary hydrostatic pressure",
+        "description": "Capillary hydrostatic pressure is the primary force that drives fluid out of the capillaries into the surrounding tissues, affecting the exchange of nutrients and waste."
+    },
+    {
+        "text": "A patient with severe septic shock is found to have low systemic vascular resistance and low blood pressure despite adequate cardiac output. Which of the following mechanisms is most likely responsible for this condition?",
+        "options": ["Systemic vasodilation", "Increased venous return", "Increased afterload", "Increased sympathetic tone", "Decreased preload"],
+        "answer": "Systemic vasodilation",
+        "description": "Septic shock is characterized by systemic vasodilation, which reduces systemic vascular resistance and contributes to hypotension, even with adequate cardiac output."
+    },
+    {
+        "text": "Which of the following factors contributes most significantly to the formation of tissue edema?",
+        "options": ["Increased plasma oncotic pressure", "Increased capillary permeability", "Decreased blood volume", "Decreased venous return", "Increased lymphatic drainage"],
+        "answer": "Increased capillary permeability",
+        "description": "Increased capillary permeability allows proteins and fluids to leak into the surrounding tissues, leading to the formation of tissue edema."
+    },
+    {
+        "text": "A person with aortic stenosis is most likely to experience which of the following symptoms due to increased left ventricular afterload?",
+        "options": ["Dyspnea on exertion", "Syncope", "Chest pain", "Palpitations", "Fatigue"],
+        "answer": "Dyspnea on exertion",
+        "description": "Aortic stenosis increases afterload, causing the left ventricle to work harder. This can lead to reduced cardiac output and dyspnea, especially during physical exertion."
+    },
+    {
+        "text": "A decrease in which of the following factors is most likely to lead to a reduction in cardiac output?",
+        "options": ["Increased stroke volume", "Increased heart rate", "Decreased preload", "Increased contractility", "Increased afterload"],
+        "answer": "Decreased preload",
+        "description": "A reduction in preload, often due to low venous return, leads to a decreased end-diastolic volume and reduced stroke volume, ultimately lowering cardiac output."
+    },
+    {
+        "text": "In a patient with ventricular septal defect (VSD), which of the following is most likely to occur?",
+        "options": ["Left-to-right shunt", "Right-to-left shunt", "Increased systemic resistance", "Decreased pulmonary blood flow", "Decreased preload"],
+        "answer": "Left-to-right shunt",
+        "description": "Ventricular septal defect results in a left-to-right shunt, where oxygenated blood from the left ventricle flows into the right ventricle, increasing pulmonary blood flow and causing volume overload in the right heart."
+    },
+    {
+        "text": "Which of the following classes of drugs primarily lowers blood pressure by inhibiting the renin-angiotensin-aldosterone system (RAAS)?",
+        "options": ["Beta-blockers", "Angiotensin-converting enzyme (ACE) inhibitors", "Calcium channel blockers", "Diuretics", "Alpha-blockers"],
+        "answer": "Angiotensin-converting enzyme (ACE) inhibitors",
+        "description": "ACE inhibitors block the conversion of angiotensin I to angiotensin II, leading to vasodilation and reduced blood pressure by inhibiting the renin-angiotensin-aldosterone system (RAAS)."
+    },
+    {
+        "text": "A 55-year-old patient is prescribed a medication that works by reducing blood volume through increased renal excretion of sodium and water. Which class of antihypertensive drugs is the patient most likely using?",
+        "options": ["Angiotensin II receptor blockers (ARBs)", "Diuretics", "Beta-blockers", "Calcium channel blockers", "Alpha-1 blockers"],
+        "answer": "Diuretics",
+        "description": "Diuretics increase renal excretion of sodium and water, reducing blood volume and lowering blood pressure."
+    },
+    {
+        "text": "Which of the following preventive strategies is most effective in reducing the incidence of hypertension in the general population?",
+        "options": ["Low-fat diet", "Increased salt intake", "Physical inactivity", "Regular exercise and weight control", "Frequent alcohol consumption"],
+        "answer": "Regular exercise and weight control",
+        "description": "Regular physical activity and maintaining a healthy weight are key preventive strategies for hypertension as they help to lower blood pressure and reduce the risk of developing hypertension."
+    },
+    {
+        "text": "A 60-year-old patient presents with stage 2 hypertension and a history of smoking and high salt intake. Which of the following lifestyle modifications is most likely to have the greatest impact on their blood pressure?",
+        "options": ["Decreased alcohol intake", "Increased dietary potassium", "Weight loss and increased physical activity", "Increased caffeine consumption", "Reduced fat intake"],
+        "answer": "Weight loss and increased physical activity",
+        "description": "Weight loss combined with regular physical activity is one of the most effective lifestyle changes for managing hypertension, especially in patients with additional risk factors such as smoking and high salt intake."
+    },
+    {
+        "text": "Which of the following structures is the primary site of gas exchange in the lungs?",
+        "options": ["Trachea", "Bronchi", "Bronchioles", "Alveoli", "Pleura"],
+        "answer": "Alveoli",
+        "description": "The alveoli are the primary sites of gas exchange in the lungs, where oxygen is transferred to the blood and carbon dioxide is removed."
+    },
+    {
+        "text": "Which of the following statements correctly compares the right and left lungs?",
+        "options": ["The right lung has two lobes and the left lung has three.", "The left lung has a cardiac notch, which the right lung lacks.", "The right lung is smaller and more vertical than the left lung.", "The left lung has a horizontal fissure, while the right lung has an oblique fissure.", "Both lungs have the same number of lobes."],
+        "answer": "The left lung has a cardiac notch, which the right lung lacks.",
+        "description": "The left lung has a cardiac notch to accommodate the heart, which is not present in the right lung."
+    },
+    {
+        "text": "Which of the following structures is directly responsible for the smooth passage of air into the lungs?",
+        "options": ["Trachea", "Diaphragm", "Alveoli", "Bronchi", "Pleura"],
+        "answer": "Bronchi",
+        "description": "The bronchi are the air passages that carry air to the lungs and further divide into smaller bronchioles, ensuring smooth airflow."
+    },
+    {
+        "text": "Which of the following is true about the neurovascular supply to the trachea?",
+        "options": ["It is primarily supplied by the vagus nerve and the sympathetic nervous system.", "The trachea is only innervated by the sympathetic nervous system.", "The vagus nerve exclusively provides motor innervation to the trachea.", "The trachea receives its blood supply from the pulmonary arteries.", "The trachea has no lymphatic drainage."],
+        "answer": "It is primarily supplied by the vagus nerve and the sympathetic nervous system.",
+        "description": "The trachea receives innervation from both the vagus nerve (parasympathetic) and sympathetic fibers, controlling airway constriction and dilation."
+    },
+    {
+        "text": "Which of the following lobes is present in the right lung but not in the left lung?",
+        "options": ["Inferior lobe", "Middle lobe", "Upper lobe", "Lingula", "Cardiac lobe"],
+        "answer": "Middle lobe",
+        "description": "The right lung contains a middle lobe, which is absent in the left lung. The left lung has a lingula instead."
+    },
+    {
+        "text": "What is the main function of the bronchopulmonary segments?",
+        "options": ["Oxygenating blood", "Preventing airflow blockage", "Allowing surgical resection of lung tissue", "Producing surfactant", "Transmitting nervous impulses to the lungs"],
+        "answer": "Allowing surgical resection of lung tissue",
+        "description": "Bronchopulmonary segments are functional units of the lungs, allowing for targeted surgical resection without damaging surrounding tissue."
+    },
+    {
+        "text": "In the context of lung diseases, what is the clinical importance of understanding the bronchopulmonary segments?",
+        "options": ["They are the primary locations for blood clot formation.", "They allow precise removal of infected or diseased lung tissue.", "They determine the size of lung volumes.", "They provide a site for gas exchange in the lungs.", "They influence the production of pulmonary surfactant."],
+        "answer": "They allow precise removal of infected or diseased lung tissue.",
+        "description": "The segmentation of the lung into bronchopulmonary segments allows for precise surgical resection of affected tissue in cases of localized disease like cancer or infections."
+    },
+    {
+        "text": "Which of the following statements is true about the pleura?",
+        "options": ["The pleura is a single layer of epithelial cells that surrounds the lungs.", "The pleura helps in lung expansion by producing serous fluid.", "The pleura is located within the trachea.", "The pleura only covers the lungs, not the chest wall.", "The pleura is made up of muscle tissue."],
+        "answer": "The pleura helps in lung expansion by producing serous fluid.",
+        "description": "The pleura is a double-layered membrane that surrounds the lungs and produces serous fluid to reduce friction during lung expansion and contraction."
+    },
+    {
+        "text": "Which of the following structures directly transports air from the trachea to the alveoli?",
+        "options": ["Bronchi", "Bronchioles", "Pulmonary arteries", "Alveolar sacs", "Lungs"],
+        "answer": "Bronchioles",
+        "description": "The bronchioles are the small air passages that branch off the bronchi and lead directly to the alveoli where gas exchange occurs."
+    },
+    {
+        "text": "Which of the following best describes the relationship between the trachea and the esophagus?",
+        "options": ["The trachea is posterior to the esophagus.", "The trachea is superior to the esophagus.", "The trachea is anterior to the esophagus.", "The trachea and esophagus are on opposite sides of the chest.", "The trachea and esophagus are not connected anatomically."],
+        "answer": "The trachea is anterior to the esophagus.",
+        "description": "The trachea is located anterior to the esophagus in the neck and thorax, allowing for clear differentiation between the air and food passageways."
+    },
+    {
+        "text": "The lung's blood supply is primarily derived from which of the following arteries?",
+        "options": ["Pulmonary arteries", "Coronary arteries", "Subclavian arteries", "Aorta", "Carotid arteries"],
+        "answer": "Pulmonary arteries",
+        "description": "The pulmonary arteries carry deoxygenated blood from the heart to the lungs for oxygenation."
+    },
+    {
+        "text": "In terms of anatomical relations, where is the left lung positioned relative to the heart?",
+        "options": ["The left lung is situated laterally to the heart.", "The left lung is posterior to the heart.", "The left lung is superior to the heart.", "The left lung is anterior to the heart.", "The left lung is inferior to the heart."],
+        "answer": "The left lung is situated laterally to the heart.",
+        "description": "The left lung is positioned laterally to the heart, with the cardiac notch allowing space for the heart on the left side."
+    },
+
+    {
+        "text": "Which type of epithelial tissue is primarily found in the lining of the trachea and bronchi?",
+        "options": ["Stratified squamous epithelium", "Simple squamous epithelium", "Ciliated pseudostratified columnar epithelium", "Transitional epithelium", "Simple cuboidal epithelium"],
+        "answer": "Ciliated pseudostratified columnar epithelium",
+        "description": "The trachea and bronchi are lined with ciliated pseudostratified columnar epithelium, which helps in trapping and moving particles out of the respiratory tract."
+    },
+    {
+        "text": "Which of the following is the primary function of the alveolar cells in the lungs?",
+        "options": ["Secreting mucus", "Absorbing oxygen", "Producing surfactant", "Filtering pathogens", "Regulating airflow"],
+        "answer": "Producing surfactant",
+        "description": "Alveolar cells, specifically type II pneumocytes, secrete surfactant, which reduces surface tension in the alveoli and prevents lung collapse."
+    },
+    {
+        "text": "Which of the following histological features distinguishes respiratory bronchioles from other airways?",
+        "options": ["Presence of cartilage", "Presence of smooth muscle", "Presence of ciliated epithelium", "Presence of alveoli", "Presence of mucus glands"],
+        "answer": "Presence of alveoli",
+        "description": "Respiratory bronchioles are distinguished by the presence of alveoli in their walls, marking the transition from conducting to respiratory zones of the lungs."
+    },
+    {
+        "text": "What is the primary histological difference between the alveolar ducts and alveolar sacs?",
+        "options": ["Alveolar ducts have fewer alveoli.", "Alveolar sacs have no alveolar walls.", "Alveolar sacs are located deeper in the lungs.", "Alveolar sacs consist of clusters of alveoli.", "Alveolar ducts have a simple cuboidal lining."],
+        "answer": "Alveolar sacs consist of clusters of alveoli.",
+        "description": "Alveolar sacs are clusters of alveoli at the end of the alveolar ducts and are involved in the primary gas exchange processes in the lungs."
+    },
+    {
+        "text": "Which of the following embryonic events is crucial for the formation of the respiratory system, specifically the development of the trachea and bronchial tree?",
+        "options": ["Formation of the intra-embryonic coelom", "Cephalo-caudal folding", "Formation of the mesoderm", "Transverse folding of the embryonic disc", "Development of the neural tube"],
+        "answer": "Transverse folding of the embryonic disc",
+        "description": "Transverse folding of the embryonic disc leads to the formation of the body cavities, which is essential for the development of the respiratory system, including the trachea and bronchial tree."
+    },
+    {
+        "text": "During the early development of the lungs, which embryonic structure is primarily responsible for the formation of the pleura?",
+        "options": ["Mesodermal layer surrounding the lungs", "Endodermal layer of the developing respiratory system", "Ectodermal cells of the respiratory epithelium", "Embryonic coelom", "Neural crest cells"],
+        "answer": "Mesodermal layer surrounding the lungs",
+        "description": "The pleura, the membrane surrounding the lungs, develops from the mesodermal layer that surrounds the developing respiratory structures."
+    },
+    {
+        "text": "Which of the following is true about the division of the intra-embryonic coelom after cephalo-caudal and transverse folding?",
+        "options": ["It divides into two cavities: the thoracic and abdominal cavities", "It forms the mesoderm and ectoderm", "It becomes the single pleural cavity", "It develops into the central nervous system", "It forms the neural tube and the respiratory system"],
+        "answer": "It divides into two cavities: the thoracic and abdominal cavities",
+        "description": "After the cephalo-caudal and transverse folding, the intra-embryonic coelom divides into the thoracic and abdominal cavities, setting the stage for the formation of the pleural cavities and the abdominal organs."
+    },
+    {
+        "text": "Which of the following pressures is primarily responsible for driving air into the lungs during inspiration?",
+        "options": ["Alveolar pressure", "Pleural pressure", "Trans-pulmonary pressure", "Atmospheric pressure", "Intrapulmonary pressure"],
+        "answer": "Alveolar pressure",
+        "description": "The decrease in alveolar pressure during inspiration, which is lower than atmospheric pressure, drives air into the lungs."
+    },
+    {
+        "text": "Which factor most directly influences lung compliance?",
+        "options": ["Airway resistance", "Alveolar surface tension", "Pleural pressure", "Elastic recoil of the lungs", "Ventilation rate"],
+        "answer": "Elastic recoil of the lungs",
+        "description": "Lung compliance refers to the ability of the lungs to stretch and expand, which is primarily influenced by the lung tissue's elastic recoil."
+    },
+    {
+        "text": "In which of the following conditions is lung compliance increased?",
+        "options": ["Pulmonary fibrosis", "Emphysema", "Asthma", "Acute respiratory distress syndrome", "Interstitial lung disease"],
+        "answer": "Emphysema",
+        "description": "In emphysema, the destruction of alveolar walls leads to decreased elastic recoil and increased lung compliance."
+    },
+    {
+        "text": "Which pressure is responsible for keeping the lungs inflated and preventing their collapse?",
+        "options": ["Alveolar pressure", "Intrapleural pressure", "Trans-pulmonary pressure", "Atmospheric pressure", "Chest wall pressure"],
+        "answer": "Trans-pulmonary pressure",
+        "description": "Trans-pulmonary pressure is the difference between alveolar pressure and intrapleural pressure, which helps keep the lungs inflated."
+    },
+    {
+        "text": "During normal breathing, when does alveolar pressure become equal to atmospheric pressure?",
+        "options": ["During inspiration", "During expiration", "At the end of inspiration", "At the end of expiration", "During forced exhalation"],
+        "answer": "At the end of expiration",
+        "description": "At the end of expiration, alveolar pressure is equal to atmospheric pressure before the next cycle of inspiration begins."
+    },
+    {
+        "text": "In a pressure-volume curve, which phase is associated with lung inflation?",
+        "options": ["Deflation limb", "Exhalation limb", "Inhalation limb", "Residual volume", "Total lung capacity"],
+        "answer": "Inhalation limb",
+        "description": "The inhalation limb of the pressure-volume curve represents the inflation of the lungs, where the volume increases as pressure is applied."
+    },
+    {
+        "text": "What causes hysteresis in the pressure-volume (compliance) curve?",
+        "options": ["Increased lung tissue elasticity", "Surfactant production", "Alveolar surface tension", "Increased lung volume", "Intrapleural pressure fluctuations"],
+        "answer": "Alveolar surface tension",
+        "description": "Hysteresis in the pressure-volume curve is caused by the presence of alveolar surface tension, which requires more pressure to inflate the lungs than to deflate them."
+    },
+    {
+        "text": "During quiet breathing, which pressure is always negative relative to atmospheric pressure?",
+        "options": ["Alveolar pressure", "Intrapleural pressure", "Trans-pulmonary pressure", "Atmospheric pressure", "Chest wall pressure"],
+        "answer": "Intrapleural pressure",
+        "description": "Intrapleural pressure is always negative relative to atmospheric pressure during normal breathing to help keep the lungs inflated."
+    },
+    {
+        "text": "Which of the following lung volumes is most directly related to the measurement of lung compliance?",
+        "options": ["Tidal volume", "Inspiratory reserve volume", "Expiratory reserve volume", "Residual volume", "Total lung capacity"],
+        "answer": "Tidal volume",
+        "description": "Tidal volume represents the volume of air inhaled and exhaled with each breath, which is influenced by lung compliance."
+    },
+    {
+        "text": "Which of the following best describes a situation where lung compliance is abnormally low?",
+        "options": ["Chronic obstructive pulmonary disease (COPD)", "Asthma", "Pulmonary fibrosis", "Emphysema", "Acute respiratory distress syndrome"],
+        "answer": "Pulmonary fibrosis",
+        "description": "Pulmonary fibrosis leads to stiffening of the lungs, causing reduced lung compliance."
+    },
+    {
+        "text": "What is the effect of decreased lung compliance on the work of breathing?",
+        "options": ["Increases work of breathing", "Decreases work of breathing", "No change in work of breathing", "Increases airway resistance", "Increases alveolar ventilation"],
+        "answer": "Increases work of breathing",
+        "description": "Decreased lung compliance means the lungs are stiffer, requiring more effort to expand during inspiration, thus increasing the work of breathing."
+    },
+    {
+        "text": "Which of the following pressures represents the difference between intrapleural pressure and alveolar pressure?",
+        "options": ["Alveolar pressure", "Trans-pulmonary pressure", "Intrapulmonary pressure", "Atmospheric pressure", "Pulmonary artery pressure"],
+        "answer": "Trans-pulmonary pressure",
+        "description": "Trans-pulmonary pressure is the difference between intrapleural pressure and alveolar pressure, playing a crucial role in lung expansion."
+    },
+    {
+        "text": "What is the significance of the chest wall pressure in the respiratory system?",
+        "options": ["It prevents lung collapse", "It controls the rate of air flow into the lungs", "It balances the lung's elastic recoil", "It regulates gas exchange", "It maintains airway resistance"],
+        "answer": "It balances the lung's elastic recoil",
+        "description": "Chest wall pressure opposes lung recoil and helps balance the elastic forces between the lungs and the chest wall, stabilizing lung volume."
+    },
+    {
+        "text": "Which of the following occurs during expiration in a normal respiratory cycle?",
+        "options": ["Increased lung volume", "Negative alveolar pressure", "Positive alveolar pressure", "Decreased pleural pressure", "Decreased trans-pulmonary pressure"],
+        "answer": "Positive alveolar pressure",
+        "description": "During expiration, the lung volume decreases, causing alveolar pressure to rise above atmospheric pressure, forcing air out of the lungs."
+    },
+    {
+        "text": "Which of the following factors will result in decreased lung compliance?",
+        "options": ["Decreased alveolar surface tension", "Pulmonary edema", "Surfactant production", "Increase in chest wall compliance", "Increase in lung elasticity"],
+        "answer": "Pulmonary edema",
+        "description": "Pulmonary edema causes fluid accumulation in the lungs, which increases surface tension and reduces lung compliance."
+    },
+    {
+        "text": "In a healthy individual, what is the most significant force responsible for lung recoil during expiration?",
+        "options": ["Elastic recoil of the lungs", "Chest wall expansion", "Increased pleural pressure", "Increased alveolar pressure", "Airway resistance"],
+        "answer": "Elastic recoil of the lungs",
+        "description": "Elastic recoil of the lungs is the primary force responsible for passive expiration, helping expel air from the lungs."
+    },
+    {
+        "text": "Which of the following is the best indicator of lung compliance on a pressure-volume curve?",
+        "options": ["Steepness of the inflation limb", "Steepness of the deflation limb", "The volume at total lung capacity", "Area under the curve", "The pressure at residual volume"],
+        "answer": "Steepness of the inflation limb",
+        "description": "The steepness of the inflation limb in the pressure-volume curve indicates the lung's ability to expand, which is directly related to lung compliance."
+    },
+    {
+        "text": "In which condition is there a marked increase in lung compliance, making the lungs excessively elastic?",
+        "options": ["Pulmonary fibrosis", "Asthma", "Emphysema", "Chronic bronchitis", "Acute lung injury"],
+        "answer": "Emphysema",
+        "description": "Emphysema causes destruction of alveolar walls, leading to increased lung compliance but reduced ability for efficient gas exchange."
+    },
+    {
+        "text": "The hysteresis observed in the lung compliance curve can be explained by which of the following?",
+        "options": ["Surfactant function", "Alveolar volume", "Airway resistance", "Elastic recoil", "Alveolar surface tension"],
+        "answer": "Alveolar surface tension",
+        "description": "Hysteresis is caused by the difference in the pressure needed to inflate and deflate the lungs, which is due to the effect of alveolar surface tension."
+    },
+    {
+        "text": "What is the primary effect of increased pleural pressure during inspiration?",
+        "options": ["Increases alveolar pressure", "Decreases lung volume", "Reduces airway resistance", "Increases lung expansion", "Decreases compliance"],
+        "answer": "Increases lung expansion",
+        "description": "Increased pleural pressure during inspiration contributes to the expansion of the lungs by creating a negative pressure gradient between the pleural space and the alveoli."
+    },
+    {
+        "text": "Which of the following best defines activation energy in enzyme-catalyzed reactions?",
+        "options": ["Energy required to break the enzyme-substrate bond", "Energy required to start the reaction", "Energy released during the reaction", "Energy required to form enzyme-product complex", "Energy required to change the enzyme structure"],
+        "answer": "Energy required to start the reaction",
+        "description": "Activation energy is the minimum energy required to start a chemical reaction, and enzymes lower this energy barrier to accelerate the reaction."
+    },
+    {
+        "text": "Which factor is most likely to affect the Km value of an enzyme?",
+        "options": ["Substrate concentration", "Enzyme concentration", "Temperature", "pH", "Enzyme inhibitors"],
+        "answer": "Enzyme inhibitors",
+        "description": "Km (Michaelis constant) is influenced by the affinity of the enzyme for its substrate, which can be altered by the presence of inhibitors, whether competitive or non-competitive."
+    },
+    {
+        "text": "Which of the following statements about co-factors is true?",
+        "options": ["Co-factors are permanently bound to enzymes", "Co-factors increase enzyme specificity", "Co-factors are inorganic ions or organic molecules", "Co-factors are not essential for enzyme activity", "Co-factors inhibit enzyme activity"],
+        "answer": "Co-factors are inorganic ions or organic molecules",
+        "description": "Co-factors are non-protein components, either inorganic (e.g., metal ions) or organic (e.g., vitamins), that are required for the proper function of enzymes."
+    },
+    {
+        "text": "Which of the following best describes the mechanism of enzyme catalysis?",
+        "options": ["Enzymes decrease the equilibrium constant of a reaction", "Enzymes lower the activation energy of a reaction", "Enzymes increase the concentration of products", "Enzymes alter the final free energy change", "Enzymes increase the substrate concentration"],
+        "answer": "Enzymes lower the activation energy of a reaction",
+        "description": "Enzymes function by lowering the activation energy required for a reaction to occur, thus increasing the rate of reaction without altering the equilibrium or final free energy change."
+    },
+    {
+        "text": "Which of the following factors would most likely increase the rate of an enzyme-catalyzed reaction?",
+        "options": ["Decreasing substrate concentration", "Increasing enzyme concentration", "Decreasing temperature", "Increasing pH beyond optimal range", "Increasing the activation energy of the reaction"],
+        "answer": "Increasing enzyme concentration",
+        "description": "Increasing enzyme concentration increases the number of active sites available for substrate binding, thus increasing the rate of the enzyme-catalyzed reaction."
+    },
+    {
+        "text": "Which of the following is an example of an isoenzyme (isozyme)?",
+        "options": ["Lactate dehydrogenase (LDH) in different tissues", "Amylase in the saliva", "Hexokinase in muscle", "Aldolase in glycolysis", "ATP synthase in mitochondria"],
+        "answer": "Lactate dehydrogenase (LDH) in different tissues",
+        "description": "Isoenzymes (isozymes) are different forms of an enzyme that catalyze the same reaction but are present in different tissues or have slightly different structures, such as lactate dehydrogenase in the heart and liver."
+    },
+    {
+        "text": "What is the primary function of co-factors in enzyme catalysis?",
+        "options": ["To increase the temperature of the reaction", "To provide energy to the enzyme", "To assist in the enzyme-substrate binding and reaction mechanism", "To alter the enzyme's shape permanently", "To act as substrates in the reaction"],
+        "answer": "To assist in the enzyme-substrate binding and reaction mechanism",
+        "description": "Co-factors assist enzymes by facilitating the binding of substrates or by participating in the reaction mechanism, often by stabilizing transition states or providing necessary chemical groups."
+    },
+    {
+        "text": "In enzyme kinetics, what does the Michaelis constant (Km) represent?",
+        "options": ["The maximum velocity of the reaction", "The enzyme's affinity for the substrate", "The rate-limiting step of the reaction", "The enzyme concentration at half-maximal velocity", "The rate of product formation at maximum substrate concentration"],
+        "answer": "The enzyme's affinity for the substrate",
+        "description": "The Michaelis constant (Km) represents the substrate concentration at which the reaction rate is half of its maximum value. A lower Km indicates higher affinity of the enzyme for the substrate."
+    },
+    {
+        "text": "Which of the following is the primary mechanism of action of beta-agonists in the treatment of asthma?",
+        "options": ["Decrease airway inflammation", "Increase bronchoconstriction", "Relax smooth muscles in the airways", "Inhibit mucous secretion", "Increase the frequency of breathing"],
+        "answer": "Relax smooth muscles in the airways",
+        "description": "Beta-agonists, such as albuterol, work by relaxing the smooth muscles in the airways, leading to bronchodilation and easing the symptoms of asthma."
+    },
+    {
+        "text": "Which of the following drug classes is commonly used as a first-line treatment for pulmonary tuberculosis?",
+        "options": ["Macrolides", "Penicillins", "Isoniazid, Rifampin, Pyrazinamide, and Ethambutol", "Fluoroquinolones", "Corticosteroids"],
+        "answer": "Isoniazid, Rifampin, Pyrazinamide, and Ethambutol",
+        "description": "The first-line treatment for pulmonary tuberculosis consists of a combination of Isoniazid, Rifampin, Pyrazinamide, and Ethambutol, which work synergistically to eradicate the Mycobacterium tuberculosis."
+    },
+    {
+        "text": "A patient with asthma presents with frequent episodes of wheezing, cough, and shortness of breath. Which of the following is most likely to be a key characteristic in the pathogenesis of asthma?",
+        "options": ["Increased surfactant production", "Airway inflammation and bronchoconstriction", "Pulmonary fibrosis and alveolar damage", "Decreased pulmonary blood flow", "Increased lung compliance"],
+        "answer": "Airway inflammation and bronchoconstriction",
+        "description": "The pathogenesis of asthma is primarily characterized by airway inflammation, bronchoconstriction, and increased mucous production, which lead to the symptoms of wheezing and difficulty breathing."
+    },
+    {
+        "text": "Which of the following pathogens is most commonly associated with community-acquired pneumonia?",
+        "options": ["Pneumocystis jirovecii", "Streptococcus pneumoniae", "Mycobacterium tuberculosis", "Legionella pneumophila", "Staphylococcus aureus"],
+        "answer": "Streptococcus pneumoniae",
+        "description": "Streptococcus pneumoniae is the most common pathogen responsible for community-acquired pneumonia, often causing symptoms such as fever, cough, and difficulty breathing."
+    },
+    {
+        "text": "In the context of pulmonary edema, which of the following is a common cause of non-cardiogenic pulmonary edema?",
+        "options": ["Congestive heart failure", "Acute respiratory distress syndrome (ARDS)", "Chronic kidney disease", "Lung cancer", "Asthma"],
+        "answer": "Acute respiratory distress syndrome (ARDS)",
+        "description": "Non-cardiogenic pulmonary edema is often caused by acute respiratory distress syndrome (ARDS), where fluid leaks into the lungs due to injury to the alveolar-capillary membrane."
+    },
+    {
+        "text": "Which of the following is a preventive strategy to reduce the risk of respiratory diseases related to smoking?",
+        "options": ["Increasing caffeine intake", "Implementing smoking cessation programs", "Using corticosteroids", "Encouraging more physical exercise", "Using bronchodilators regularly"],
+        "answer": "Implementing smoking cessation programs",
+        "description": "The most effective preventive strategy for reducing the risk of respiratory diseases related to smoking is the implementation of smoking cessation programs that help individuals quit smoking."
+    },
+    {
+        "text": "A patient is diagnosed with primary tuberculosis. Which of the following is the most likely cause of this condition?",
+        "options": ["Acute viral infection", "Inhalation of Mycobacterium tuberculosis", "A genetic mutation in lung tissue", "Exposure to pneumocystis fungi", "Overuse of antibiotics"],
+        "answer": "Inhalation of Mycobacterium tuberculosis",
+        "description": "Primary tuberculosis is most commonly caused by inhalation of the bacteria Mycobacterium tuberculosis, which primarily affects the lungs and can spread to other parts of the body if untreated."
+    },
+    {
+        "text": "Which of the following best describes the process of external respiration?",
+        "options": ["Gas exchange between the alveoli and blood", "Gas exchange between the cells and blood", "Movement of oxygen from the atmosphere into the lungs", "Utilization of oxygen by cells", "Transportation of gases in the blood"],
+        "answer": "Gas exchange between the alveoli and blood",
+        "description": "External respiration refers to the exchange of gases (oxygen and carbon dioxide) between the alveoli in the lungs and the blood in the capillaries."
+    },
+    {
+        "text": "Which of the following is a primary function of Type II alveolar cells?",
+        "options": ["Gas exchange", "Phagocytosis of pathogens", "Production of surfactant", "Transport of gases", "Formation of the blood-air barrier"],
+        "answer": "Production of surfactant",
+        "description": "Type II alveolar cells are responsible for the production of surfactant, which reduces surface tension in the alveoli and prevents their collapse during exhalation."
+    },
+    {
+        "text": "What term is used to describe the total volume of air entering and leaving the lungs per minute?",
+        "options": ["Alveolar minute ventilation", "Total minute ventilation", "Tidal volume", "Residual volume", "Expiratory reserve volume"],
+        "answer": "Total minute ventilation",
+        "description": "Total minute ventilation refers to the total volume of air that enters and leaves the lungs each minute, calculated as tidal volume multiplied by the respiratory rate."
+    },
+    {
+        "text": "Which of the following forces is responsible for promoting alveolar collapse?",
+        "options": ["Surface tension of the alveolar fluid", "Elastic recoil of lung tissue", "Surfactant production", "Increased lung compliance", "Positive intrapleural pressure"],
+        "answer": "Surface tension of the alveolar fluid",
+        "description": "Surface tension of the fluid lining the alveoli promotes alveolar collapse. Surfactant helps reduce this surface tension and prevents collapse."
+    },
+    {
+        "text": "Which term describes the volume of air in the respiratory tract that does not participate in gas exchange?",
+        "options": ["Alveolar dead space", "Anatomic dead space", "Physiologic dead space", "Residual volume", "Tidal volume"],
+        "answer": "Anatomic dead space",
+        "description": "Anatomic dead space refers to the parts of the respiratory system, such as the trachea and bronchi, where air does not participate in gas exchange."
+    },
+    {
+        "text": "Which of the following describes the primary difference between anatomic dead space and physiologic dead space?",
+        "options": ["Anatomic dead space is where no gas exchange occurs, whereas physiologic dead space includes areas where gas exchange is impaired.", "Anatomic dead space is located in the lungs, while physiologic dead space is in the airways.", "Anatomic dead space increases with age, while physiologic dead space decreases.", "Anatomic dead space involves oxygenated air, whereas physiologic dead space involves deoxygenated air.", "There is no difference between the two."],
+        "answer": "Anatomic dead space is where no gas exchange occurs, whereas physiologic dead space includes areas where gas exchange is impaired.",
+        "description": "Anatomic dead space includes airways where no gas exchange occurs. Physiologic dead space includes areas where gas exchange should occur, but is impaired due to factors like alveolar damage."
+    },
+    {
+        "text": "What condition is characterized by an increase in the rate and depth of breathing, resulting in excessive loss of CO2?",
+        "options": ["Hyperventilation", "Hypoventilation", "Eupnea", "Apnea", "Hyperpnea"],
+        "answer": "Hyperventilation",
+        "description": "Hyperventilation is characterized by rapid and deep breathing, leading to excessive loss of CO2 from the body, often causing respiratory alkalosis."
+    },
+    {
+        "text": "Which of the following is a key function of alveolar macrophages?",
+        "options": ["Production of surfactant", "Gas exchange", "Phagocytosis of foreign particles", "Transport of oxygen", "Synthesis of respiratory enzymes"],
+        "answer": "Phagocytosis of foreign particles",
+        "description": "Alveolar macrophages are responsible for engulfing and removing pathogens, dust, and other foreign particles from the lungs."
+    },
+    {
+        "text": "In which of the following scenarios is lung compliance most likely to be decreased?",
+        "options": ["Pulmonary fibrosis", "Chronic obstructive pulmonary disease (COPD)", "Asthma exacerbation", "Healthy individuals", "Pulmonary edema"],
+        "answer": "Pulmonary fibrosis",
+        "description": "Lung compliance is decreased in pulmonary fibrosis due to the thickening and scarring of lung tissue, which makes it harder for the lungs to expand during inhalation."
+    },
+    {
+        "text": "What is the main physiological effect of surfactant in the lungs?",
+        "options": ["Increase lung compliance", "Decrease surface tension", "Prevent alveolar collapse", "Enhance gas exchange", "Increase dead space"],
+        "answer": "Decrease surface tension",
+        "description": "Surfactant decreases surface tension in the alveoli, preventing their collapse and improving lung compliance, making breathing easier."
+    }
+
+
+
+
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+const userAnswers = [];
+const skippedQuestions = [];
+let timerInterval;
+const timePerQuestion = 66; // 1.1 minutes in seconds
+let totalQuizTime; // Total time for the quiz
+let timeRemaining; // Time left in the quiz
+
+// Progress Bar Functions
+let progressBarContainer;
+
+function createProgressBar(numQuestions) {
+    // Create a rectangular container with fixed height and scroll functionality
+    progressBarContainer = document.createElement("div");
+    progressBarContainer.id = "progress-bar-container";
+    progressBarContainer.style.textAlign = "center";
+    progressBarContainer.style.marginBottom = "20px";
+    progressBarContainer.style.height = "60px";  // Fixed height for the container
+    progressBarContainer.style.overflowX = "auto";  // Enable horizontal scrolling
+    progressBarContainer.style.whiteSpace = "nowrap";  // Ensure the boxes stay on the same line
+    progressBarContainer.style.border = "1px solid #e0e0e0";  // Rectangular border
+    progressBarContainer.style.borderRadius = "11px";  // Optional rounded corners
+    document.querySelector('.question-container').prepend(progressBarContainer);
+
+    for (let i = 0; i < numQuestions; i++) {
+        const square = document.createElement("div");
+        square.textContent = i + 1;
+        square.style.display = "inline-block";
+        square.style.width = "30px";
+        square.style.height = "30px";
+        square.style.lineHeight = "30px";
+        square.style.textAlign = "center";
+        square.style.margin = "5px";
+        square.style.border = "1px solid black";
+        square.style.borderRadius = "5px";
+        square.style.backgroundColor = "white";
+        square.dataset.index = i;
+        progressBarContainer.appendChild(square);
+    }
+}
+
+function updateProgressBar(index, status) {
+    const square = progressBarContainer.children[index];
+    if (status === "answered") {
+        square.style.backgroundColor = "green";
+        square.style.color = "white";
+    } else if (status === "skipped") {
+        square.style.backgroundColor = "yellow";
+        square.style.color = "black";
+    }
+}
+
+function removeProgressBar() {
+    if (progressBarContainer) {
+        progressBarContainer.remove();
+    }
+}
+
+// Quiz Logic
+function validateLogin() {
+    const name = document.getElementById("user-name").value;
+    const gmail = document.getElementById("user-gmail").value;
+    const userId = document.getElementById("user-id").value;
+
+    const user = allowedUsers.find(user => user.name === name && user.gmail === gmail && user.username === userId);
+    if (user) {
+        document.querySelector('.login-container').style.display = "none";
+        document.querySelector('.question-container').style.display = "block";
+        startQuiz();
+    } else {
+        alert("Invalid login credentials. Please try again.");
+    }
+}
+
+function startQuiz() {
+    createProgressBar(questions.length);
+    totalQuizTime = timePerQuestion * questions.length;
+    timeRemaining = totalQuizTime;
+
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.question-container').style.display = "block";
+    startTimer();
+    showQuestion();
+}
+
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        updateTimerDisplay();
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            endQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const timerElement = document.getElementById("timer");
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    timerElement.textContent = `Time Left: ${minutes}m ${seconds}s`;
+}
+// This function hides the timer when the last question is reached
+function handleTimerVisibility() {
+    if (currentQuestion === questions.length - 1) {
+        clearInterval(timerInterval); // Stop the timer on the last question
+        document.getElementById("timer").style.display = "none";  // Hide the timer after the last question
+    }
+}
+// Call this function when moving to the next question
+function nextQuestion() {
+    // Your existing logic for the next question
+
+    // Check timer visibility when changing questions
+    handleTimerVisibility();
+}
+
+// End quiz and hide timer
+function endQuiz() {
+    // Your existing endQuiz logic goes here
+    clearInterval(timerInterval); // Ensure timer is stopped when quiz ends
+    document.getElementById("timer").style.display = "none";  // Hide timer after quiz ends
+}
+function nextQuestion() {
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    if (selectedOption) {
+        const userAnswer = selectedOption.value;
+        userAnswers[currentQuestion] = userAnswer;
+        if (userAnswer === questions[currentQuestion].answer) {
+            score++;
+        }
+        updateProgressBar(currentQuestion, "answered");
+        questions[currentQuestion].answered = true;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            showQuestion();
+        } else {
+            handleSkippedQuestions();
+        }
+    } else {
+        alert("Please select an answer or skip the question.");
+    }
+}
+
+function skipQuestion() {
+    if (!skippedQuestions.includes(currentQuestion)) {
+        skippedQuestions.push(currentQuestion);
+    }
+    updateProgressBar(currentQuestion, "skipped");
+    currentQuestion++;
+    if (currentQuestion < questions.length) {
+        showQuestion();
+    } else {
+        handleSkippedQuestions();
+    }
+}
+
+function showQuestion() {
+    if (currentQuestion >= questions.length) {
+        removeProgressBar();
+        endQuiz();
+        return;
+    }
+
+    const question = questions[currentQuestion];
+    if (question.answered) {
+        handleSkippedQuestions();
+        return;
+    }
+
+    document.querySelector('.question-container').style.display = "block";
+    document.getElementById("question").textContent = question.text;
+
+    let optionsHTML = '';
+    question.options.forEach(option => {
+        optionsHTML += `<label><input type="radio" name="answer" value="${option}"> ${option}</label><br>`;
+    });
+
+    document.getElementById("options").innerHTML = optionsHTML;
+    updateButtons();
+}
+
+function handleSkippedQuestions() {
+    if (skippedQuestions.length > 0) {
+        currentQuestion = skippedQuestions.shift();
+        showQuestion();
+    } else {
+        endQuiz();
+    }
+}
+
+function updateButtons() {
+    const nextButton = document.getElementById("next-button");
+    if (skippedQuestions.length > 0) {
+        nextButton.textContent = currentQuestion === questions.length - 1 && skippedQuestions.length === 1 ? "Finish" : "Next";
+    } else {
+        nextButton.textContent = currentQuestion === questions.length - 1 ? "Finish" : "Next";
+    }
+}
+function endQuiz() {
+    document.querySelector('.question-container').style.display = "none";
+    document.querySelector('.result-container').style.display = "block";
+    document.getElementById("score").textContent = score;
+
+    const answerKey = document.getElementById("answer-key");
+    answerKey.innerHTML = '';
+    questions.forEach((question, index) => {
+        const userAnswer = userAnswers[index];
+        const resultItem = document.createElement("li");
+        resultItem.innerHTML = `
+            <div class="question">${question.text}</div>
+            <div class="options">
+                ${question.options.map(option => {
+                    let optionText = option;
+                    if (userAnswer === option) {
+                        // If the answer is incorrect, color "Your answer" red
+                        if (userAnswer !== question.answer) {
+                            optionText += " <span style='color: red;'>(Your answer)</span>";
+                        } else {
+                            optionText += " <span style='color: green;'>(Correct)</span>";
+                        }
+                    }
+                    if (option === question.answer && userAnswer !== option) {
+                        // For correct option (when the user didn't choose it), mark it as green
+                        optionText += " <span style='color: green;'>(Correct)</span>";
+                    }
+                    return `<div>${optionText}</div>`;
+                }).join('')}
+            </div>
+            <hr style="border: 1px solid #ccc; margin: 10px 0;">  <!-- Horizontal Line -->
+            <div class="description"><strong>Explanation:</strong> ${question.description}</div>
+        `;
+        answerKey.appendChild(resultItem);
+    });
+}
+
+function showLogin() {
+    document.querySelector('.start-container').style.display = "none";
+    document.querySelector('.login-container').style.display = "block";
+}
+
+
+</script>
+</body>
+</html>

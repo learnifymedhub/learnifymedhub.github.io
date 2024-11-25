@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Proff</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            color: white;
+            border-radius: 14px;
+        }
+
+        #allthings {
+            border: 2px solid white;
+            width: 950px;
+            display: flex;
+            background-color: white;
+            margin: 33px auto;
+            flex-wrap: wrap; /* Ensures items wrap on smaller screens */
+        }
+
+        .item {
+            border: 2px solid #e0e0e0;
+            padding: 26px 32px;
+            margin: 25px 7px;
+            background-color: #fffbfb;
+            flex: 1 1 45%; /* Flex-grow, flex-shrink, flex-basis */
+            min-width: 300px; /* Ensures minimum width */
+        }
+
+        p,
+        h1 {
+            text-align: center;
+        }
+
+        h2,
+        h1 {
+            color: black;
+            text-align: center;
+            font-size: 40px;
+        }
+
+        .blocka,
+        .blockb,
+        .blockc {
+            display: block;
+            padding: 10px 25px;
+            margin: 10px auto;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        a {
+            display: inline-block;
+            background-color: #c25ee0;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 15px;
+            text-align: center;
+            text-decoration: none;
+            padding: 10px 20px;
+        }
+
+        a:hover {
+            background-color: #bb81e2;
+        }
+
+        .container {
+            border: 1px solid white;
+            margin: 2px 72px;
+        }
+
+        .back {
+            float: left;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            #allthings {
+                width: 100%; /* Full width for smaller screens */
+                margin: 20px auto;
+            }
+
+            .container {
+                margin: 10px;
+            }
+
+            h2,
+            h1 {
+                font-size: 32px; /* Smaller font size for headings */
+            }
+
+            .item {
+                margin: 15px 5px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #allthings {
+                flex-direction: column; /* Stacks items vertically */
+                width: 100%;
+            }
+
+            .container {
+                margin: 10px;
+            }
+
+            .item {
+                width: 90%;
+                margin: 15px auto; /* Center align items */
+            }
+
+            h2,
+            h1 {
+                font-size: 28px; /* Adjust font size further */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a class="back" href="index.html">Back</a>
+        </header>
+        <br><br> <br>
+        <div class="head-one">
+            <h2>Pre-Proff Practice Tests</h2>
+        </div>
+
+        <div id="allthings">
+            <div id="fswe" class="item">
+                <h1>Previous Pre-Proff</h1>
+                <p><a class="blocka" href="blocka.html">Block A</a></p>
+                <p><a class="blockb" href="blockb.html">Block B</a></p>
+                <p><a class="blockc" href="blockc.html">Block C</a></p>
+            </div>
+            <div id="pcsp" class="item">
+                <h1>New Pre-Proff</h1>
+                <p><a class="blocka" href="blockanew.html">Block A</a></p>
+                <p><a class="blockb" href="blockbnew.html">Block B</a></p>
+                <p><a class="blockc" href="blockcnew.html">Block C</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
